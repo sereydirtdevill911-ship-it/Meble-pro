@@ -1,0 +1,4212 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Konfigurator PRO – R3.2.0</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root{
+  --bg:#eeeef0;
+  --surface:#ffffff;
+  --surface2:#f5f5f7;
+  --surface3:#ebebed;
+  --border:rgba(0,0,0,.09);
+  --border2:rgba(0,0,0,.14);
+  --accent:#a07830;
+  --accent2:#c49a3c;
+  --accent3:#1a7a58;
+  --danger:#c0392b;
+  --success:#1a9260;
+  --info:#2775c0;
+  --text:#1a1a1f;
+  --text2:#5a5a6a;
+  --muted:#9090a0;
+  --radius:6px;
+  --radius2:10px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;}
+
+body{
+  font-family:'Barlow Condensed',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  padding:0 0 40px;
+  background-image: none;
+}
+
+.container{ max-width:860px; margin:auto; }
+
+/* ── HEADER ── */
+/* ── TOPBAR ── */
+.topbar{
+  background:#8b6420;
+  padding:0 20px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+  height:52px;
+  margin-bottom:0;
+}
+.topbar-logo{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:1.4rem;
+  font-weight:800;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.topbar-logo-box{
+  width:34px; height:34px;
+  background:rgba(255,255,255,.15);
+  border:2px solid rgba(255,255,255,.4);
+  display:flex; align-items:center; justify-content:center;
+  font-size:1rem; font-weight:800; color:#fff;
+  border-radius:4px;
+}
+.topbar-divider{
+  width:1px; height:28px;
+  background:rgba(255,255,255,.25);
+  margin:0 4px;
+}
+.topbar-badge{
+  font-family:'JetBrains Mono',monospace;
+  font-size:.6rem;
+  background:rgba(255,255,255,.18);
+  color:rgba(255,255,255,.85);
+  padding:3px 8px;
+  border-radius:3px;
+  letter-spacing:.1em;
+  font-weight:700;
+  border:1px solid rgba(255,255,255,.25);
+}
+
+/* breadcrumb */
+.breadcrumb{
+  background:var(--surface);
+  border-bottom:1px solid var(--border);
+  padding:8px 20px;
+  font-size:.75rem;
+  color:var(--muted);
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.03em;
+}
+.breadcrumb span{color:var(--accent);cursor:pointer;}
+.breadcrumb span:hover{text-decoration:underline;}
+
+/* legacy h1 hide */
+h1.legacy-hide{ display:none; }
+
+h1 span.badge{display:none;}
+
+/* ── MAIN TABS ── */
+.main-tabs{
+  display:flex;
+  gap:0;
+  margin-bottom:0;
+  background:var(--surface);
+  border-bottom:2px solid var(--border);
+  padding:0 12px;
+}
+.main-tab-btn{
+  flex:none;
+  padding:13px 20px;
+  border-radius:0;
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;
+  font-size:.88rem;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  cursor:pointer;
+  border:none;
+  border-bottom:3px solid transparent;
+  background:transparent;
+  color:var(--muted);
+  transition:all .18s;
+  margin-bottom:-2px;
+}
+.main-tab-btn.active{
+  color:var(--accent);
+  border-bottom-color:var(--accent);
+  background:transparent;
+  box-shadow:none;
+}
+.main-tab-btn:hover:not(.active){
+  color:var(--text2);
+}
+
+/* ── GRID ── */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:12px;
+}
+.grid2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+@media(max-width:600px){
+  .grid,.grid2{grid-template-columns:1fr;}
+}
+
+/* ── CARD ── */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius2);
+  padding:16px 18px;
+  position:relative;
+  box-shadow:0 1px 4px rgba(0,0,0,.06);
+}
+.card::before{
+  content:none;
+}
+
+.card h3{
+  font-size:.68rem;
+  text-transform:uppercase;
+  letter-spacing:.14em;
+  color:var(--muted);
+  margin-bottom:12px;
+  font-family:'JetBrains Mono',monospace;
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+.card h3::before{
+  content:'';
+  display:inline-block;
+  width:12px; height:2px;
+  background:var(--accent);
+  border-radius:2px;
+}
+
+/* ── LABELS ── */
+label{
+  display:block;
+  font-size:.69rem;
+  color:var(--muted);
+  margin-bottom:4px;
+  margin-top:11px;
+  letter-spacing:.07em;
+  text-transform:uppercase;
+  font-family:'JetBrains Mono',monospace;
+  font-weight:500;
+}
+label:first-of-type{margin-top:0;}
+
+/* ── INPUTS ── */
+select,input[type=number]{
+  width:100%;
+  padding:9px 12px;
+  background:var(--surface2);
+  border:1px solid rgba(0,0,0,.12);
+  border-radius:var(--radius);
+  color:var(--text);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.85rem;
+  outline:none;
+  transition:border-color .18s, box-shadow .18s;
+  -webkit-appearance:none;
+}
+select{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239090a0'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  padding-right:28px;
+  cursor:pointer;
+}
+select:focus,input[type=number]:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(160,120,48,.12);
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button{opacity:.4;}
+
+/* ── BUTTONS ── */
+.buttons{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:8px;
+  margin-top:14px;
+}
+
+button{
+  padding:10px 12px;
+  border:none;
+  border-radius:var(--radius);
+  font-family:'Barlow Condensed',sans-serif;
+  font-weight:700;
+  font-size:.88rem;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:filter .15s, transform .1s, box-shadow .15s;
+}
+button:hover{filter:brightness(1.12);}
+button:active{transform:scale(.97);}
+
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+  grid-column:1/-1;
+  font-size:1rem;
+  padding:13px;
+  letter-spacing:.1em;
+  box-shadow:0 2px 8px rgba(160,120,48,.25);
+}
+.btn-primary:hover{box-shadow:0 4px 16px rgba(160,120,48,.35);}
+.btn-secondary{
+  background:var(--surface2);
+  color:var(--text2);
+  border:1px solid var(--border2);
+}
+.btn-success{
+  background:var(--success);
+  color:#fff;
+}
+.btn-danger{
+  background:var(--danger);
+  color:#fff;
+}
+.btn-view-active{
+  background:var(--accent)!important;
+  color:#111!important;
+}
+
+/* ── DRAWER BLOCK ── */
+.drawer-block{
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-left:3px solid var(--accent2);
+  border-radius:var(--radius);
+  padding:10px 12px;
+  margin-bottom:8px;
+  transition:border-color .2s;
+}
+.drawer-block:hover{ border-left-color:var(--accent); }
+.drawer-block strong{
+  font-size:.75rem;
+  color:var(--accent2);
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+
+/* ── RESULT CARD ── */
+.result-card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius2);
+  padding:16px 18px;
+  margin-top:14px;
+  border-top:3px solid var(--accent3);
+  box-shadow:0 2px 8px rgba(0,0,0,.07);
+}
+.result-card h2{
+  font-size:.8rem;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--text2);
+  margin-bottom:14px;
+  font-family:'JetBrains Mono',monospace;
+  display:flex; align-items:center; gap:8px;
+}
+.result-card h2::before{
+  content:'';
+  display:inline-block;
+  width:16px; height:2px;
+  background:var(--accent3);
+}
+
+/* ── TABLE ── */
+table{
+  width:100%;
+  border-collapse:collapse;
+  font-family:'JetBrains Mono',monospace;
+  font-size:.76rem;
+}
+th{
+  background:var(--surface2);
+  color:var(--muted);
+  padding:7px 10px;
+  text-align:left;
+  font-size:.64rem;
+  letter-spacing:.1em;
+  text-transform:uppercase;
+  border-bottom:2px solid var(--border2);
+}
+td{
+  padding:7px 10px;
+  border-bottom:1px solid var(--border);
+  color:var(--text);
+}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(160,120,48,.04);}
+
+/* ── WARN ── */
+.warn{
+  background:rgba(192,57,43,.07);
+  border:1px solid rgba(192,57,43,.3);
+  border-left:3px solid var(--danger);
+  border-radius:var(--radius);
+  padding:11px 14px;
+  color:#c0392b;
+  font-size:.82rem;
+  font-weight:600;
+  margin-top:12px;
+  font-family:'JetBrains Mono',monospace;
+}
+.warn::before{content:"ERR: ";}
+
+/* ── MISC ── */
+.info-row td:first-child{color:var(--accent2);}
+#drawerSection{display:none;}
+
+/* ── CANVAS TAB BUTTONS ── */
+.btn-tab{
+  padding:6px 14px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  color:var(--muted);
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.8rem;
+  font-weight:700;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:all .2s;
+}
+.btn-tab.active{
+  background:var(--accent);
+  border-color:var(--accent);
+  color:#111;
+}
+
+/* ── LAYOUT BUTTONS ── */
+.layout-btn{
+  padding:7px 4px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  color:var(--text2);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;
+  font-weight:700;
+  cursor:pointer;
+  transition:all .18s;
+  text-align:center;
+}
+.layout-btn:hover{border-color:var(--accent2); color:var(--accent2);}
+.layout-btn.active{
+  background:rgba(247,193,79,.15);
+  border-color:var(--accent2);
+  color:var(--accent2);
+  box-shadow:0 0 10px rgba(247,193,79,.15);
+}
+
+/* ── TYPE PRESET BUTTONS ── */
+.type-preset-btn{
+  padding:6px 4px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  color:var(--text2);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.72rem;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .18s;
+}
+.type-preset-btn:hover{border-color:var(--accent2);}
+.type-preset-btn.active{
+  background:rgba(247,193,79,.18);
+  border-color:var(--accent2);
+  color:var(--accent2);
+}
+
+/* ── HEIGHT SUM BAR ── */
+#heightSum{
+  padding:8px 12px;
+  border-radius:var(--radius);
+  font-family:'JetBrains Mono',monospace;
+  font-size:.78rem;
+  font-weight:600;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  margin-top:6px;
+  letter-spacing:.03em;
+}
+
+/* ── SCROLL ── */
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:var(--surface2);}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,.18);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.28);}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeSlideIn{
+  from{opacity:0;transform:translateY(10px);}
+  to{opacity:1;transform:translateY(0);}
+}
+.result-card,.card{animation:fadeSlideIn .25s ease both;}
+
+/* ── H2/H3 inside result ── */
+.result-card h3{
+  font-size:.75rem;
+  text-transform:uppercase;
+  letter-spacing:.1em;
+  color:var(--accent);
+  margin:16px 0 8px;
+  font-family:'JetBrains Mono',monospace;
+}
+
+/* ── CATEGORY CARDS (meblowo style) ── */
+.cat-card{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:14px 18px;
+  border-bottom:1px solid var(--border);
+  cursor:pointer;
+  transition:background .15s;
+  background:var(--surface);
+  user-select:none;
+}
+.cat-card:hover{
+  background:rgba(160,120,48,.04);
+}
+.cat-card.cat-open{
+  background:rgba(160,120,48,.06);
+  border-left:3px solid var(--accent);
+  padding-left:15px;
+}
+.cat-card-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+.cat-arrow{
+  font-size:1.4rem;
+  color:var(--muted);
+  line-height:1;
+  transition:transform .2s;
+  display:inline-block;
+}
+.cat-arrow.open{
+  transform:rotate(90deg);
+  color:var(--accent);
+}
+.cat-label{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:1.05rem;
+  font-weight:700;
+  letter-spacing:.04em;
+  color:var(--text);
+}
+.cat-thumb{
+  width:120px;
+  height:72px;
+  border-radius:4px;
+  overflow:hidden;
+  border:1px solid var(--border);
+  flex-shrink:0;
+  background:#e8e8e8;
+}
+.cat-thumb svg{
+  width:100%;
+  height:100%;
+}
+.cat-sub{
+  display:none;
+  background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  padding:6px 18px 6px 44px;
+  flex-direction:column;
+  gap:2px;
+}
+.cat-sub.open{
+  display:flex;
+}
+.cat-sub-item{
+  padding:8px 10px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:.95rem;
+  font-weight:600;
+  color:var(--text2);
+  cursor:pointer;
+  border-radius:var(--radius);
+  letter-spacing:.02em;
+  transition:all .14s;
+  border-left:2px solid transparent;
+}
+.cat-sub-item:hover{
+  background:rgba(160,120,48,.08);
+  color:var(--text);
+  border-left-color:var(--accent2);
+}
+.cat-sub-item.active{
+  background:rgba(160,120,48,.1);
+  color:var(--accent);
+  border-left-color:var(--accent);
+  font-weight:700;
+}
+
+</style>
+
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#8b6420">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Meble PRO">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <script>
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', ()=>{
+        navigator.serviceWorker.register('./sw.js')
+          .then(r=>console.log('SW registered'))
+          .catch(e=>console.log('SW error',e));
+      });
+    }
+  </script>
+</head>
+<body>
+<div class="container" style="padding:0 12px 20px;">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo-box">M</div>
+  <div class="topbar-logo">MEBLE<span style="opacity:.5;">&thinsp;/&thinsp;</span>PRO</div>
+  <div class="topbar-divider"></div>
+  <span class="topbar-badge">v3.2</span>
+</div>
+
+<!-- BREADCRUMB -->
+<div class="breadcrumb">
+  <span onclick="void(0)">Konfigurator</span>
+  &nbsp;/&nbsp;
+  <span id="breadcrumbType">Szafki Dolne</span>
+</div>
+
+<!-- G&#322;&#243;wne zak&#322;adki -->
+<div class="main-tabs" style="margin-top:0;margin-bottom:16px;margin-left:-12px;margin-right:-12px;padding-left:8px;">
+  <button id="mainTabKonfig" class="main-tab-btn active" onclick="switchMainTab('konfig')">&#9881; Konfig</button>
+  <button id="mainTabRozm" class="main-tab-btn" onclick="switchMainTab('rozm')">&#128208; Rozmiarka</button>
+  <button id="mainTabRozkroj" class="main-tab-btn" onclick="switchMainTab('rozkroj')">&#9986; Rozkr&#243;j</button>
+</div>
+
+<!-- SEKCJA KONFIGURATOR -->
+<div id="sectionKonfig">
+
+  <!-- Typ szafy — visual category cards -->
+  <div class="card" style="padding:0;overflow:hidden;">
+    <div style="padding:14px 18px 8px;border-bottom:1px solid var(--border);">
+      <h3 style="margin-bottom:0;">Typ szafy</h3>
+    </div>
+
+    <!-- Hidden select for backward compatibility -->
+    <select id="type" onchange="autoLogic()" style="display:none;">
+      <optgroup label="Dolne">
+        <option>Dolna</option>
+        <option>Dolna GOLA</option>
+        <option>Pod zmywark&#281;</option>
+      </optgroup>
+      <optgroup label="Wisz&#261;ce">
+        <option>Wisz&#261;ca</option>
+        <option>Wisz&#261;ca z klap&#261;</option>
+        <option>Pod okap</option>
+      </optgroup>
+      <optgroup label="S&#322;upki / Kolumny">
+        <option>S&#322;upek pod piekarnik</option>
+        <option>S&#322;upek pod zmywark&#281;</option>
+        <option>S&#322;upek pod lod&#243;wk&#281;</option>
+        <option>S&#322;upek pe&#322;ny (z p&#243;&#322;kami)</option>
+        <option>S&#322;upek MIX (szuflady+drzwi)</option>
+        <option>Cargo / Spacetower</option>
+      </optgroup>
+      <optgroup label="Naro&#380;ne">
+        <option>Naro&#380;na dolna &#346;lepa</option>
+        <option>Naro&#380;na dolna L</option>
+        <option>Naro&#380;na g&#243;rna</option>
+      </optgroup>
+    </select>
+
+    <!-- Visual category cards -->
+    <div id="catCards">
+      <!-- CAT: Szafki Dolne -->
+      <div class="cat-card" onclick="toggleCat('cat-dolne')">
+        <div class="cat-card-left">
+          <span class="cat-arrow" id="arr-cat-dolne">&#8250;</span>
+          <span class="cat-label">Szafki Dolne</span>
+        </div>
+        <div class="cat-thumb"><svg viewBox="0 0 140 85" xmlns="http://www.w3.org/2000/svg">
+  <!-- wall bg -->
+  <rect width="140" height="85" fill="#e8e8e8"/>
+  <!-- upper cabs row -->
+  <rect x="5" y="8" width="38" height="28" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <rect x="45" y="8" width="38" height="28" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <rect x="85" y="8" width="50" height="28" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <!-- countertop -->
+  <rect x="5" y="52" width="130" height="4" rx="1" fill="#b0b0b0"/>
+  <!-- base cabs -->
+  <rect x="5" y="56" width="38" height="24" rx="1" fill="#5594e0" stroke="#3d78c4" stroke-width=".5"/>
+  <rect x="45" y="56" width="38" height="24" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <rect x="85" y="56" width="50" height="24" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+</svg></div>
+      </div>
+      <div class="cat-sub" id="cat-dolne">
+        <div class="cat-sub-item active" onclick="selectType('Dolna',this)" data-val="Dolna">Dolna</div>
+        <div class="cat-sub-item" onclick="selectType('Dolna GOLA',this)" data-val="Dolna GOLA">Dolna GOLA</div>
+        <div class="cat-sub-item" onclick="selectType('Pod zmywark\u0119',this)" data-val="Pod zmywark&#281;">Pod zmywark&#281;</div>
+      </div>
+      <!-- CAT: Szafki Wisz&#261;ce -->
+      <div class="cat-card" onclick="toggleCat('cat-wiszace')">
+        <div class="cat-card-left">
+          <span class="cat-arrow" id="arr-cat-wiszace">&#8250;</span>
+          <span class="cat-label">Szafki Wisz&#261;ce</span>
+        </div>
+        <div class="cat-thumb"><svg viewBox="0 0 140 85" xmlns="http://www.w3.org/2000/svg">
+  <rect width="140" height="85" fill="#e8e8e8"/>
+  <!-- base cabs -->
+  <rect x="5" y="52" width="130" height="4" rx="1" fill="#b0b0b0"/>
+  <rect x="5" y="56" width="130" height="24" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <!-- upper cabs — highlighted -->
+  <rect x="5" y="8" width="38" height="28" rx="1" fill="#5594e0" stroke="#3d78c4" stroke-width=".5"/>
+  <rect x="45" y="8" width="38" height="28" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <rect x="85" y="8" width="50" height="28" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+</svg></div>
+      </div>
+      <div class="cat-sub" id="cat-wiszace">
+        <div class="cat-sub-item" onclick="selectType('Wisz\u0105ca',this)" data-val="Wisz&#261;ca">Wisz&#261;ca</div>
+        <div class="cat-sub-item" onclick="selectType('Wisz\u0105ca z klap\u0105',this)" data-val="Wisz&#261;ca z klap&#261;">Wisz&#261;ca z klap&#261;</div>
+        <div class="cat-sub-item" onclick="selectType('Pod okap',this)" data-val="Pod okap">Pod okap</div>
+      </div>
+      <!-- CAT: S&#322;upki -->
+      <div class="cat-card" onclick="toggleCat('cat-slupki')">
+        <div class="cat-card-left">
+          <span class="cat-arrow" id="arr-cat-slupki">&#8250;</span>
+          <span class="cat-label">S&#322;upki / Kolumny</span>
+        </div>
+        <div class="cat-thumb"><svg viewBox="0 0 140 85" xmlns="http://www.w3.org/2000/svg">
+  <rect width="140" height="85" fill="#e8e8e8"/>
+  <!-- tall column highlighted -->
+  <rect x="5" y="8" width="28" height="72" rx="1" fill="#5594e0" stroke="#3d78c4" stroke-width=".5"/>
+  <!-- upper cabs -->
+  <rect x="36" y="8" width="36" height="28" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <rect x="75" y="8" width="60" height="28" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <!-- countertop -->
+  <rect x="36" y="52" width="99" height="4" rx="1" fill="#b0b0b0"/>
+  <!-- base cabs -->
+  <rect x="36" y="56" width="99" height="24" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+</svg></div>
+      </div>
+      <div class="cat-sub" id="cat-slupki">
+        <div class="cat-sub-item" onclick="selectType('S\u0142upek pod piekarnik',this)" data-val="S&#322;upek pod piekarnik">S&#322;upek pod piekarnik</div>
+        <div class="cat-sub-item" onclick="selectType('S\u0142upek pod zmywark\u0119',this)" data-val="S&#322;upek pod zmywark&#281;">S&#322;upek pod zmywark&#281;</div>
+        <div class="cat-sub-item" onclick="selectType('S\u0142upek pod lod\u00f3wk\u0119',this)" data-val="S&#322;upek pod lod&#243;wk&#281;">S&#322;upek pod lod&#243;wk&#281;</div>
+        <div class="cat-sub-item" onclick="selectType('S\u0142upek pe\u0142ny (z p\u00f3\u0142kami)',this)" data-val="S&#322;upek pe&#322;ny (z p&#243;&#322;kami)">S&#322;upek pe&#322;ny (z p&#243;&#322;kami)</div>
+        <div class="cat-sub-item" onclick="selectType('S\u0142upek MIX (szuflady+drzwi)',this)" data-val="S&#322;upek MIX (szuflady+drzwi)">S&#322;upek MIX (szuflady+drzwi)</div>
+        <div class="cat-sub-item" onclick="selectType('Cargo / Spacetower',this)" data-val="Cargo / Spacetower">Cargo / Spacetower</div>
+      </div>
+      <!-- CAT: Naro&#380;ne -->
+      <div class="cat-card" onclick="toggleCat('cat-narozne')">
+        <div class="cat-card-left">
+          <span class="cat-arrow" id="arr-cat-narozne">&#8250;</span>
+          <span class="cat-label">Naro&#380;ne</span>
+        </div>
+        <div class="cat-thumb"><svg viewBox="0 0 140 85" xmlns="http://www.w3.org/2000/svg">
+  <rect width="140" height="85" fill="#e8e8e8"/>
+  <!-- upper cabs -->
+  <rect x="5" y="8" width="130" height="28" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <!-- countertop -->
+  <rect x="5" y="52" width="130" height="4" rx="1" fill="#b0b0b0"/>
+  <!-- base cabs - corner highlighted in L shape -->
+  <rect x="5" y="56" width="40" height="24" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <!-- corner piece highlight -->
+  <rect x="47" y="56" width="30" height="24" rx="1" fill="#5594e0" stroke="#3d78c4" stroke-width=".5"/>
+  <rect x="79" y="56" width="56" height="24" rx="1" fill="#c8c8cc" stroke="#b0b0b4" stroke-width=".5"/>
+  <!-- L corner line -->
+  <line x1="47" y1="56" x2="77" y2="56" stroke="#3d78c4" stroke-width="1"/>
+</svg></div>
+      </div>
+      <div class="cat-sub" id="cat-narozne">
+        <div class="cat-sub-item" onclick="selectType('Naro\u017cna dolna \u015blepa',this)" data-val="Naro&#380;na dolna &#346;lepa">Naro&#380;na dolna &#346;lepa</div>
+        <div class="cat-sub-item" onclick="selectType('Naro\u017cna dolna L',this)" data-val="Naro&#380;na dolna L">Naro&#380;na dolna L</div>
+        <div class="cat-sub-item" onclick="selectType('Naro\u017cna g\u00f3rna',this)" data-val="Naro&#380;na g&#243;rna">Naro&#380;na g&#243;rna</div>
+      </div>
+    </div><!-- /catCards -->
+
+    <!-- Konstrukcja + fronty below -->
+    <div style="padding:12px 18px 14px;border-top:1px solid var(--border);">
+      <label>Konstrukcja</label>
+      <select id="config" onchange="updateDrawerSelectors()">
+        <option>Drzwi</option>
+        <option>Szuflady</option>
+      </select>
+      <label>Ilo&#347;&#263; front&#243;w (tylko dla Drzwi)</label>
+      <select id="frontCount">
+        <option value="1">1</option>
+        <option value="2">2</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Prawa kolumna -->
+  <div class="card">
+    <h3>Wymiary (mm)</h3>
+
+    <label>Wysoko&#347;&#263;</label>
+    <input type="number" id="height" value="720" min="300" max="2400" oninput="updateDrawerSelectors()">
+
+    <label>Szeroko&#347;&#263;</label>
+    <input type="number" id="width" value="600" min="300" max="1200">
+
+    <label>G&#322;&#281;boko&#347;&#263;</label>
+    <input type="number" id="depth" value="560" min="200" max="800">
+  </div>
+
+</div>
+
+<!-- Szuflady section -->
+<div class="card" id="drawerSection" style="margin-bottom:16px;">
+  <h3>Szuflady</h3>
+
+  <div class="grid">
+    <div>
+      <label>System szuflad</label>
+      <select id="system" onchange="updateDrawerSelectors()">
+        <optgroup label="Blum">
+          <option>Antaro</option>
+          <option>Tandembox</option>
+          <option>Merivobox</option>
+          <option>Legrabox</option>
+        </optgroup>
+        <optgroup label="Hettich">
+          <option>InnoTech Atira</option>
+          <option>ArciTech</option>
+        </optgroup>
+        <optgroup label="Grass">
+          <option>Vionaro</option>
+          <option>Nova Pro Scala</option>
+          <option>Dynapro</option>
+        </optgroup>
+        <optgroup label="GTV">
+          <option>GTV Axis Pro</option>
+          <option>GTV Vertico</option>
+        </optgroup>
+        <optgroup label="DTC">
+          <option>DTC Mova</option>
+          <option>DTC Slimbox</option>
+        </optgroup>
+      </select>
+    </div>
+    <div>
+      <label>Prowadnica (mm)</label>
+      <select id="runner">
+        <option>450</option>
+        <option selected>500</option>
+        <option>550</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Ukryte pole qty — sterowane przez przyciski -->
+  <input type="hidden" id="qty" value="3">
+
+  <label style="margin-top:12px;">Uk&#322;ad szuflad</label>
+  <div id="layoutBtns" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;"></div>
+
+  <div id="frontHSum" style="margin-top:10px;padding:8px 12px;background:var(--surface2);border-radius:6px;font-size:.78rem;font-family:'JetBrains Mono',monospace;border:1px solid var(--border);display:none;"></div>
+
+  <div id="drawerSelectors" style="margin-top:12px;"></div>
+</div>
+
+<!-- Polki dla wszystkich typow -->
+<div class="card" id="shelvesCard" style="margin-bottom:16px;display:none;">
+  <h3>P&#243;&#322;ki wewn&#281;trzne</h3>
+  <div style="display:flex;gap:8px;margin-bottom:10px;">
+    <button onclick="setShelfMode(false)" id="btnNoShelf"
+      style="flex:1;padding:8px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;border:2px solid var(--accent);background:var(--accent);color:#111;">
+      Bez p&#243;&#322;ek
+    </button>
+    <button onclick="setShelfMode(true)" id="btnWithShelf"
+      style="flex:1;padding:8px;border-radius:6px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;border:2px solid var(--border);background:var(--surface2);color:var(--text2);">
+      Z p&#243;&#322;kami
+    </button>
+  </div>
+  <div id="shelfCountWrap" style="display:none;">
+    <label>Ilo&#347;&#263; p&#243;&#322;ek wewn&#281;trznych</label>
+    <input type="number" id="shelfCount" value="1" min="1" max="8">
+    <div style="font-size:.7rem;color:var(--muted);margin-top:4px;font-family:'JetBrains Mono',monospace;">
+      Pozycje p&#243;&#322;ek wyliczane r&#243;wnomiernie automatycznie
+    </div>
+  </div>
+</div>
+
+<!-- === AKCESORIA === -->
+<div class="card" id="akcCard" style="margin-bottom:16px;">
+  <h3>Akcesoria</h3>
+  <div class="grid" id="legRow">
+    <div>
+      <label>N&#243;&#380;ki</label>
+      <select id="legType">
+        <option value="none">Bez n&#243;&#380;ek</option>
+        <option value="uni_h100" selected>Uniwersalna H100</option>
+        <option value="uni_h150">Uniwersalna H150</option>
+        <option value="axilo_h100">Axilo H100 (rozst.64mm)</option>
+        <option value="axilo_h150">Axilo H150 (rozst.64mm)</option>
+        <option value="multileg_h100">Multileg H100 (rozst.64mm)</option>
+      </select>
+    </div>
+    <div>
+      <label>Ilo&#347;&#263; n&#243;&#380;ek</label>
+      <select id="legQty">
+        <option value="4" selected>4 szt</option>
+        <option value="6">6 szt (szer.&gt;800)</option>
+        <option value="8">8 szt (szer.&gt;1200)</option>
+        <option value="0">—</option>
+      </select>
+    </div>
+  </div>
+  <div class="grid" id="zawRow" style="margin-top:10px;">
+    <div>
+      <label>Zawiasy</label>
+      <select id="hingeType">
+        <option value="none">Bez zawias&#243;w</option>
+        <option value="blum110" selected>Blum 110° Clip Top</option>
+        <option value="blum110d">Blum 110° Clip Top Blumotion</option>
+        <option value="blum155">Blum 155° Inserta</option>
+        <option value="hettich">Hettich Sensys 8631i</option>
+        <option value="grass">Grass Tiomos 110°</option>
+      </select>
+    </div>
+    <div>
+      <label>Ilo&#347;&#263; zawias&#243;w</label>
+      <select id="hingeQty">
+        <option value="auto" selected>Auto (wg wys.)</option>
+        <option value="2">2 szt</option>
+        <option value="3">3 szt</option>
+        <option value="4">4 szt</option>
+      </select>
+    </div>
+  </div>
+  <div id="klapaRow" style="margin-top:10px;display:none;">
+    <label>Mechanizm klapy</label>
+    <select id="klapaType">
+      <option value="none">Bez mechanizmu</option>
+      <option value="aventos_hf">Blum Aventos HF (pe&#322;na)</option>
+      <option value="aventos_hl">Blum Aventos HL (uchylna g&#243;ra)</option>
+      <option value="aventos_hk">Blum Aventos HK-S (ma&#322;a)</option>
+    </select>
+  </div>
+</div>
+
+<!-- === PROJEKT INFO === -->
+<div class="card" style="margin-bottom:16px;" id="projektCard">
+  <h3>Projekt</h3>
+  <div class="grid">
+    <div>
+      <label>Klient</label>
+      <input type="text" id="clientName" placeholder="Nazwisko klienta"
+        style="padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;width:100%;outline:none;">
+    </div>
+    <div>
+      <label>Nr projektu</label>
+      <input type="text" id="projectName" placeholder="np. KCH-2026-01"
+        style="padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;width:100%;outline:none;">
+    </div>
+  </div>
+  <div style="margin-top:8px;">
+    <label>Uwagi</label>
+    <input type="text" id="moduleNote" placeholder="np. szafka zlewozmywakowa, strona lewa"
+      style="padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;width:100%;outline:none;">
+  </div>
+</div>
+
+<div class="buttons">
+  <button class="btn-primary" onclick="calculate()">🔧 Oblicz</button>
+  <button class="btn-success" onclick="addModule()">+ Dodaj modul</button>
+  <button class="btn-secondary" onclick="showProject()">📊 Poka&#380; projekt</button>
+  <button class="btn-danger" onclick="clearProjectLS()">🗑 Wyczy&#347;&#263;</button>
+</div>
+<div class="buttons" style="margin-top:8px;">
+  <button id="btnSaveProject" onclick="saveProject()"
+    style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text2);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;">
+    💾 Zapisz projekt
+  </button>
+  <button id="btnLoadProject" onclick="loadProject()"
+    style="flex:1;padding:9px;background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text2);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;">
+    📂 Wczytaj projekt
+  </button>
+</div>
+
+<div id="result"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<div id="canvasWrap" class="result-card" style="display:none;margin-top:16px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+    <h2 style="margin:0;">Widok</h2>
+    <div style="display:flex;gap:8px;">
+      <button class="btn-tab active" id="tabFront" onclick="switchView('front')">&#9634; Prz&#243;d</button>
+      <button class="btn-tab" id="tabSide"  onclick="switchView('side')">&#9633; Bok</button>
+      <button class="btn-tab" id="tab3D"    onclick="switchView('3d')">&#x1F9CA; 3D</button>
+    </div>
+  </div>
+  <canvas id="corpusCanvas" style="width:100%;border-radius:6px;background:#0a0d14;display:block;"></canvas>
+  <div id="canvas3D" style="display:none;border-radius:6px;touch-action:none;">
+    <div id="ctrl3D" style="display:flex;gap:8px;padding:8px 0 8px 0;flex-wrap:wrap;">
+      <button id="btn3DFront" onclick="toggle3DFronts()"
+        style="padding:7px 16px;border-radius:6px;border:2px solid var(--accent);background:var(--surface);color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.06em;cursor:pointer;text-transform:uppercase;">
+        &#x1F6AA; Fronty
+      </button>
+      <button id="btn3DBoki" onclick="toggle3DBoki()"
+        style="padding:7px 16px;border-radius:6px;border:2px solid var(--border);background:var(--surface);color:var(--text2);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.06em;cursor:pointer;text-transform:uppercase;">
+        &#9633; Boki: w&#322;
+      </button>
+    </div>
+    <div style="position:relative;border-radius:6px;overflow:hidden;">
+      <canvas id="threeCanvas" style="width:100%;display:block;border-radius:6px;"></canvas>
+      <div style="position:absolute;bottom:8px;right:10px;font-size:.66rem;font-family:'JetBrains Mono',monospace;color:rgba(255,255,255,.4);pointer-events:none;">
+        przeci&#261;gnij &middot; k&#243;&#322;ko = zoom
+      </div>
+    </div>
+  </div>
+  <div id="canvasLegend" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;font-size:.72rem;font-family:'JetBrains Mono',monospace;color:var(--muted);"></div>
+</div>
+
+<div id="projectView"></div>
+
+</div><!-- /sectionKonfig -->
+
+<!-- SEKCJA ROZMIARKA -->
+<div id="sectionRozm" style="display:none;">
+
+  <div class="card">
+    <h3>📏 Rozmiarka boku</h3>
+    <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">R&#1091;&#1083;&#1077;&#1090;&#1082;&#1072; od wie&#324;ca dolnego (0mm) do g&#243;rnego. Wpisz wymiary → dostaniesz list&#281; metek.</p>
+
+    <label>Wysoko&#347;&#263; formatki (boku)</label>
+    <input type="number" id="rm_height" value="760" min="300" max="2400" oninput="calcRozm()">
+
+    <label style="margin-top:14px;">Szuflady — wysoko&#347;ci front&#243;w (od do&#322;u, przez spacj&#281; lub przecinek)</label>
+    <input type="text" id="rm_drawers" placeholder="np. 304 304 141" oninput="calcRozm()"
+      style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.9rem;outline:none;">
+    <div id="rm_drawer_preview" style="font-size:.72rem;color:var(--muted);margin-top:4px;"></div>
+
+    <label style="margin-top:14px;">P&#243;&#322;ki — pozycje od wie&#324;ca dolnego (przez spacj&#281; lub przecinek)</label>
+    <input type="text" id="rm_shelves" placeholder="np. 200 400" oninput="calcRozm()"
+      style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.9rem;outline:none;">
+
+    <div class="grid2" style="margin-top:12px;gap:10px;">
+      <div>
+        <label>Zazor mi&#281;dzy frontami</label>
+        <input type="number" id="rm_gap_front" value="3" min="0" max="10" oninput="calcRozm()">
+      </div>
+      <div>
+        <label>Luz techniczny</label>
+        <input type="number" id="rm_gap_tech" value="9" min="0" max="20" oninput="calcRozm()">
+      </div>
+    </div>
+  </div>
+
+  <!-- Wynik -->
+  <div id="rm_result"></div>
+
+</div><!-- /sectionRozm -->
+
+<!-- SEKCJA ROZKROJ -->
+<div id="sectionRozkroj" style="display:none;">
+
+  <div class="card">
+    <h3>&#9986; Optymalizacja rozkroju</h3>
+    <p style="font-size:.75rem;color:var(--muted);margin-bottom:12px;">Wpisz detale r&#281;cznie lub przenie&#347; z Konfiguratora. Kalkulator u&#322;o&#380;y je na p&#322;ytach i policzy akcesoria.</p>
+
+    <!-- Rozmiar p&#322;yty -->
+    <label>Rozmiar p&#322;yty (mm)</label>
+    <div class="grid2" style="gap:8px;">
+      <input type="number" id="rk_pw" value="2800" placeholder="D&#322;ugo&#347;&#263;">
+      <input type="number" id="rk_ph" value="2070" placeholder="Szeroko&#347;&#263;">
+    </div>
+    <label style="margin-top:8px;">Szeroko&#347;&#263; ci&#281;cia pi&#322;y (mm)</label>
+    <input type="number" id="rk_saw" value="4" min="1" max="10">
+
+    <!-- Import z konfiguratora -->
+    <button onclick="importFromKonfig()" style="margin-top:12px;width:100%;padding:9px;background:var(--surface2);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem;cursor:pointer;">
+      &#8594; Importuj detale z Konfiguratora
+    </button>
+
+    <!-- Lista detali -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;margin-bottom:6px;">
+      <label style="margin:0;">Lista detali</label>
+      <button onclick="addRkPart()" style="padding:4px 10px;background:var(--accent);border:none;border-radius:5px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.75rem;cursor:pointer;">+ Dodaj</button>
+    </div>
+    <div id="rk_parts_list"></div>
+
+    <button onclick="calcRozkroj()" style="margin-top:14px;width:100%;padding:13px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;cursor:pointer;">
+      &#9986; Oblicz rozkr&#243;j i akcesoria
+    </button>
+  </div>
+
+  <div id="rk_result"></div>
+
+</div><!-- /sectionRozkroj -->
+
+</div><!-- /container -->
+
+<script>
+const systemData={
+  // === BLUM ===
+  // Antaro: offset=37.5mm (zaokr. 38), typy N/M/C/D
+  // Montaz: 2 otwory na boku, odstep 32mm, srodek prowadnicy od wience
+  Antaro:{
+    brand:'Blum',
+    types:{N:68, M:84, C:148, D:196},
+    offset:38, minWidth:270, maxWidth:700,
+    lengths:[270,300,350,400,450,500,550,600],
+    drillX:37, drillY:32,        // x od przodu boku, y=32mm system
+    sideOffset:0,                // prowadnica flush z bokiem
+    pushOpen:false,
+    note:'Blumotion/TipOn opcjonalnie'
+  },
+  // Tandembox: identyczny montaz jak Antaro, rozni sie designem
+  Tandembox:{
+    brand:'Blum',
+    types:{N:68, M:84, C:148, D:196},
+    offset:38, minWidth:270, maxWidth:700,
+    lengths:[270,300,350,400,450,500,550,600],
+    drillX:37, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'Wersja ze sciankami metalowymi'
+  },
+  // Merivobox: offset=42mm, typy E/M/K/H (wyzsze niz Antaro)
+  Merivobox:{
+    brand:'Blum',
+    types:{E:90, M:130, K:180, H:250},
+    offset:42, minWidth:350, maxWidth:800,
+    lengths:[270,300,350,400,450,500,550,600],
+    drillX:42, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'System pelnometalowy, wysokie boki'
+  },
+  // Legrabox: offset=38mm, typy N/M/C/F
+  Legrabox:{
+    brand:'Blum',
+    types:{N:66, M:90, C:177, F:241},
+    offset:38, minWidth:270, maxWidth:700,
+    lengths:[270,300,350,400,450,500,550,600],
+    drillX:37, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'Legrabox Pure / Free'
+  },
+
+  // === HETTICH ===
+  // InnoTech Atira: offset=44mm, typy wg wysokosci A/B/C
+  'InnoTech Atira':{
+    brand:'Hettich',
+    types:{A:69, B:99, C:144},
+    offset:44, minWidth:250, maxWidth:700,
+    lengths:[270,300,350,400,450,500,550,600],
+    drillX:44, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'Quadro V6 / SilentSystem'
+  },
+  // ArciTech: offset=47mm, typy D/E/F (design drawer)
+  ArciTech:{
+    brand:'Hettich',
+    types:{D:94, E:126, F:176},
+    offset:47, minWidth:250, maxWidth:700,
+    lengths:[270,300,350,400,450,500,550,600],
+    drillX:47, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'System wysokich bokow, InvisaMount'
+  },
+
+  // === GRASS ===
+  // Vionaro: offset=38mm, typy H84/H92/H128/H202
+  Vionaro:{
+    brand:'Grass',
+    types:{H84:84, H92:92, H128:128, H202:202},
+    offset:38, minWidth:250, maxWidth:650,
+    lengths:[270,300,350,400,450,500,550],
+    drillX:38, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'Tiomos soft-close opcjonalnie'
+  },
+  // Nova Pro Scala: offset=37mm, ekonomiczna seria
+  'Nova Pro Scala':{
+    brand:'Grass',
+    types:{H86:86, H131:131, H176:176},
+    offset:37, minWidth:250, maxWidth:600,
+    lengths:[270,300,350,400,450,500,550],
+    drillX:37, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'Seria ekonomiczna, Dynalock'
+  },
+  // Dynapro: offset=37mm, pelna extensja
+  Dynapro:{
+    brand:'Grass',
+    types:{H83:83, H128:128, H173:173},
+    offset:37, minWidth:250, maxWidth:600,
+    lengths:[270,300,350,400,450,500,550],
+    drillX:37, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'100% wysuw, Dynalock soft-close'
+  },
+
+  // === GTV ===
+  // GTV Axis Pro: offset=37mm, ekonomiczna alternatywa
+  'GTV Axis Pro':{
+    brand:'GTV',
+    types:{H86:86, H116:116, H136:136, H196:196},
+    offset:37, minWidth:250, maxWidth:600,
+    lengths:[270,300,350,400,450,500,550],
+    drillX:37, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'Push-to-open dostepny'
+  },
+  // GTV Vertico: offset=35mm, budzetowa
+  'GTV Vertico':{
+    brand:'GTV',
+    types:{H84:84, H120:120, H168:168},
+    offset:35, minWidth:250, maxWidth:600,
+    lengths:[270,300,350,400,450,500],
+    drillX:35, drillY:32,
+    sideOffset:0,
+    pushOpen:true,
+    note:'TipOn wbudowany'
+  },
+
+  // === DTC ===
+  // DTC Mova: offset=37mm, pelna extensja
+  'DTC Mova':{
+    brand:'DTC',
+    types:{H86:86, H136:136, H186:186},
+    offset:37, minWidth:250, maxWidth:600,
+    lengths:[270,300,350,400,450,500,550],
+    drillX:37, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'Soft-close, pelna extensja'
+  },
+  // DTC Slimbox: offset=35mm, plytkie szuflady
+  'DTC Slimbox':{
+    brand:'DTC',
+    types:{H68:68, H84:84, H118:118},
+    offset:35, minWidth:250, maxWidth:600,
+    lengths:[270,300,350,400,450,500],
+    drillX:35, drillY:32,
+    sideOffset:0,
+    pushOpen:false,
+    note:'Seria slim do plytkich szafek'
+  }
+};
+
+let project=[];
+
+/* ===== AUTO LOGIC ===== */
+function autoLogic(){
+  const t=document.getElementById("type").value;
+  const cfgEl=document.getElementById("config");
+  const heightEl=document.getElementById("height");
+  const depthEl=document.getElementById("depth");
+  const shelvesCard=document.getElementById("shelvesCard");
+
+  // Typy bez szuflad
+  const noDrawerTypes=["Wisz\u0105ca","Wisz\u0105ca z klap\u0105","Pod okap","Pod zmywark\u0119",
+    "S\u0142upek pod piekarnik","S\u0142upek pod zmywark\u0119","S\u0142upek pod lod\u00f3wk\u0119",
+    "Naro\u017cna dolna \u015alepa","Naro\u017cna dolna L","Naro\u017cna g\u00f3rna"];
+  if(noDrawerTypes.includes(t)){
+    cfgEl.value="Drzwi";
+    cfgEl.disabled=true;
+  } else {
+    cfgEl.disabled=false;
+  }
+
+  // Presets wymiar\u00f3w
+  if(t==="Wisz\u0105ca")                  {heightEl.value=720;  depthEl.value=320;}
+  if(t==="Pod zmywark\u0119")             {heightEl.value=720;  depthEl.value=560;}
+  if(t==="Dolna"||t==="Dolna GOLA")      {heightEl.value=720;  depthEl.value=560;}
+  if(t==="S\u0142upek pod piekarnik")    {heightEl.value=2130; depthEl.value=560;}
+  if(t==="S\u0142upek pod zmywark\u0119") {heightEl.value=2130; depthEl.value=560;}
+  if(t==="S\u0142upek pod lod\u00f3wk\u0119"){heightEl.value=2130;depthEl.value=600;}
+  if(t==="S\u0142upek pe\u0142ny (z p\u00f3\u0142kami)"){heightEl.value=2130;depthEl.value=560;
+    const sc=document.getElementById("shelfCount"); if(sc&&sc.value<2) sc.value=4;
+  }
+  if(t==="Naro\u017cna dolna \u015alepa"||t==="Naro\u017cna dolna L"){heightEl.value=720;depthEl.value=560;}
+  if(t==="Wisz\u0105ca z klap\u0105")  {heightEl.value=400;  depthEl.value=350;}
+  if(t==="Pod okap")           {heightEl.value=400;  depthEl.value=350;}
+  if(t==="S\u0142upek MIX (szuflady+drzwi)"){heightEl.value=2130;depthEl.value=560;}
+  if(t==="Cargo / Spacetower"){heightEl.value=2130;depthEl.value=560;}
+  if(t==="Naro\u017cna g\u00f3rna")       {heightEl.value=720;  depthEl.value=320;}
+
+  // Polki
+  // Typy ktore maja polki (widoczny shelvesCard)
+  const shelfTypes=["Wisz\u0105ca","Wisz\u0105ca z klap\u0105","Pod okap","Dolna","Dolna GOLA",
+    "S\u0142upek pe\u0142ny (z p\u00f3\u0142kami)","Naro\u017cna g\u00f3rna"];
+  // Narozna dolna slepa/L i Slupek pod AGD nie maja polek
+  const hasShelvesUI = shelfTypes.includes(t);
+  shelvesCard.style.display = hasShelvesUI ? "block" : "none";
+  if(!hasShelvesUI){
+    // Reset polek jesli typ nie obsluguje
+    const sc=document.getElementById("shelfCount");
+    if(sc) sc.value=0;
+  }
+  const klapaRow=document.getElementById("klapaRow");
+  if(klapaRow) klapaRow.style.display=(t==="Wisz\u0105ca z klap\u0105")?"block":"none";
+  // Cargo: disable config
+  if(t==="Cargo / Spacetower"||t==="S\u0142upek MIX (szuflady+drzwi)"){
+    cfgEl.value="Szuflady"; cfgEl.disabled=true;
+  }
+
+  // === LOGIKA AKCESORIOW ===
+  const isWiszaca = ["Wisz\u0105ca","Wisz\u0105ca z klap\u0105","Pod okap","Naro\u017cna g\u00f3rna"].includes(t);
+  const isAGDSlupek = ["S\u0142upek pod piekarnik","S\u0142upek pod zmywark\u0119","S\u0142upek pod lod\u00f3wk\u0119"].includes(t);
+  const isMountedOnly = isWiszaca; // wiszace: tylko montaz scienny, bez nozek
+
+  // Nozki: ukryj i wyzeruj dla wiszacych
+  const legRow    = document.getElementById("legRow");
+  const legTypeEl = document.getElementById("legType");
+  const legQtyEl  = document.getElementById("legQty");
+  if(legRow){
+    legRow.style.display = isMountedOnly ? "none" : "grid";
+    if(isMountedOnly && legTypeEl) legTypeEl.value = "none";
+  }
+
+  // Zawiasy: ukryj dla slupkow AGD (nie maja drzwi frontowych w standardzie)
+  const zawRow = document.getElementById("zawRow");
+  if(zawRow){
+    // Slupek pod piekarnik/zmywarka/lodowka ma swoje drzwi wbudowane w generator
+    // ale zawiasy do nich warto zachowac — zostaw widoczne
+    zawRow.style.display = "grid";
+  }
+
+  // Info o montazu sciennym
+  let mountInfo = document.getElementById("mountInfo");
+  if(!mountInfo){
+    const akcCard = document.getElementById("akcCard");
+    if(akcCard){
+      mountInfo = document.createElement("div");
+      mountInfo.id = "mountInfo";
+      mountInfo.style.cssText = "padding:8px 10px;border-radius:6px;font-size:.75rem;font-family:'JetBrains Mono',monospace;margin-top:8px;";
+      akcCard.appendChild(mountInfo);
+    }
+  }
+  if(mountInfo){
+    if(isMountedOnly){
+      mountInfo.style.display = "block";
+      mountInfo.style.background = "rgba(39,117,192,.1)";
+      mountInfo.style.border = "1px solid rgba(39,117,192,.3)";
+      mountInfo.style.color = "var(--info)";
+      mountInfo.textContent = "\u2139 Szafka wisz\u0105ca \u2014 monta\u017c \u015bcienny, bez n\u00f3\u017cek";
+    } else {
+      mountInfo.style.display = "none";
+    }
+  }
+
+  updateDrawerSelectors();
+}
+
+/* ===== LAYOUT  ( + ) ===== */
+const LAYOUTS=[
+  {id:"1",    label:"1",     qty:1, dist:"equal",  desc:"Jedna szuflada"},
+  {id:"2eq",  label:"2",     qty:2, dist:"equal",  desc:"2 r\u00f3wne"},
+  {id:"3eq",  label:"3",     qty:3, dist:"equal",  desc:"3 r\u00f3wne"},
+  {id:"2+1",  label:"2+1",   qty:3, dist:"2big1sm", desc:"2 du\u017ce na g\u00f3rze + 1 ma\u0142a na dole"},
+  {id:"1+2",  label:"1+2",   qty:3, dist:"1sm2big", desc:"2 du\u017ce na g\u00f3rze + 1 ma\u0142a na dole"},
+  {id:"4eq",  label:"4",     qty:4, dist:"equal",   desc:"4 r\u00f3wne"},
+  {id:"2+2",  label:"2+2",   qty:4, dist:"2big2sm",  desc:"2 du\u017ce na g\u00f3rze + 2 ma\u0142e na dole"},
+  {id:"3+1",  label:"3+1",   qty:4, dist:"3big1sm",  desc:"3 du\u017ce na g\u00f3rze + 1 ma\u0142a na dole"},
+];
+
+let activeLayout="3eq";
+
+function renderLayoutButtons(){
+  const wrap=document.getElementById("layoutBtns");
+  if(!wrap) return;
+  wrap.innerHTML="";
+  LAYOUTS.forEach(l=>{
+    const btn=document.createElement("button");
+    btn.textContent=l.label;
+    btn.title=l.desc;
+    const isActive=l.id===activeLayout;
+    btn.style.cssText=`padding:8px 16px;border-radius:6px;font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;cursor:pointer;transition:all .15s;border:2px solid ${isActive?"var(--accent)":"var(--border)"};background:${isActive?"var(--accent)":"var(--surface2)"};color:${isActive?"#fff":"var(--text)"};`;
+    btn.onclick=()=>{
+      activeLayout=l.id;
+      document.getElementById("qty").value=l.qty;
+      renderLayoutButtons();
+      updateDrawerSelectors();
+      //    dist-  
+      applyLayoutDist(l);
+    };
+    wrap.appendChild(btn);
+  });
+}
+
+function applyLayoutDist(layout){
+  const H=parseInt(document.getElementById("height").value)||720;
+  const golaOffset=(document.getElementById("type").value==="Dolna GOLA")?50:0;
+  const qty=layout.qty;
+  const available=H-golaOffset-4-((qty-1)*3);
+
+  let heights=[];
+  if(layout.dist==="equal"){
+    const eq=Math.floor(available/qty);
+    heights=Array(qty-1).fill(eq).concat([available-(qty-1)*eq]);
+  } else if(layout.dist==="2big1sm"){
+    // 2+1: od dolu WEL WEL MAL = mala NA GORZE (index 0=top)
+    const sm=Math.max(100, Math.floor(available*0.16));
+    const big=Math.floor((available-sm)/2);
+    heights=[sm, big, available-sm-big]; // [mala_gora, duza, duza_dol]
+  } else if(layout.dist==="1sm2big"){
+    // identyczne: mala na gorze
+    const sm=Math.max(100, Math.floor(available*0.16));
+    const big=Math.floor((available-sm)/2);
+    heights=[sm, big, available-sm-big]; // [mala_gora, duza, duza_dol]
+  } else if(layout.dist==="2big2sm"){
+    // 2+2: od dolu WEL WEL MAL MAL = 2 male NA GORZE
+    const sm=Math.max(100, Math.floor(available*0.13));
+    const big=Math.floor((available-sm*2)/2);
+    heights=[sm, available-big*2-sm, big, big]; // [mala, mala, duza, duza_dol]
+  } else if(layout.dist==="3big1sm"){
+    // 3+1: od dolu WEL WEL WEL MAL = mala NA GORZE
+    const sm=Math.max(100, Math.floor(available*0.13));
+    const big=Math.floor((available-sm)/3);
+    heights=[sm, big, big, available-sm-big*2]; // [mala_gora, duza, duza, duza_dol]
+  }
+
+  // heights[0]=top → drawerFrontH_qty, heights[qty-1]=bottom → drawerFrontH_1
+  heights.forEach((h,i)=>{
+    const fieldIdx=qty-i; // heights[0]->qty, heights[1]->qty-1, ..., heights[qty-1]->1
+    const el=document.getElementById("drawerFrontH_"+fieldIdx);
+    if(el) el.value=Math.max(100,h);
+  });
+  updateHeightSum();
+}
+
+/* ===== P  ===== */
+function getPresets(qty, available){
+  const a=available;
+  const presets=[];
+
+  if(qty===1){
+    presets.push({label:"1 szuflada", heights:[a]});
+  }
+
+  if(qty===2){
+    const eq=Math.floor(a/2);
+    presets.push({label:"2 r\u00f3wne", heights:[eq, a-eq]});
+    const big=Math.floor(a*0.67), small=a-big;
+    if(small>=100) presets.push({label:"Du\u017ca + ma\u0142a", heights:[small, big]});
+  }
+
+  if(qty===3){
+    const eq=Math.floor(a/3);
+    presets.push({label:"3 r\u00f3wne", heights:[eq, eq, a-eq*2]});
+    // 2 du\u017ce + 1 ma\u0142a (ma\u0142a na g\u00f3rze = szuflada 1)
+    const big=Math.floor(a*0.42), small=a-big*2;
+    if(small>=100 && big>=100) presets.push({label:"2 du\u017ce + ma\u0142a", heights:[small, big, big]});
+    // 1 ma\u0142a + 2 du\u017ce (ma\u0142a na dole = szuflada 1)
+    const big2=Math.floor((a-small)/2);
+    if(small>=100 && big2>=100) presets.push({label:"2 du\u017ce + ma\u0142a", heights:[small, big2, a-small-big2]});
+  }
+
+  if(qty===4){
+    const eq=Math.floor(a/4);
+    presets.push({label:"4 r\u00f3wne", heights:[eq,eq,eq,a-eq*3]});
+    const big=Math.floor(a*0.3), small=Math.floor((a-big*2)/2);
+    if(small>=100&&big>=100) presets.push({label:"2×du\u017ce + 2×ma\u0142e", heights:[small,small,big,a-small*2-big]});
+  }
+
+  if(qty>=5){
+    const eq=Math.floor(a/qty);
+    presets.push({label:`${qty} r\u00f3wnych`, heights:Array(qty-1).fill(eq).concat([a-(qty-1)*eq])});
+  }
+
+  // Zawsze dodaj "W\u0142asny" jako reset do auto
+  return presets;
+}
+
+function applyPreset(heights){
+  heights.forEach((h,i)=>{
+    const el=document.getElementById("drawerFrontH_"+(i+1));
+    if(el) el.value=h;
+  });
+  // Highlight active preset
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('preset-active'));
+  event.target.classList.add('preset-active');
+  updateHeightSum();
+}
+
+/* ===== SZUFLADY SELECTORS ===== */
+function updateDrawerSelectors(){
+  const config=document.getElementById("config").value;
+  const drawerSection=document.getElementById("drawerSection");
+  const qty=parseInt(document.getElementById("qty").value)||3;
+  const system=document.getElementById("system").value;
+  const container=document.getElementById("drawerSelectors");
+
+  // Zaktualizuj select prowadnic dla wybranego systemu
+  const sd=systemData[system];
+  const runnerSel=document.getElementById("runner");
+  if(sd && sd.lengths){
+    const curVal=parseInt(runnerSel.value)||500;
+    runnerSel.innerHTML=sd.lengths.map(l=>`<option value="${l}" ${l===curVal?'selected':''}>${l} mm</option>`).join('');
+  }
+
+  drawerSection.style.display=(config==="Szuflady")?"block":"none";
+  container.innerHTML="";
+  if(config!=="Szuflady") return;
+
+  renderLayoutButtons();
+
+  const H=parseInt(document.getElementById("height").value)||720;
+  const golaOffset=(document.getElementById("type").value==="Dolna GOLA")?50:0;
+  const available=H-golaOffset-4-((qty-1)*3);
+  const autoFrontH=Math.max(100, Math.floor(available/qty));
+
+  // === TYPY SZUFLAD — oryginalne etykiety H86/H116/H136/H196 ===
+  const typeKeys=Object.keys(systemData[system].types);
+
+  const typePresets=[];
+
+  if(qty===1){
+    typeKeys.forEach(t=>typePresets.push({label:t, types:[t]}));
+  } else if(qty===2){
+    typeKeys.forEach(t=>typePresets.push({label:`${t}-${t}`, types:[t,t]}));
+    for(let a=0;a<typeKeys.length;a++)
+      for(let b=a+1;b<typeKeys.length;b++)
+        typePresets.push({label:`${typeKeys[b]}-${typeKeys[a]}`, types:[typeKeys[b],typeKeys[a]]});
+  } else if(qty===3){
+    typeKeys.forEach(t=>typePresets.push({label:`${t}-${t}-${t}`, types:[t,t,t]}));
+    for(let big=typeKeys.length-1;big>0;big--)
+      for(let sm=0;sm<big;sm++)
+        typePresets.push({
+          label:`${typeKeys[big]}-${typeKeys[big]}-${typeKeys[sm]}`,
+          types:[typeKeys[big],typeKeys[big],typeKeys[sm]]
+        });
+  } else if(qty===4){
+    typeKeys.forEach(t=>typePresets.push({label:`${t}×4`, types:[t,t,t,t]}));
+    for(let big=typeKeys.length-1;big>0;big--)
+      typePresets.push({
+        label:`${typeKeys[big]}×3+${typeKeys[0]}`,
+        types:[typeKeys[big],typeKeys[big],typeKeys[big],typeKeys[0]]
+      });
+  }
+
+  if(typePresets.length>0){
+    const tpLabel=document.createElement("div");
+    tpLabel.style.cssText="font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;margin-top:12px;";
+    tpLabel.textContent="Typ korpusu szuflady";
+    container.appendChild(tpLabel);
+
+    const tpRow=document.createElement("div");
+    tpRow.id="typePrevRow";
+    tpRow.style.cssText="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;";
+
+    typePresets.forEach((p,idx)=>{
+      const btn=document.createElement("button");
+      btn.className="type-preset-btn";
+      btn.textContent=p.label;
+      const isFirst=idx===0;
+      btn.style.cssText=`padding:5px 11px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.75rem;cursor:pointer;transition:all .15s;border:1px solid ${isFirst?"var(--accent2)":"var(--border)"};background:${isFirst?"rgba(247,193,79,.15)":"var(--surface2)"};color:${isFirst?"var(--accent2)":"var(--muted)"};`;
+      btn.onclick=()=>{
+        document.querySelectorAll('.type-preset-btn').forEach(b=>{
+          b.style.background='var(--surface2)';
+          b.style.color='var(--muted)';
+          b.style.borderColor='var(--border)';
+        });
+        btn.style.background='rgba(247,193,79,.15)';
+        btn.style.color='var(--accent2)';
+        btn.style.borderColor='var(--accent2)';
+
+        // Ustaw typy
+        p.types.forEach((t,i)=>{
+          const sel=document.getElementById("drawerType_"+(i+1));
+          if(sel) sel.value=t;
+        });
+
+        // Auto-wylicz optymalne wysokosci front\u00f3w
+        // front min = backH + 20 (mocowanie) + 30 (wewnetrzna) = backH + 50
+        // rozklad: gorny (ma\u0142y front) = jego backH + 50, reszta = r\u00f3wno z pozosta\u0142ej wys.
+        const sysD = systemData[system];
+        const H = parseInt(document.getElementById("height").value)||720;
+        const golaOff = (document.getElementById("type").value==="Dolna GOLA")?50:0;
+        const GAP = 3;
+        const available = H - golaOff - 4 - ((qty-1)*GAP);
+
+        // backH dla kazdego pola (od do\u0142u: pole i → p.types[qty-1-i])
+        // p.types[0] = g\u00f3rny (field_qty), p.types[qty-1] = dolny (field_1)
+        const backHs = p.types.map(t=>sysD.types[t]||68);
+        const minFronts = backHs.map(b=>b+50); // min front dla ka\u017cdego
+
+        // Rozdziel: najpierw daj minimum ka\u017cdemu, reszt\u0119 podziel proporcjonalnie
+        const totalMin = minFronts.reduce((a,b)=>a+b,0);
+        let heights;
+        if(totalMin > available){
+          // Za ma\u0142o miejsca — daj po minimum
+          heights = [...minFronts];
+          // Korekta sumy (ostatni bierze reszt\u0119)
+          const diff = available - totalMin;
+          heights[heights.length-1] = Math.max(minFronts[heights.length-1], heights[heights.length-1]+diff);
+        } else {
+          const extra = available - totalMin;
+          // Rozdziel extra proporcjonalnie do minFronts
+          const totalMinF = totalMin;
+          heights = minFronts.map((m,i)=>{
+            const share = Math.floor(extra * m / totalMinF);
+            return m + share;
+          });
+          // Korekta zaokr\u0105glenia
+          const sum = heights.reduce((a,b)=>a+b,0);
+          heights[heights.length-1] += (available - sum);
+        }
+
+        // heights[0] = g\u00f3rny (field_qty), heights[qty-1] = dolny (field_1)
+        heights.forEach((h,i)=>{
+          const fieldIdx = qty - i; // heights[0]→field_qty (g\u00f3rny), heights[qty-1]→field_1 (dolny)
+          const el = document.getElementById("drawerFrontH_"+fieldIdx);
+          if(el) el.value = Math.max(minFronts[i], h);
+        });
+
+        // Pokaz podpowied\u017a min pod ka\u017cdym polem
+        for(let i=1;i<=qty;i++){
+          const hint = document.getElementById("frontHint_"+i);
+          const typeIdx = qty - i; // field_i odpowiada heights[qty-i] i types[qty-i]
+          const bH = backHs[typeIdx]||68;
+          if(hint) hint.textContent = `min ${bH+50}mm (korpus ${bH}mm)`;
+        }
+
+        updateHeightSum();
+      };
+      tpRow.appendChild(btn);
+    });
+    container.appendChild(tpRow);
+  }
+
+  // === POLA SZUFLAD ===
+  for(let i=1;i<=qty;i++){
+    const numOdDolu=i;           // i=1 = najnizsza
+    const numOdGory=qty-i+1;     // i=1 -> qty od gory
+    const div=document.createElement("div");
+    div.className="drawer-block";
+    div.innerHTML=`<strong>Szuflada ${numOdDolu} <span style="color:var(--muted);font-weight:400;font-size:.72rem;">(od do\u0142u: ${numOdDolu})</span></strong>`;
+
+    const row=document.createElement("div");
+    row.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px;align-items:center;";
+
+    const sel=document.createElement("select");
+    sel.id="drawerType_"+i;
+    sel.style.cssText="padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Syne',sans-serif;font-size:.82rem;";
+    for(const t in systemData[system].types){
+      const opt=document.createElement("option");
+      opt.value=t;
+      opt.text=`${t} (${systemData[system].types[t]}mm)`;
+      sel.appendChild(opt);
+    }
+    row.appendChild(sel);
+
+    const inp=document.createElement("input");
+    inp.type="number";
+    inp.id="drawerFrontH_"+i;
+    inp.min=100; inp.max=400;
+    inp.value=autoFrontH;
+    inp.placeholder=`${autoFrontH} mm`;
+    inp.style.cssText="padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.82rem;";
+    inp.title="Wysoko\u015b\u0107 frontu (mm)";
+    inp.oninput=updateHeightSum;
+    row.appendChild(inp);
+    div.appendChild(row);
+
+    // Podpowied\u017a min (uzupe\u0142niana po wyborze typu)
+    const hint=document.createElement("div");
+    hint.id="frontHint_"+i;
+    hint.style.cssText="font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;";
+    div.appendChild(hint);
+    container.appendChild(div);
+  }
+
+  //   layout dist
+  const activeLay=LAYOUTS.find(l=>l.id===activeLayout);
+  if(activeLay) applyLayoutDist(activeLay);
+
+  //   type preset 
+  const firstTypeBtn=container.querySelector('.type-preset-btn');
+  if(firstTypeBtn) firstTypeBtn.click();
+
+  updateHeightSum();
+}
+
+
+function updateHeightSum(){
+  const config=document.getElementById("config").value;
+  const sumEl=document.getElementById("frontHSum");
+  if(!sumEl||config!=="Szuflady"){if(sumEl)sumEl.style.display="none";return;}
+
+  const qty=parseInt(document.getElementById("qty").value)||3;
+  const H=parseInt(document.getElementById("height").value)||720;
+  const golaOffset=(document.getElementById("type").value==="Dolna GOLA")?50:0;
+  const available=H-golaOffset-4-((qty-1)*3);
+
+  let sum=0;
+  for(let i=1;i<=qty;i++){
+    const el=document.getElementById("drawerFrontH_"+i);
+    if(el) sum+=parseInt(el.value)||0;
+  }
+  const diff=available-sum;
+  sumEl.style.display="block";
+  sumEl.innerHTML=`\u2211 front\u00f3w: <strong>${sum} mm</strong>  /  dost\u0119pne: <strong>${available} mm</strong>  `
+    +(diff===0
+      ? `<span style="color:var(--success)">\u2713 idealne</span>`
+      : diff>0
+        ? `<span style="color:var(--accent2)">pozosta\u0142o ${diff} mm</span>`
+        : `<span style="color:var(--danger)">\u26a0 przekroczone o ${-diff} mm</span>`);
+}
+
+function onHeightModeChange(){} // legacy stub
+
+
+/* ===== CORE GENERATOR (FIXED) ===== */
+function generateModuleData(cfg){
+  // Guard: ensure cfg.type exists
+  if(!cfg || !cfg.type) throw "Brak typu szafki";
+  const parts=[];
+  const runners=[];
+  const light=cfg.width-36;
+  const golaOffset=(cfg.type==="Dolna GOLA")?50:0;
+
+  /* === WALIDACJA GLOBALNA === */
+  if(cfg.width<200||cfg.width>1200)  throw "Szeroko\u015b\u0107 musi by\u0107 200–1200 mm";
+  if(cfg.height<300||cfg.height>2600) throw "Wysoko\u015b\u0107 musi by\u0107 300–2600 mm";
+  if(cfg.depth<200||cfg.depth>800)    throw "G\u0142\u0119boko\u015b\u0107 musi by\u0107 200–800 mm";
+  if(light<=0) throw "Za ma\u0142a szeroko\u015b\u0107 – \u015bwiat\u0142o ujemne";
+
+  const isSlupek  = cfg.type.startsWith("S\u0142upek");
+  const isNarozna = cfg.type.startsWith("Naro\u017cna");
+  const isCargo   = cfg.type==="Cargo / Spacetower";
+  const isWiszKlapa = cfg.type==="Wisz\u0105ca z klap\u0105";
+  const isPodOkap   = cfg.type==="Pod okap";
+
+  /* ================================================================
+     S\u0141UPKI (kolumny)
+  ================================================================ */
+  if(isSlupek){
+    // Boki
+    parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+    parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+    // Dno i wieniec
+    parts.push({name:"Dno",     w:light, h:cfg.depth, t:18});
+    parts.push({name:"Wieniec", w:light, h:cfg.depth, t:18});
+    // Plecy
+    parts.push({name:"Plecy", w:cfg.width-2, h:cfg.height-2, t:3});
+
+    if(cfg.type==="S\u0142upek pod piekarnik"){
+      // Typowy: szuflada na dole (~200mm) + piekarnik 600mm + miejsce na mikrofal\u00f3wk\u0119
+      // Dno pod piekarnik (mostek)
+      const mostek1H = 100; // pod dno szuflady
+      const piekH    = 595; // wneka piekarnika
+      const mostek2H = cfg.height - 36 - mostek1H - piekH; // reszta na g\u00f3r\u0119
+      parts.push({name:"Mostek dolny (dno szuflady)", w:light, h:cfg.depth-20, t:18});
+      parts.push({name:"[INFO] Wn\u0119ka piekarnik", w:light, h:piekH, t:0});
+      parts.push({name:"Mostek g\u00f3rny / p\u00f3\u0142ka",   w:light, h:cfg.depth-20, t:18});
+      if(mostek2H>100){
+        parts.push({name:"[INFO] Miejsce g\u00f3rne wys.", w:light, h:mostek2H, t:0});
+      }
+      // Front szuflady dolnej (ok. 200mm)
+      const frontSzuflH = Math.max(150, mostek1H - 4);
+      parts.push({name:"Front szuflady dolnej", w:cfg.width-4, h:frontSzuflH, t:18});
+      // Drzwi na piekarnik (opcja)
+      parts.push({name:"Drzwi piekarnik",        w:cfg.width-4, h:piekH-4,    t:18});
+
+    } else if(cfg.type==="S\u0142upek pod zmywark\u0119"){
+      // Wneka zmywarki 820mm, szuflada na g\u00f3rze (reszta)
+      const zmywH = 820;
+      const gorH  = cfg.height - 36 - zmywH;
+      parts.push({name:"[INFO] Wn\u0119ka zmywarka", w:light, h:zmywH, t:0});
+      if(gorH>50){
+        parts.push({name:"Mostek / p\u00f3\u0142ka", w:light, h:cfg.depth-20, t:18});
+        parts.push({name:"[INFO] G\u00f3ra wys.",    w:light, h:gorH-18,     t:0});
+      }
+
+    } else if(cfg.type==="S\u0142upek pod lod\u00f3wk\u0119"){
+      // Wneka lod\u00f3wki: H - dno - wieniec - mostek nad lod\u00f3wk\u0105
+      const lodH  = cfg.height - 36 - 100; // 100mm nad lod\u00f3wk\u0105
+      parts.push({name:"[INFO] Wn\u0119ka lod\u00f3wka", w:light, h:lodH, t:0});
+      parts.push({name:"Mostek nad lod\u00f3wk\u0105",  w:light, h:cfg.depth-20, t:18});
+      parts.push({name:"[INFO] Nad lod\u00f3wk\u0105 wys.", w:light, h:82, t:0});
+
+    } else if(cfg.type==="S\u0142upek pe\u0142ny (z p\u00f3\u0142kami)"){
+      // Zwyk\u0142y s\u0142upek z p\u00f3\u0142kami
+      const sc = cfg.shelfCount || 3;
+      for(let i=1;i<=sc;i++){
+        parts.push({name:`P\u00f3\u0142ka ${i}`, w:light, h:cfg.depth-20, t:18});
+      }
+      parts.push({name:"Drzwi", w:cfg.width-4, h:cfg.height-4, t:18});
+    }
+
+  /* ================================================================
+     CARGO / SPACETOWER
+  ================================================================ */
+  } else if(isCargo){
+    parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+    parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+    parts.push({name:"Dno",     w:light, h:cfg.depth, t:18});
+    parts.push({name:"Wieniec", w:light, h:cfg.depth, t:18});
+    parts.push({name:"Plecy", w:cfg.width-2, h:cfg.height-2, t:3});
+    // Cargo: szuflady na ca\u0142\u0105 wysoko\u015b\u0107 (Spacetower)
+    const cargoQty = cfg.qty || 5;
+    const availH   = cfg.height - 36;
+    const cFrontH  = Math.floor(availH / cargoQty) - 3;
+    for(let i=0;i<cargoQty;i++){
+      parts.push({name:`Sz. cargo front ${i+1}`, w:cfg.width-4, h:cFrontH, t:18});
+      // Dno szuflady cargo (p\u0142ytsze)
+      parts.push({name:`Sz. cargo dno ${i+1}`,  w:light-2, h:cfg.depth-80, t:16});
+    }
+    runners.push({length: cfg.runner||500, qty: cargoQty*2, system:cfg.system});
+
+  /* ================================================================
+     WISZ\u0104CA Z KLAP\u0104
+  ================================================================ */
+  } else if(isWiszKlapa || isPodOkap){
+    parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+    parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+    parts.push({name:"Dno",     w:light, h:cfg.depth, t:18});
+    parts.push({name:"Wieniec", w:light, h:cfg.depth, t:18});
+    parts.push({name:"Plecy", w:cfg.width-2, h:cfg.height-2, t:3});
+    // P\u00f3\u0142ki wewn\u0119trzne (0 jezeli nie wybrano)
+    const sc=cfg.shelfCount||0;
+    for(let i=1;i<=sc;i++) parts.push({name:`P\u00f3\u0142ka ${i}`, w:light, h:cfg.depth-20, t:18});
+    // Front klapy
+    if(isWiszKlapa){
+      parts.push({name:"Front klapy", w:cfg.width-4, h:cfg.height-4, t:18});
+      parts.push({name:"[INFO] Klapa — dobierz mechanizm Aventos", w:0, h:0, t:0});
+    } else {
+      // Pod okap — dwa fronty (drzwiczki)
+      const fw=Math.floor((cfg.width-4-2)/2);
+      parts.push({name:"Front", w:fw, h:cfg.height-4, t:18});
+      parts.push({name:"Front", w:cfg.width-4-2-fw, h:cfg.height-4, t:18});
+    }
+
+  /* ================================================================
+     S\u0141UPEK MIX (szuflady na dole + drzwi na g\u00f3rze)
+  ================================================================ */
+  } else if(cfg.type==="S\u0142upek MIX (szuflady+drzwi)"){
+    parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+    parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+    parts.push({name:"Dno",     w:light, h:cfg.depth, t:18});
+    parts.push({name:"Wieniec", w:light, h:cfg.depth, t:18});
+    parts.push({name:"Plecy", w:cfg.width-2, h:cfg.height-2, t:3});
+    // Podzia\u0142: 1/3 szuflady (d\u00f3\u0142) + 2/3 drzwi (g\u00f3ra)
+    const mixDrawH = Math.floor((cfg.height-36)*0.35);
+    const mixDoorH = cfg.height-36 - mixDrawH;
+    // Mostek dziel\u0105cy
+    parts.push({name:"Mostek / przegroda", w:light, h:cfg.depth-20, t:18});
+    // Szuflady na dole (2 szt auto)
+    const dQty=2;
+    const dFH = Math.floor((mixDrawH - (dQty-1)*3) / dQty);
+    for(let i=1;i<=dQty;i++){
+      parts.push({name:`Front szuflady ${i}`, w:cfg.width-4, h:dFH, t:18});
+    }
+    runners.push({length:cfg.runner||500, qty:dQty*2, system:cfg.system});
+    // Drzwi na g\u00f3rze (1 szt)
+    parts.push({name:"Drzwi g\u00f3rne", w:cfg.width-4, h:mixDoorH-4, t:18});
+    parts.push({name:"[INFO] Szuflady d\u00f3\u0142:", w:mixDrawH, h:0, t:0});
+    parts.push({name:"[INFO] Drzwi g\u00f3ra:", w:mixDoorH, h:0, t:0});
+
+  /* ================================================================
+     NARO\u017bNE
+  ================================================================ */
+  } else if(isNarozna){
+    const depthA = cfg.depth;    // g\u0142\u0119boko\u015b\u0107 ramienia A
+    const depthB = cfg.depth;    // g\u0142\u0119boko\u015b\u0107 ramienia B (symetrycznie)
+    const widthA = cfg.width;    // szeroko\u015b\u0107 widoczna A
+    const widthB = cfg.width;    // szeroko\u015b\u0107 widoczna B (symetrycznie)
+    const lightA = widthA - 36;
+    const lightB = widthB - 36;
+
+    // Boki zewn\u0119trzne (2 szt)
+    parts.push({name:"Bok zewn\u0119trzny A", w:cfg.height, h:depthA, t:18});
+    parts.push({name:"Bok zewn\u0119trzny B", w:cfg.height, h:depthB, t:18});
+    // Dno
+    parts.push({name:"Dno A", w:lightA, h:depthA, t:18});
+    parts.push({name:"Dno B", w:lightB, h:depthB, t:18});
+    // Wieniec
+    parts.push({name:"Wieniec A", w:lightA, h:depthA, t:18});
+    parts.push({name:"Wieniec B", w:lightB, h:depthB, t:18});
+    // Plecy (2 ramiona)
+    parts.push({name:"Plecy A", w:widthA-2, h:cfg.height-2, t:3});
+    parts.push({name:"Plecy B", w:widthB-2, h:cfg.height-2, t:3});
+
+    if(cfg.type==="Naro\u017cna dolna \u015alepa"){
+      // \u015alepa naro\u017cna: jedno ramie z drzwiami, drugie \u015blepe
+      parts.push({name:"[INFO] Ramie \u015blepe — bez frontu", w:lightA, h:cfg.height-4, t:0});
+      parts.push({name:"Front (ramie A)", w:widthA-4, h:cfg.height-4, t:18});
+
+    } else if(cfg.type==="Naro\u017cna dolna L"){
+      // L-shape: dwa fronty pod k\u0105tem 90&#176;
+      parts.push({name:"Front A", w:widthA-4, h:cfg.height-4, t:18});
+      parts.push({name:"Front B", w:widthB-4, h:cfg.height-4, t:18});
+      // Bok wewn\u0119trzny (\u015bcianka \u0142\u0105cz\u0105ca)
+      if(depthA>widthB) parts.push({name:"\u015acianka wewn\u0119trzna", w:cfg.height, h:depthA-widthB, t:18});
+
+    } else if(cfg.type==="Naro\u017cna g\u00f3rna"){
+      // Wisz\u0105ca naro\u017cna: dwa ramiona z p\u00f3\u0142kami
+      const sc = cfg.shelfCount || 1;
+      for(let i=1;i<=sc;i++){
+        parts.push({name:`P\u00f3\u0142ka A${i}`, w:lightA, h:depthA-20, t:18});
+        parts.push({name:`P\u00f3\u0142ka B${i}`, w:lightB, h:depthB-20, t:18});
+      }
+      parts.push({name:"Front A", w:widthA-4, h:cfg.height-4, t:18});
+      parts.push({name:"Front B", w:widthB-4, h:cfg.height-4, t:18});
+    }
+
+    // INFO o naro\u017cniku
+    const diagCut = Math.round(Math.sqrt(depthA*depthA + depthB*depthB));
+    parts.push({name:"[INFO] Przek\u0105tna naro\u017ca (ref.)", w:diagCut, h:cfg.height, t:0});
+
+  /* ================================================================
+     STANDARDOWE (Dolna, Wisz\u0105ca, Pod zmywark\u0119...)
+  ================================================================ */
+  } else {
+
+  /* === BOKI === */
+  parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+  parts.push({name:"Bok", w:cfg.height, h:cfg.depth, t:18});
+
+  /* === DNO === */
+  if(cfg.type!=="Pod zmywark\u0119"){
+    parts.push({name:"Dno", w:light, h:cfg.depth, t:18});
+  }
+
+  /* === WIENIEC lub WN\u0118KA === */
+  if(cfg.type==="Pod lod\u00f3wk\u0119"){
+    const wnekaH=cfg.height-(2*18)-4;
+    parts.push({name:"[INFO] Wn\u0119ka wys.", w:light, h:wnekaH, t:0});
+  } else {
+    parts.push({name:"Wieniec", w:light, h:cfg.depth, t:18});
+  }
+
+  /* === PLECY === */
+  parts.push({name:"Plecy", w:cfg.width-2, h:cfg.height-2, t:3});
+
+  /* === P\u00d3\u0141KI dla Wisz\u0105ca i Dolna === */
+  if(cfg.type==="Wisz\u0105ca"||cfg.type==="Dolna"||cfg.type==="Dolna GOLA"){
+    const shelfCount=cfg.shelfCount;
+    for(let i=0;i<shelfCount;i++){
+      parts.push({name:`P\u00f3\u0142ka ${i+1}`, w:light, h:cfg.depth-20, t:18});
+    }
+  }
+
+  } // end else standardowe
+
+  /* === DRZWI (tylko standardowe) === */
+  if(cfg.config==="Drzwi" && !isSlupek && !isNarozna && !isCargo && !isWiszKlapa && !isPodOkap){
+    const fh=cfg.height-4-golaOffset;
+
+    if(fh<100) throw "Front za niski (min 100 mm)";
+    if(fh>2500) throw "Front za wysoki (max 2500 mm)";
+
+    if(cfg.frontCount===2){
+      const luz=2;
+      const fw=Math.floor((cfg.width-4-luz)/2);
+      const fw2=(cfg.width-4-luz)-fw;
+      // Nazwane "Front" - r\u00f3\u017cne wymiary wi\u0119c i tak b\u0119d\u0105 osobnymi wierszami w BOM
+      parts.push({name:"Front", w:fw,  h:fh, t:18});
+      parts.push({name:"Front", w:fw2, h:fh, t:18});
+    } else {
+      parts.push({name:"Front", w:cfg.width-4, h:fh, t:18});
+    }
+  }
+
+  /* === SZUFLADY (tylko standardowe) === */
+  if(cfg.config==="Szuflady" && !isSlupek && !isNarozna && !isCargo){
+    const sysInfo=systemData[cfg.system];
+
+    if(cfg.width<sysInfo.minWidth)
+      throw `Szeroko\u015b\u0107 za ma\u0142a dla systemu ${cfg.system} (min ${sysInfo.minWidth} mm)`;
+    if(sysInfo.maxWidth && cfg.width>sysInfo.maxWidth)
+      throw `Szeroko\u015b\u0107 za du\u017ca dla systemu ${cfg.system} (max ${sysInfo.maxWidth} mm)`;
+
+    if(cfg.depth<cfg.runner+10)
+      throw `Za ma\u0142a g\u0142\u0119boko\u015b\u0107 dla prowadnicy ${cfg.runner} mm`;
+
+    if(cfg.qty<1||cfg.qty>8)
+      throw "Ilo\u015b\u0107 szuflad: 1–8";
+
+    if(cfg.height>1500&&cfg.qty>5)
+      throw "Maksymalnie 5 szuflad dla korpusu >1500 mm";
+
+    // Zawsze u\u017cywaj r\u0119cznych wysoko\u015bci front\u00f3w
+    const frontHeights=cfg.frontHeights;
+    const available=cfg.height-golaOffset-4-((cfg.qty-1)*3);
+    const sum=frontHeights.reduce((a,b)=>a+b,0);
+    if(sum>available)
+      throw `Suma front\u00f3w (${sum}mm) przekracza dost\u0119pn\u0105 wysoko\u015b\u0107 (${available}mm)`;
+    if(frontHeights.some(h=>h<100))
+      throw `Ka\u017cdy front musi mie\u0107 min 100 mm`;
+    if(frontHeights.some(h=>h>700))
+      throw `Ka\u017cdy front musi mie\u0107 max 700 mm`;
+
+    //    ( ):
+    // -  1:   = 2 (  )
+    // -  2:   = _ + __ + 12
+    // - 12 = 3    + 9  
+    const GAP = 12; // 3mm + 9mm
+
+    // frontHeights[0] = dolny (szuflada 1 od dolu), frontHeights[qty-1] = gorny
+    const fhFromBottom = [...frontHeights]; // juz od dolu → [dol, srodek, ..., gora]
+
+    let mark = 2 + golaOffset; // od dna wewnetrznego
+    const runnerYs = []; // od dolu: runnerYs[0]=dolny, runnerYs[qty-1]=gorny
+
+    for(let i=0;i<cfg.qty;i++){
+      runnerYs.push(mark);
+      mark += fhFromBottom[i] + GAP;
+    }
+    // NIE odwracamy — obie tablice sa od dolu do gory (i=0=dolny)
+
+    let curFromTop = 2 + golaOffset;
+
+    for(let i=0;i<cfg.qty;i++){
+      const frontH=frontHeights[i];
+      const backH=sysInfo.types[cfg.drawerTypes[i]];
+
+      if(frontH<backH+20)
+        throw `Szuflada ${i+1}: front za niski dla typu (${cfg.drawerTypes[i]}) – min ${backH+20}mm`;
+
+      const internal=frontH-backH-20;
+      if(internal<30)
+        throw `Szuflada ${i+1}: za ma\u0142a wysoko\u015b\u0107 wewn\u0119trzna (${internal} mm)`;
+
+      const dnoW=light-sysInfo.offset;
+      const runnerY = runnerYs[i];
+
+      parts.push({name:`Front ${i+1}`,        w:cfg.width-4, h:frontH, t:18});
+      parts.push({name:`Ty\u0142 szuflady ${i+1}`,  w:dnoW,        h:backH,  t:16});
+      parts.push({name:`Dno szuflady ${i+1}`,  w:dnoW,        h:cfg.runner, t:16});
+      runners.push({length:cfg.runner, drawerNum:i+1, y:runnerY, frontH, backH});
+
+      curFromTop += frontH + 3; // 3mm   
+    }
+  }
+
+  /* === AKCESORIA (n\u00f3\u017cki, zawiasy, klapa) === */
+  const acc=[];
+  const legLabels={
+    uni_h100:'N\u00f3ga uniw. H100', uni_h150:'N\u00f3ga uniw. H150',
+    axilo_h100:'N\u00f3ga Axilo H100 (rozst.64mm)', axilo_h150:'N\u00f3ga Axilo H150 (rozst.64mm)',
+    multileg_h100:'N\u00f3ga Multileg H100 (rozst.64mm)'
+  };
+  const _isWallMounted = ["Wisz\u0105ca","Wisz\u0105ca z klap\u0105","Pod okap","Naro\u017cna g\u00f3rna"].includes(cfg.type);
+  if(cfg.legType && cfg.legType!=='none' && !_isWallMounted){
+    acc.push({name: legLabels[cfg.legType]||cfg.legType, qty: cfg.legQty||4, unit:'szt'});
+    if(cfg.legType.startsWith('axilo')||cfg.legType.startsWith('multi')){
+      acc.push({name:'Poprzeczka n\u00f3\u017cek', qty:2, unit:'szt'});
+    }
+  }
+  const hingeLabels={
+    blum110:'Zawias Blum Clip Top 110\u00b0',
+    blum110d:'Zawias Blum Clip Top Blumotion 110\u00b0',
+    blum155:'Zawias Blum Inserta 155\u00b0',
+    hettich:'Zawias Hettich Sensys 8631i',
+    grass:'Zawias Grass Tiomos 110\u00b0'
+  };
+  const hasDoors = cfg.config==='Drzwi' || (cfg.type||'').includes('klap') || (cfg.type||'').includes('MIX');
+  if(cfg.hingeType && cfg.hingeType!=='none' && hasDoors){
+    const hQty = (cfg.hingeQty||2) * (cfg.frontCount||1);
+    acc.push({name: hingeLabels[cfg.hingeType]||cfg.hingeType, qty: hQty, unit:'szt'});
+    acc.push({name:'P\u0142ytka montazowa zawiasu', qty: hQty, unit:'szt'});
+  }
+  const klapaLabels={
+    aventos_hf:'Blum Aventos HF (pe\u0142na)',
+    aventos_hl:'Blum Aventos HL (g\u00f3rna uchylna)',
+    aventos_hk:'Blum Aventos HK-S (ma\u0142a)'
+  };
+  if(cfg.klapaType && cfg.klapaType!=='none'){
+    acc.push({name: klapaLabels[cfg.klapaType]||cfg.klapaType, qty: cfg.frontCount||1, unit:'kpl'});
+  }
+
+  /* === POZYCJE P\u00d3\u0141EK (od wewn\u0119trznego dna) === */
+  const shelves = [];
+  const _shelfTypes = ["Wisz\u0105ca","Wisz\u0105ca z klap\u0105","Pod okap","Dolna","Dolna GOLA",
+    "S\u0142upek pe\u0142ny (z p\u00f3\u0142kami)","Naro\u017cna g\u00f3rna"];
+  if(_shelfTypes.some(t=>cfg.type===t) && cfg.shelfCount>0){
+    // Wewn\u0119trzna wysoko\u015b\u0107 = H - dno(18) - wieniec(18) - golaOffset
+    const _innerH = cfg.height - 18 - 18 - golaOffset;
+    const _sc = cfg.shelfCount;
+    for(let i=1;i<=_sc;i++){
+      const yFromBottom = Math.round((_innerH / (_sc+1)) * i);
+      const yFromTop    = _innerH - yFromBottom;
+      const spacingBelow = i===1 ? yFromBottom : Math.round((_innerH / (_sc+1)));
+      const spacingAbove = i===_sc ? _innerH - yFromBottom : Math.round((_innerH / (_sc+1)));
+      shelves.push({
+        num: i,
+        yFromBottom,       // od dna wewn\u0119trznego
+        yFromTop,          // od wier\u0144ca wewn\u0119trznego
+        spacingBelow: Math.round(_innerH / (_sc+1)), // odst\u0119p mi\u0119dzy p\u00f3\u0142kami
+        type: cfg.type.startsWith("Naro") ? "A+B" : "standard"
+      });
+    }
+  }
+
+  return {parts, runners, acc, shelves};
+}
+
+/* ===== ZBIERZ CONFIG ===== */
+function collectConfig(){
+  const drawerTypes=[];
+  const frontHeights=[];
+  const configVal=document.getElementById("config").value;
+  const qtyVal=parseInt(document.getElementById("qty").value)||3;
+
+  if(configVal==="Szuflady"){
+    for(let i=1;i<=qtyVal;i++){
+      const el=document.getElementById("drawerType_"+i);
+      drawerTypes.push(el?el.value:"N");
+      const hEl=document.getElementById("drawerFrontH_"+i);
+      frontHeights.push(hEl?parseInt(hEl.value)||200:200);
+    }
+  }
+
+  // legs
+  const legTypeEl   = document.getElementById("legType");
+  const legQtyEl    = document.getElementById("legQty");
+  const hingeTypeEl = document.getElementById("hingeType");
+  const hingeQtyEl  = document.getElementById("hingeQty");
+  const klapaTypeEl = document.getElementById("klapaType");
+  const noteEl      = document.getElementById("moduleNote");
+  const clientEl    = document.getElementById("clientName");
+  const projEl      = document.getElementById("projectName");
+
+  // auto hinge count by height
+  const heightVal=parseInt(document.getElementById("height").value)||720;
+  let autoHingeQty=2;
+  if(heightVal>900) autoHingeQty=3;
+  if(heightVal>1500) autoHingeQty=4;
+
+  return{
+    type:        document.getElementById("type").value,
+    config:      configVal,
+    frontCount:  parseInt(document.getElementById("frontCount").value),
+    system:      document.getElementById("system").value,
+    qty:         qtyVal,
+    width:       parseInt(document.getElementById("width").value),
+    height:      heightVal,
+    depth:       parseInt(document.getElementById("depth").value),
+    runner:      parseInt(document.getElementById("runner").value),
+    shelfCount:  parseInt(document.getElementById("shelfCount").value) || 0,
+    drawerTypes: drawerTypes,
+    frontHeights:frontHeights,
+    legType:     legTypeEl  ? legTypeEl.value   : "uni_h100",
+    legQty:      legQtyEl   ? parseInt(legQtyEl.value)||4 : 4,
+    hingeType:   hingeTypeEl? hingeTypeEl.value  : "blum110",
+    hingeQty:    hingeQtyEl && hingeQtyEl.value!=="auto" ? parseInt(hingeQtyEl.value) : autoHingeQty,
+    klapaType:   klapaTypeEl? klapaTypeEl.value  : "none",
+    note:        noteEl     ? noteEl.value        : "",
+    client:      clientEl   ? clientEl.value      : "",
+    project:     projEl     ? projEl.value        : ""
+  };
+}
+
+/* ===== RENDER TABLE ===== */
+function renderTable(parts, runners, cfg){
+  // Info o systemie
+  let sysHtml='';
+  if(cfg && cfg.config==='Szuflady'){
+    const sd=systemData[cfg.system];
+    if(sd){
+      const recLen = sd.lengths ? sd.lengths.filter(l=>l<=cfg.depth).pop() || sd.lengths[0] : cfg.runner;
+      sysHtml=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:.75rem;font-family:'JetBrains Mono',monospace;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;">
+          <span style="color:var(--muted);">Marka</span><span style="font-weight:700;color:var(--accent);">${sd.brand} — ${cfg.system}</span>
+          <span style="color:var(--muted);">Offset montazu</span><span><strong>${sd.offset} mm</strong></span>
+          <span style="color:var(--muted);">Szer. min/max</span><span>${sd.minWidth}–${sd.maxWidth||'?'} mm</span>
+          <span style="color:var(--muted);">Dlugosc prowadnicy</span><span><strong style="color:var(--success);">${recLen} mm</strong> (zalecana)</span>
+          <span style="color:var(--muted);">Otwory: X/Y</span><span>${sd.drillX} / ${sd.drillY} mm (32mm system)</span>
+          ${sd.pushOpen ? '<span style="color:var(--muted);">Push-to-open</span><span style="color:var(--success);">wbudowany</span>' : ''}
+        </div>
+        ${sd.note ? `<div style="margin-top:6px;color:var(--muted);">&#8505; ${sd.note}</div>` : ''}
+      </div>`;
+    }
+  }
+
+  let out=sysHtml+`<table>
+    <tr><th>Element</th><th>Szeroko\u015b\u0107</th><th>Wysoko\u015b\u0107</th><th>Grubo\u015b\u0107</th></tr>`;
+
+  parts.forEach(p=>{
+    const isInfo=p.t===0;
+    out+=`<tr class="${isInfo?"info-row":""}">
+      <td>${p.name}</td>
+      <td>${p.w} mm</td>
+      <td>${p.h} mm</td>
+      <td>${isInfo?"—":p.t+" mm"}</td>
+    </tr>`;
+  });
+
+  if(runners.length>0){
+    const rg={};
+    runners.forEach(r=>{if(!rg[r.length])rg[r.length]=0;rg[r.length]++;});
+    Object.keys(rg).forEach(len=>{
+      out+=`<tr><td>Prowadnica ${len} mm</td><td colspan="2">—</td><td>×${rg[len]}</td></tr>`;
+    });
+  }
+
+  out+="</table>";
+
+  // Tabela koordinat prowadnic
+  if(runners.length>0 && runners[0].y !== undefined){
+    out+=`
+    <h2 style="margin-top:18px;">📍 Koordinaty prowadnic</h2>
+    <table>
+      <tr>
+        <th>Szuflada</th>
+        <th>D\u00f3\u0142 prowadnicy<br><span style="font-weight:400;font-size:.7rem;color:var(--muted)">od wie\u0144ca dolnego</span></th>
+        <th>D\u0142ugo\u015b\u0107</th>
+        <th>Typ</th>
+        <th>Front</th>
+      </tr>`;
+
+    // runners[0]=dolny (szuflada 1), runners[qty-1]=gorny — wyswietlamy od dolu
+    runners.forEach((r,idx)=>{
+      const numOdDolu=idx+1;
+      out+=`<tr>
+        <td>Szuflada ${numOdDolu} <span style="color:var(--muted);font-size:.72rem;">(od do\u0142u)</span></td>
+        <td><strong style="color:var(--accent2);">${r.y} mm</strong></td>
+        <td>${r.length} mm</td>
+        <td>${r.backH} mm</td>
+        <td>${r.frontH} mm</td>
+      </tr>`;
+    });
+
+    out+=`</table>
+    <div style="margin-top:8px;padding:8px 12px;background:var(--surface2);border-radius:6px;font-size:.75rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">
+      ℹ Koordinata = d\u00f3\u0142 prowadnicy od g\u00f3rnej powierzchni wie\u0144ca dolnego (wewn\u0119trzne dno korpusu)
+    </div>`;
+  }
+
+  return out;
+}
+
+function renderShelvesTable(shelves, cfg){
+  if(!shelves||shelves.length===0) return '';
+  const golaOff=(cfg.type==="Dolna GOLA")?19:0;
+  const innerH=cfg.height-36-golaOff;
+  const sc=shelves.length;
+  const spacing=Math.round(innerH/(sc+1));
+
+  let html=`<h2 style="margin-top:18px;">\ud83d\udccd Pozycje p\u00f3\u0142ek</h2>
+  <div style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;font-size:.75rem;font-family:'JetBrains Mono',monospace;color:var(--muted);">
+    \u2139 Y = pozycja <strong style="color:var(--text);">otworu na ko\u0142ek</strong> od wewn. pow. dna (p\u0142yta dna 18\u202fmm).
+    P\u00f3\u0142ka (18\u202fmm) le\u017cy NA otworze.
+    Odst\u0119p: <strong style="color:var(--text);">${spacing}\u202fmm</strong>
+    \u00a0|\u00a0 Wewn. H: <strong style="color:var(--text);">${innerH}\u202fmm</strong>
+  </div>
+  <table>
+    <tr>
+      <th>P\u00f3\u0142ka</th>
+      <th>Otw\u00f3r od dna wewn.</th>
+      <th>Otw\u00f3r od wierz. wewn.</th>
+      <th>Odst\u0119p</th>
+    </tr>`;
+  shelves.forEach((sh,idx)=>{
+    const n=idx+1;
+    html+=`<tr>
+      <td>P\u00f3\u0142ka ${n}<span style="color:var(--muted);font-size:.72rem;"> (od do\u0142u)</span></td>
+      <td><strong style="color:var(--accent2);">${sh.yFromBottom}\u202fmm</strong><span style="color:var(--muted);font-size:.72rem;"> \u25b4 otw\u00f3r</span></td>
+      <td><strong style="color:var(--text2);">${sh.yFromTop}\u202fmm</strong></td>
+      <td>${spacing}\u202fmm</td>
+    </tr>`;
+  });
+  html+=`</table>`;
+
+  // SVG: d\u00f3\u0142 = dno korpusu, g\u00f3ra = wieniec
+  // ka\u017cda p\u00f3\u0142ka: krop (otw\u00f3r) + prostok\u0105t 18mm wy\u017cej (p\u0142yta)
+  const svgH=220,svgW=240,pad=32;
+  const sc2=shelves.length;
+  const totalSegments=sc2+1;
+  const segPx=Math.round((svgH-pad*2)/totalSegments);
+  const shThickPx=Math.max(3,Math.round(18*segPx/spacing)); // 18mm w pikselach
+  let si='';
+  // Korpus
+  si+=`<rect x="${pad}" y="${pad}" width="${svgW-pad*2}" height="${svgH-pad*2}" fill="none" stroke="var(--accent)" stroke-width="2" rx="2"/>`;
+  shelves.forEach((sh,i)=>{
+    const segIdx=i+1;
+    const yHole=svgH-pad-segIdx*segPx;
+    const yShelf=yHole-shThickPx;
+    // P\u0142yta p\u00f3\u0142ki
+    si+=`<rect x="${pad+2}" y="${yShelf}" width="${svgW-pad*2-4}" height="${shThickPx}" fill="#c8d8f0" stroke="#5599cc" stroke-width="1" rx="1"/>`;
+    // Otw\u00f3r — czerwona linia przerywana przez ca\u0142\u0105 szeroko\u015b\u0107 boku
+    si+=`<line x1="${pad}" y1="${yHole}" x2="${svgW-pad}" y2="${yHole}" stroke="#cc2222" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+    // Ko\u0142eczki na bokach
+    si+=`<circle cx="${pad}" cy="${yHole}" r="2.5" fill="#cc2222"/>`;
+    si+=`<circle cx="${svgW-pad}" cy="${yHole}" r="2.5" fill="#cc2222"/>`;
+    // Etykieta
+    si+=`<text x="${svgW-pad+7}" y="${yHole+4}" font-size="9" fill="#cc2222" font-weight="700">${sh.yFromBottom}</text>`;
+  });
+  // Strza\u0142ki odst\u0119p\u00f3w (mi\u0119dzy otworami)
+  const segYs=[svgH-pad,...shelves.map((_,i)=>svgH-pad-(i+1)*segPx),pad];
+  for(let i=0;i<segYs.length-1;i++){
+    const y1=segYs[i],y2=segYs[i+1],xArr=pad-14,mid=Math.round((y1+y2)/2);
+    si+=`<line x1="${xArr}" y1="${y1}" x2="${xArr}" y2="${y2}" stroke="var(--muted)" stroke-width="1"/>`;
+    si+=`<line x1="${xArr-3}" y1="${y1}" x2="${xArr+3}" y2="${y1}" stroke="var(--muted)" stroke-width="1"/>`;
+    si+=`<line x1="${xArr-3}" y1="${y2}" x2="${xArr+3}" y2="${y2}" stroke="var(--muted)" stroke-width="1"/>`;
+    si+=`<text x="${xArr-5}" y="${mid+4}" font-size="9" fill="var(--muted)" text-anchor="end">${spacing}</text>`;
+  }
+
+  html+=`<div style="margin-top:14px;display:flex;justify-content:center;">
+    <svg width="${svgW}" height="${svgH}" style="overflow:visible;">${si}</svg>
+  </div>
+  <div style="font-size:.72rem;color:var(--muted);text-align:center;margin-top:4px;">
+    <span style="display:inline-block;width:14px;height:8px;background:#c8d8f0;border:1px solid #5599cc;border-radius:1px;vertical-align:middle;margin-right:4px;"></span>p\u00f3\u0142ka 18mm
+    &nbsp;&nbsp;
+    <svg width="18" height="10" style="vertical-align:middle;margin-right:4px;"><line x1="0" y1="5" x2="18" y2="5" stroke="#cc2222" stroke-width="1.5" stroke-dasharray="4,3"/></svg>otw\u00f3r na ko\u0142ek
+  </div>`;
+  return html;
+}
+
+
+function calculate(){
+  try{
+    const cfg=collectConfig();
+    const data=generateModuleData(cfg);
+    const noteStr2 = cfg.note ? `<span style="color:var(--muted);font-size:.8rem;margin-left:8px;">${cfg.note}</span>` : '';
+    const clientStr2 = cfg.client ? '<div style="font-size:.75rem;color:var(--text2);font-family:JetBrains Mono,monospace;margin-top:2px;">Klient: <b>' + cfg.client + '</b>' + (cfg.project ? ' | Projekt: <b>' + cfg.project + '</b>' : '') + '</div>' : '';
+    // Kolizje
+    const collisions = checkCollisions(cfg, data.runners);
+    // Szpargalka wiercenia
+    const drillHoles = generateDrillSheet(cfg, data.runners);
+    const drillHtml  = renderDrillSheet(drillHoles, cfg);
+    const perf32Html = renderPerf32(cfg);
+
+    document.getElementById("result").innerHTML=`
+      <div class="result-card">
+        <h2>Wynik – ${cfg.type} ${cfg.width}×${cfg.height}×${cfg.depth}${noteStr2}</h2>
+        ${clientStr2}
+        ${renderCollisions(collisions)}
+        ${renderTable(data.parts,data.runners,cfg)}
+        ${renderShelvesTable(data.shelves,cfg)}
+        ${renderAcc(data.acc,cfg)}
+        ${drillHtml}
+        ${perf32Html}
+        <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button onclick="exportCSV(lastData.parts,lastData.runners,lastCfg)"
+            style="padding:7px 14px;background:var(--surface2);border:1px solid var(--accent);border-radius:6px;color:var(--accent);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.82rem;letter-spacing:.05em;cursor:pointer;text-transform:uppercase;">
+            &#11015; CSV
+          </button>
+        </div>
+      </div>`;
+    lastCfg=cfg;
+    lastData=data;
+    draw2D(cfg);
+    document.getElementById('canvasWrap').style.display='block';
+    setTimeout(()=>{
+      document.getElementById('canvasWrap').scrollIntoView({behavior:'smooth',block:'nearest'});
+      drawDrillCanvas(drillHoles, cfg);
+    },80);
+  }catch(e){
+    document.getElementById("result").innerHTML=`<div class='warn'>${e}</div>`;
+    document.getElementById('canvasWrap').style.display='none';
+  }
+}
+
+
+/* ===== ADD MODULE ===== */
+function addModule(){
+  try{
+    const cfg=collectConfig();
+    generateModuleData(cfg); // walidacja
+    project.push(cfg);
+    const btn=document.querySelector(".btn-success");
+    btn.textContent=`✅ Dodano (${project.length})`;
+    setTimeout(()=>{btn.textContent="+ Dodaj modul";},1600);
+  }catch(e){
+    document.getElementById("result").innerHTML=`<div class="warn">${e}</div>`;
+  }
+}
+
+/* ===== SHOW PROJECT ===== */
+function showProject(){
+  const pv=document.getElementById("projectView");
+  if(project.length===0){
+    pv.innerHTML="<div class='warn'>Brak modu\u0142\u00f3w w projekcie</div>";
+    return;
+  }
+
+  let allParts=[];
+  let allRunners=[];
+
+  project.forEach(cfg=>{
+    try{
+      const data=generateModuleData(cfg);
+      allParts=allParts.concat(data.parts);
+      allRunners=allRunners.concat(data.runners);
+    }catch(e){/* pomi\u0144 b\u0142\u0119dne */}
+  });
+
+  // Grupuj — FIX: usu\u0144 numery z nazw (np. "Front 1" → "Front") \u017ceby grupowanie dzia\u0142a\u0142o
+  const grouped={};
+  allParts.forEach(p=>{
+    if(p.t===0) return; // pomi\u0144 info-rows w BOM
+    const baseName=p.name.replace(/\s+\d+$/,""); // usu\u0144 trailing numer
+    const key=`${baseName}_${p.w}_${p.h}_${p.t}`;
+    if(!grouped[key]) grouped[key]={...p, name:baseName, qty:0};
+    grouped[key].qty++;
+  });
+
+  const rg={};
+  allRunners.forEach(r=>{if(!rg[r.length])rg[r.length]=0;rg[r.length]++;});
+
+  // Collect client/project from first module
+  const firstCfg = project[0] || {};
+  const clientHeader = firstCfg.client
+    ? `<div style="font-size:.8rem;color:var(--text2);font-family:'JetBrains Mono',monospace;margin-bottom:6px;">
+        Klient: <strong>${firstCfg.client}</strong>
+        ${firstCfg.project ? '  |  Projekt: <strong>'+firstCfg.project+'</strong>' : ''}
+         |  Data: <strong>${new Date().toLocaleDateString('pl-PL')}</strong>
+       </div>` : '';
+
+  // Collect all accessories
+  const allAcc={};
+  project.forEach(cfg=>{
+    try{
+      const data=generateModuleData(cfg);
+      (data.acc||[]).forEach(a=>{
+        const key=a.name;
+        if(!allAcc[key]) allAcc[key]={...a,qty:0};
+        allAcc[key].qty+=a.qty;
+      });
+    }catch(e){}
+  });
+
+  let out=`<div class="result-card">
+    <h2>Wycena – ${project.length} modu\u0142(y)</h2>
+    ${clientHeader}`;
+
+  // Module list
+  out+=`<div style="margin-bottom:12px;">`;
+  project.forEach((cfg,i)=>{
+    out+=`<div style="font-size:.75rem;font-family:'JetBrains Mono',monospace;color:var(--text2);padding:3px 0;border-bottom:1px solid var(--border);">
+      <span style="color:var(--muted)">${i+1}.</span> 
+      <strong>${cfg.type}</strong> ${cfg.width}×${cfg.height}×${cfg.depth} mm
+      ${cfg.note?'<span style="color:var(--muted)"> — '+cfg.note+'</span>':''}
+    </div>`;
+  });
+  out+=`</div>`;
+  out+=`<table>
+    <tr><th>Element</th><th>Wymiar</th><th>Grubo\u015b\u0107</th><th>Ilo\u015b\u0107</th></tr>`;
+
+  Object.values(grouped).forEach(p=>{
+    out+=`<tr>
+      <td>${p.name}</td>
+      <td>${p.w}×${p.h} mm</td>
+      <td>${p.t} mm</td>
+      <td><strong>${p.qty}</strong></td>
+    </tr>`;
+  });
+
+  Object.keys(rg).forEach(len=>{
+    out+=`<tr>
+      <td>Prowadnica ${len} mm</td>
+      <td>—</td><td>—</td>
+      <td><strong>${rg[len]}</strong></td>
+    </tr>`;
+  });
+
+  out+=`</table>`;
+
+  // Accessories summary
+  if(Object.keys(allAcc).length>0){
+    out+=`<div style="margin-top:14px;">
+      <h3 style="font-size:.85rem;letter-spacing:.1em;color:var(--accent);margin-bottom:8px;">AKCESORIA ZBIORCZO</h3>
+      <table>
+      <tr><th>Akcesorium</th><th>Ilo\u015b\u0107</th><th>Jed.</th></tr>`;
+    Object.values(allAcc).forEach(a=>{
+      out+=`<tr><td>${a.name}</td><td><strong>${a.qty}</strong></td><td>${a.unit||'szt'}</td></tr>`;
+    });
+    out+=`</table></div>`;
+  }
+
+  out+=`</div>`;
+  pv.innerHTML=out;
+  setTimeout(()=>pv.scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+
+/* ===== CLEAR ===== */
+function clearProject(){
+  project=[];
+  document.getElementById("projectView").innerHTML="";
+  document.getElementById("result").innerHTML="";
+}
+
+/* ===== 2D VISUALIZATION ===== */
+
+let currentView='front';
+let lastCfg=null;
+let lastData={parts:[],runners:[],acc:[]};
+
+function switchView(v){
+  currentView=v;
+  document.getElementById('tabFront').classList.toggle('active', v==='front');
+  document.getElementById('tabSide').classList.toggle('active',  v==='side');
+  const t3=document.getElementById('tab3D');
+  if(t3) t3.classList.toggle('active', v==='3d');
+
+  const c2d=document.getElementById('corpusCanvas');
+  const c3d=document.getElementById('canvas3D');
+  if(v==='3d'){
+    c2d.style.display='none';
+    c3d.style.display='block';
+    if(lastCfg) draw3D(lastCfg);
+  } else {
+    c2d.style.display='block';
+    c3d.style.display='none';
+    if(lastCfg) draw2D(lastCfg);
+  }
+}
+
+const COLORS={
+  bok:     '#2a4a7f',
+  dno:     '#2a6b4a',
+  wieniec: '#2a6b4a',
+  plecy:   '#5a3a7a',
+  front:   '#7a4a2a',
+  szuflada:'#7a6a2a',
+  polka:   '#2a5a6b',
+  info:    '#444',
+  dim:     '#4f8ef7',
+  text:    '#e8ecf5',
+  muted:   '#7a829e',
+  grid:    '#1a1d27',
+};
+
+function draw2D(cfg){
+  const wrap=document.getElementById('canvasWrap');
+  wrap.style.display='block';
+
+  const canvas=document.getElementById('corpusCanvas');
+  const PAD=60, DIM=28, MARGIN=20;
+  const maxW=canvas.parentElement.clientWidth - 32;
+  const scale=Math.min((maxW - PAD*2 - DIM) / cfg.width, 280 / cfg.height);
+
+  const CW=Math.round(cfg.width*scale + PAD*2 + DIM);
+  const CH=Math.round(cfg.height*scale + PAD*2 + DIM + MARGIN);
+  canvas.width=CW;
+  canvas.height=CH;
+
+  const ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,CW,CH);
+
+  // dark bg
+  ctx.fillStyle='#0a0d14';
+  ctx.fillRect(0,0,CW,CH);
+
+  // subtle grid
+  ctx.strokeStyle='#141820';
+  ctx.lineWidth=1;
+  const gs=20;
+  for(let x=0;x<CW;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,CH);ctx.stroke();}
+  for(let y=0;y<CH;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(CW,y);ctx.stroke();}
+
+  const t=18; // thickness mm
+  const ox=PAD+DIM/2; // origin x
+  const oy=PAD;       // origin y
+
+  // helpers
+  function rx(mm){ return ox + mm*scale; }
+  function ry(mm){ return oy + mm*scale; }
+  function rmm(mm){ return mm*scale; }
+
+  function drawRect(x,y,w,h,color,label,alpha=1){
+    ctx.globalAlpha=alpha;
+    ctx.fillStyle=color;
+    ctx.fillRect(rx(x),ry(y),rmm(w),rmm(h));
+    ctx.globalAlpha=1;
+    ctx.strokeStyle='rgba(255,255,255,0.12)';
+    ctx.lineWidth=1;
+    ctx.strokeRect(rx(x),ry(y),rmm(w),rmm(h));
+    // label inside if big enough
+    if(rmm(w)>30 && rmm(h)>14 && label){
+      ctx.fillStyle='rgba(255,255,255,0.55)';
+      ctx.font=`bold ${Math.min(10, rmm(h)*0.4)}px 'JetBrains Mono',monospace`;
+      ctx.textAlign='center';
+      ctx.textBaseline='middle';
+      ctx.fillText(label, rx(x)+rmm(w)/2, ry(y)+rmm(h)/2);
+    }
+  }
+
+  function dimLine(x1,y1,x2,y2, label, outside=false){
+    ctx.strokeStyle=COLORS.dim;
+    ctx.fillStyle=COLORS.dim;
+    ctx.lineWidth=1;
+    ctx.setLineDash([3,3]);
+    // extension lines
+    ctx.beginPath(); ctx.moveTo(x1-4,y1); ctx.lineTo(x1+4,y1); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x2-4,y2); ctx.lineTo(x2+4,y2); ctx.stroke();
+    // main line
+    ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+    ctx.setLineDash([]);
+    // label
+    ctx.fillStyle=COLORS.dim;
+    ctx.font=`10px 'JetBrains Mono',monospace`;
+    ctx.textAlign='center';
+    ctx.textBaseline='middle';
+    ctx.fillText(label, (x1+x2)/2, (y1+y2)/2 - 8);
+  }
+
+  function dimH(xpx, y1mm, y2mm, label){
+    const x=xpx, ya=ry(y1mm), yb=ry(y2mm);
+    ctx.strokeStyle=COLORS.dim; ctx.fillStyle=COLORS.dim;
+    ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(x-4,ya); ctx.lineTo(x+4,ya); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x-4,yb); ctx.lineTo(x+4,yb); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(x,ya); ctx.lineTo(x,yb); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font=`9px 'JetBrains Mono',monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.save(); ctx.translate(x-10,(ya+yb)/2); ctx.rotate(-Math.PI/2);
+    ctx.fillText(label,0,0); ctx.restore();
+  }
+
+  function dimW(ypx, x1mm, x2mm, label){
+    const y=ypx, xa=rx(x1mm), xb=rx(x2mm);
+    ctx.strokeStyle=COLORS.dim; ctx.fillStyle=COLORS.dim;
+    ctx.lineWidth=1; ctx.setLineDash([3,3]);
+    ctx.beginPath(); ctx.moveTo(xa,y-4); ctx.lineTo(xa,y+4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xb,y-4); ctx.lineTo(xb,y+4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(xa,y); ctx.lineTo(xb,y); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font=`9px 'JetBrains Mono',monospace`;
+    ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText(label, (xa+xb)/2, y+12);
+  }
+
+  const light=cfg.width-36;
+  const golaOffset=(cfg.type==="Dolna GOLA")?50:0;
+
+  if(currentView==='front'){
+    // === WIDOK Z PRZODU ===
+
+    // Boki
+    drawRect(0,          0, t, cfg.height, COLORS.bok, 'BOK');
+    drawRect(cfg.width-t,0, t, cfg.height, COLORS.bok, 'BOK');
+
+    // Dno
+    if(cfg.type!=="Pod zmywark\u0119"){
+      drawRect(t, cfg.height-t, light, t, COLORS.dno, 'DNO');
+    }
+
+    // Wieniec / INFO
+    if(cfg.type!=="Pod lod\u00f3wk\u0119"){
+      drawRect(t, 0, light, t, COLORS.wieniec, 'WIEN.');
+    }
+
+    // Plecy (za scen\u0105 — linia)
+    ctx.strokeStyle='rgba(150,80,200,0.3)';
+    ctx.lineWidth=2;
+    ctx.setLineDash([4,4]);
+    ctx.strokeRect(rx(1),ry(1),rmm(cfg.width-2),rmm(cfg.height-2));
+    ctx.setLineDash([]);
+
+    // P\u00f3\u0142ki
+    const isSlupek2D = cfg.type.startsWith("S\u0142upek");
+    const isNarozna2D = cfg.type.startsWith("Naro\u017cna");
+
+    // Slupek - rysuj mostki/wn\u0119ki
+    if(isSlupek2D){
+      if(cfg.type==="S\u0142upek pod piekarnik"){
+        const mostek1H=100, piekH=595;
+        const sc=scale;
+        // Linia mostka dolnego
+        ctx.strokeStyle='rgba(247,193,79,.6)'; ctx.lineWidth=2; ctx.setLineDash([3,3]);
+        ctx.beginPath(); ctx.moveTo(rx(t),ry(mostek1H+t)); ctx.lineTo(rx(t+light),ry(mostek1H+t)); ctx.stroke();
+        // Wneka piekarnika
+        ctx.fillStyle='rgba(247,193,79,.06)';
+        ctx.fillRect(rx(t),ry(mostek1H+t+18),rmm(light),rmm(piekH));
+        ctx.fillStyle='rgba(247,193,79,.8)'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
+        ctx.fillText('PIEKARNIK 60cm',rx(t+light/2),ry(mostek1H+t+18+piekH/2));
+        ctx.setLineDash([]);
+      } else if(cfg.type==="S\u0142upek pod zmywark\u0119"){
+        const zmywH=820;
+        ctx.fillStyle='rgba(61,155,232,.08)';
+        ctx.fillRect(rx(t),ry(t+18),rmm(light),rmm(zmywH));
+        ctx.fillStyle='rgba(61,155,232,.7)'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
+        ctx.fillText('ZMYWARKA',rx(t+light/2),ry(t+18+zmywH/2));
+      } else if(cfg.type==="S\u0142upek pod lod\u00f3wk\u0119"){
+        const lodH=cfg.height-36-100;
+        ctx.fillStyle='rgba(79,200,200,.08)';
+        ctx.fillRect(rx(t),ry(t+18),rmm(light),rmm(lodH));
+        ctx.fillStyle='rgba(79,200,200,.7)'; ctx.font='bold 10px monospace'; ctx.textAlign='center';
+        ctx.fillText('LOD\u00d3WKA',rx(t+light/2),ry(t+18+lodH/2));
+      } else {
+        // Slupek pelny - polki
+        const sc=cfg.shelfCount||3;
+        const innerH=cfg.height-2*t;
+        for(let i=1;i<=sc;i++){
+          const yy=t+(innerH/(sc+1))*i-t/2;
+          drawRect(t,yy,light,t,COLORS.polka,`P\u00d3\u0141KA ${i}`);
+        }
+      }
+    }
+
+    if(cfg.type==="Wisz\u0105ca"||cfg.type==="Dolna"||cfg.type==="Dolna GOLA"||
+       (isSlupek2D && cfg.type==="S\u0142upek pe\u0142ny (z p\u00f3\u0142kami)")){
+      const sc=cfg.shelfCount||0;
+      const innerH=cfg.height-2*t;
+      for(let i=1;i<=sc;i++){
+        const yy=t + (innerH/(sc+1))*i - t/2;
+        drawRect(t, yy, light, t, COLORS.polka, `P\u00d3\u0141KA ${i}`);
+      }
+    }
+
+    // Fronty (tylko standardowe)
+    if(cfg.config==="Drzwi" && !isSlupek2D && !isNarozna2D){
+      const fh=cfg.height-4-golaOffset;
+      const fy=2;
+      if(cfg.frontCount===2){
+        const luz=2, fw=Math.floor((cfg.width-4-luz)/2), fw2=(cfg.width-4-luz)-fw;
+        drawRect(2,      fy+golaOffset, fw,  fh, COLORS.front, 'FRONT', 0.7);
+        drawRect(2+fw+luz,fy+golaOffset, fw2, fh, COLORS.front, 'FRONT', 0.7);
+      } else {
+        drawRect(2, fy+golaOffset, cfg.width-4, fh, COLORS.front, 'FRONT', 0.7);
+      }
+      // GOLA gap
+      if(golaOffset>0){
+        ctx.fillStyle='rgba(247,193,79,0.15)';
+        ctx.fillRect(rx(2),ry(2),rmm(cfg.width-4),rmm(golaOffset));
+        ctx.fillStyle=COLORS.accent2;
+        ctx.font=`9px 'JetBrains Mono',monospace`;
+        ctx.textAlign='center';
+        ctx.fillText('GOLA',rx(cfg.width/2),ry(2+golaOffset/2));
+      }
+    }
+
+    // Szuflady
+    if(cfg.config==="Szuflady"){
+      const sysInfo=systemData[cfg.system];
+      // Zawsze u\u017cywaj frontHeights
+      let frontHeights=[];
+      if(cfg.frontHeights && cfg.frontHeights.length===cfg.qty){
+        frontHeights=cfg.frontHeights;
+      } else {
+        const availableHeight=cfg.height-golaOffset-((cfg.qty+1)*3);
+        const autoH=Math.floor(availableHeight/cfg.qty)-4;
+        frontHeights=Array(cfg.qty).fill(autoH);
+      }
+      let curY=golaOffset+3;
+      for(let i=0;i<cfg.qty;i++){
+        const fh=frontHeights[i];
+        drawRect(2, curY, cfg.width-4, fh, COLORS.szuflada, `SZ.${i+1}  ${fh}mm`, 0.8);
+        // uchwyt
+        const hx=rx(cfg.width/2)-15, hy=ry(curY+fh/2)-3;
+        ctx.fillStyle='rgba(255,255,255,0.3)';
+        ctx.beginPath();
+        ctx.roundRect(hx,hy,30,6,3);
+        ctx.fill();
+        curY+=fh+4+3;
+      }
+    }
+
+    // Wymiary
+    dimW(ry(cfg.height)+18, 0, cfg.width, `${cfg.width} mm`);
+    dimH(rx(0)-14, 0, cfg.height, `${cfg.height} mm`);
+
+  } else {
+    // === WIDOK Z BOKU ===
+    const D=cfg.depth;
+
+    // Bok
+    drawRect(0,0,D,cfg.height,COLORS.bok,'BOK',0.5);
+
+    // Dno
+    if(cfg.type!=="Pod zmywark\u0119"){
+      drawRect(0,cfg.height-t,D,t,COLORS.dno,'DNO');
+    }
+    // Wieniec
+    if(cfg.type!=="Pod lod\u00f3wk\u0119"){
+      drawRect(0,0,D,t,COLORS.wieniec,'WIEN.');
+    }
+
+    // Plecy
+    drawRect(D-3,0,3,cfg.height,COLORS.plecy,'');
+
+    // P\u00f3\u0142ki
+    if(cfg.type==="Wisz\u0105ca"){
+      const sc=cfg.shelfCount||0;
+      const innerH=cfg.height-2*t;
+      for(let i=1;i<=sc;i++){
+        const yy=t + (innerH/(sc+1))*i - t/2;
+        drawRect(0,yy,D-20,t,COLORS.polka,`P\u0141.${i}`);
+      }
+    }
+
+    // Prowadnice —        
+    if(cfg.config==="Szuflady"){
+      const sysInfo=systemData[cfg.system];
+      const GAP=12;
+      // frontHeights[0]=dolny, frontHeights[qty-1]=gorny
+      const fhFromBottom=[...cfg.frontHeights]; // juz od dolu
+      let mark=2+golaOffset;
+      const runnerYs=[]; // runnerYs[0]=dolny, ..., [qty-1]=gorny
+      for(let i=0;i<cfg.qty;i++){
+        runnerYs.push(mark);
+        mark+=fhFromBottom[i]+GAP;
+      }
+      // NIE odwracamy — i=0 = dolny pasuje do frontHeights[0]=dolny
+
+      for(let i=0;i<cfg.qty;i++){
+        const frontH=(cfg.frontHeights&&cfg.frontHeights[i])?cfg.frontHeights[i]:Math.floor((cfg.height-golaOffset-4-((cfg.qty-1)*3))/cfg.qty);
+        const backH=sysInfo.types[cfg.drawerTypes[i]||'N'];
+        const runnerBottom=runnerYs[i];
+
+        // Dno szuflady (box)
+        drawRect(0, runnerBottom, cfg.runner, backH, COLORS.szuflada, `SZ.${i+1}`, 0.5);
+
+        // Tylna scianka szuflady (16mm, na koncu prowadnicy)
+        const tylT=16;
+        drawRect(cfg.runner-tylT, runnerBottom, tylT, backH, COLORS.szuflada, '', 0.85);
+
+        //    
+        ctx.strokeStyle='rgba(79,193,247,0.9)';
+        ctx.lineWidth=1.5;
+        ctx.setLineDash([4,3]);
+        ctx.beginPath();
+        ctx.moveTo(rx(0), ry(runnerBottom));
+        ctx.lineTo(rx(cfg.runner), ry(runnerBottom));
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        //   
+        const lx=rx(0)-18;
+        ctx.strokeStyle='rgba(79,193,247,0.7)';
+        ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(lx,ry(0));
+        ctx.lineTo(lx,ry(runnerBottom));
+        ctx.stroke();
+        [[lx-3,lx+3,ry(0)],[lx-3,lx+3,ry(runnerBottom)]].forEach(([x1,x2,y])=>{
+          ctx.beginPath();ctx.moveTo(x1,y);ctx.lineTo(x2,y);ctx.stroke();
+        });
+
+        ctx.fillStyle='rgba(79,193,247,1)';
+        ctx.font=`bold 9px 'JetBrains Mono',monospace`;
+        ctx.textAlign='right';
+        ctx.fillText(`${runnerBottom}`,lx-4,ry(runnerBottom)+3);
+      }
+
+      ctx.fillStyle='rgba(79,193,247,0.6)';
+      ctx.font=`8px 'JetBrains Mono',monospace`;
+      ctx.textAlign='left';
+      ctx.fillText(`↑ od wie\u0144ca [mm]`,rx(0),ry(cfg.height)+42);
+    }
+
+    // Wymiary g\u0142\u0119boko\u015b\u0107 i wysoko\u015b\u0107
+    dimW(ry(cfg.height)+18, 0, D, `${D} mm`);
+    dimH(rx(0)-14, 0, cfg.height, `${cfg.height} mm`);
+
+    // Prowadnica wymiar
+    if(cfg.config==="Szuflady"){
+      ctx.fillStyle=COLORS.dim;
+      ctx.font=`9px 'JetBrains Mono',monospace`;
+      ctx.textAlign='left';
+      ctx.fillText(`prow. ${cfg.runner}mm`, rx(4), ry(cfg.height)+30);
+    }
+  }
+
+  // Tytu\u0142
+  ctx.fillStyle='rgba(255,255,255,0.25)';
+  ctx.font=`bold 11px 'JetBrains Mono',monospace`;
+  ctx.textAlign='right';
+  ctx.fillText(`${cfg.type.toUpperCase()} • ${cfg.config.toUpperCase()}`, CW-8, 14);
+
+  // Legenda
+  const legendEl=document.getElementById('canvasLegend');
+  const items=[
+    {color:COLORS.bok,'Boki/Wieniec/Dno':1, label:'Bok / Dno / Wieniec'},
+    {color:COLORS.front, label:'Front'},
+    {color:COLORS.szuflada, label:'Szuflada'},
+    {color:COLORS.polka, label:'P\u00f3\u0142ka'},
+    {color:COLORS.plecy, label:'Plecy'},
+  ];
+  legendEl.innerHTML=items.map(it=>`
+    <span style="display:flex;align-items:center;gap:5px;">
+      <span style="width:12px;height:12px;border-radius:2px;background:${it.color};display:inline-block;"></span>
+      ${it.label}
+    </span>`).join('');
+}
+
+// Init
+autoLogic();
+
+/* =====   ===== */
+function switchMainTab(tab){
+  document.getElementById('sectionKonfig').style.display  = tab==='konfig'  ? '' : 'none';
+  document.getElementById('sectionRozm').style.display    = tab==='rozm'    ? '' : 'none';
+  document.getElementById('sectionRozkroj').style.display = tab==='rozkroj' ? '' : 'none';
+
+  ['Konfig','Rozm','Rozkroj'].forEach(id=>{
+    const btn=document.getElementById('mainTab'+id);
+    if(!btn) return;
+    btn.classList.toggle('active', tab===id.toLowerCase());
+  });
+
+  if(tab==='rozm') calcRozm();
+  if(tab==='rozkroj') renderRkParts();
+}
+
+
+/* ===== RENDER ACCESSORIES ===== */
+function renderAcc(acc, cfg){
+  if(!acc || acc.length===0) return '';
+  let out=`<div style="margin-top:12px;">
+    <h3 style="font-size:.85rem;letter-spacing:.1em;color:var(--accent);margin-bottom:8px;">AKCESORIA</h3>
+    <table>
+    <tr><th>Akcesorium</th><th>Ilo\u015b\u0107</th><th>Jed.</th></tr>`;
+  acc.forEach(a=>{
+    out+=`<tr><td>${a.name}</td><td><strong>${a.qty}</strong></td><td>${a.unit||'szt'}</td></tr>`;
+  });
+  out+=`</table></div>`;
+  return out;
+}
+
+/* ===== SHELF MODE ===== */
+function setShelfMode(withShelves){
+  document.getElementById('shelfCountWrap').style.display = withShelves ? 'block' : 'none';
+  if(!withShelves) document.getElementById('shelfCount').value=0;
+  else if(document.getElementById('shelfCount').value==0) document.getElementById('shelfCount').value=1;
+  
+  const btnNo   = document.getElementById('btnNoShelf');
+  const btnWith = document.getElementById('btnWithShelf');
+  btnNo.style.background    = !withShelves ? 'var(--accent)'   : 'var(--surface2)';
+  btnNo.style.borderColor   = !withShelves ? 'var(--accent)'   : 'var(--border)';
+  btnNo.style.color         = !withShelves ? '#111'            : 'var(--text2)';
+  btnWith.style.background  = withShelves  ? 'var(--accent)'   : 'var(--surface2)';
+  btnWith.style.borderColor = withShelves  ? 'var(--accent)'   : 'var(--border)';
+  btnWith.style.color       = withShelves  ? '#111'            : 'var(--text2)';
+}
+
+/* ===== ROZMIARKA ===== */
+function parseNums(str){
+  return str.split(/[\s,;]+/).map(v=>parseInt(v)).filter(v=>!isNaN(v)&&v>0);
+}
+
+function calcRozm(){
+  const H       = parseInt(document.getElementById('rm_height').value)||760;
+  const gapF    = parseInt(document.getElementById('rm_gap_front').value)||3;
+  const gapT    = parseInt(document.getElementById('rm_gap_tech').value)||9;
+  const GAP     = gapF + gapT; // 12mm
+  const drawers = parseNums(document.getElementById('rm_drawers').value);
+  const shelves = parseNums(document.getElementById('rm_shelves').value);
+
+  // Preview szuflad
+  const prev = document.getElementById('rm_drawer_preview');
+  if(drawers.length){
+    const sum = drawers.reduce((a,b)=>a+b,0);
+    const avail = H - 4 - ((drawers.length-1)*gapF);
+    const diff = avail - sum;
+    prev.innerHTML = `${drawers.length} szt · suma front\u00f3w: <strong>${sum}mm</strong> · dost\u0119pne: <strong>${avail}mm</strong> · `
+      + (diff===0 ? `<span style="color:var(--success)">✓ idealne</span>`
+        : diff>0  ? `<span style="color:var(--warn)">pozosta\u0142o ${diff}mm</span>`
+                  : `<span style="color:var(--danger)">⚠ przekroczone o ${-diff}mm</span>`);
+  } else {
+    prev.innerHTML = '';
+  }
+
+  // Buduj list\u0119 metek
+  const marks = []; // {y, label, type}
+
+  // Wieniec dolny = punkt 0
+  marks.push({y:0, label:'▼ WIENIEC DOLNY (punkt 0)', type:'ref'});
+
+  // Szuflady — od do\u0142u
+  if(drawers.length){
+    let cursor = 2; // 2mm od wie\u0144ca
+    drawers.forEach((fh, i)=>{
+      marks.push({y: cursor, label: `PROWADNICA ${i+1} (od do\u0142u) — d\u00f3\u0142 · front: ${fh}mm`, type:'runner'});
+      cursor += fh + GAP;
+    });
+  }
+
+  // P\u00f3\u0142ki
+  shelves.forEach((pos, i)=>{
+    marks.push({y: pos, label: `P\u00d3\u0141KA ${i+1}`, type:'shelf'});
+  });
+
+  // Wieniec g\u00f3rny
+  marks.push({y: H, label:`▲ WIENIEC G\u00d3RNY`, type:'ref'});
+
+  // Sortuj od do\u0142u do g\u00f3ry
+  marks.sort((a,b)=>a.y-b.y);
+
+  // Render
+  const out = document.getElementById('rm_result');
+  if(!marks.length){ out.innerHTML=''; return; }
+
+  // Nag\u0142\u00f3wek
+  let html = `<div class="result-card" style="margin-top:12px;">
+    <h2 style="margin-bottom:12px;">📋 Lista metek — bok ${H}mm</h2>
+    <div style="font-size:.72rem;color:var(--muted);margin-bottom:14px;font-family:'JetBrains Mono',monospace;">
+      R&#1091;&#1083;&#1077;&#1090;&#1082;&#1072; od wie\u0144ca dolnego · GAP = ${gapF}mm + ${gapT}mm = ${GAP}mm
+    </div>`;
+
+  // Tabela z deltami
+  html += `<table style="width:100%;border-collapse:collapse;">
+    <tr style="font-size:.7rem;color:var(--muted);border-bottom:1px solid var(--border);">
+      <th style="text-align:left;padding:6px 4px;">&#1052;&#1077;&#1090;&#1082;&#1072;</th>
+      <th style="text-align:right;padding:6px 4px;">&#1042;&#1110;&#1076;&#1089;&#1090;&#1072;&#1085;&#1100;</th>
+      <th style="text-align:right;padding:6px 4px;">+Δ &#1074;&#1110;&#1076; &#1087;&#1086;&#1087;&#1077;&#1088;&#1077;&#1076;&#1085;&#1100;&#1086;&#1111;</th>
+    </tr>`;
+
+  marks.forEach((m, i)=>{
+    const prev = i>0 ? marks[i-1].y : null;
+    const delta = prev !== null ? m.y - prev : null;
+    const color = m.type==='runner' ? 'rgba(79,193,247,1)'
+                : m.type==='shelf'  ? 'rgba(79,220,160,1)'
+                : 'var(--muted)';
+    const bold  = m.type!=='ref' ? 'font-weight:700;' : 'font-weight:400;';
+    html += `<tr style="border-bottom:1px solid var(--border);">
+      <td style="padding:9px 4px;font-size:.8rem;${bold}color:${color};">${m.label}</td>
+      <td style="padding:9px 4px;text-align:right;font-size:1rem;font-weight:700;color:${color};">${m.y} mm</td>
+      <td style="padding:9px 4px;text-align:right;font-size:.8rem;color:var(--muted);">${delta!==null ? '+'+delta+' mm' : '—'}</td>
+    </tr>`;
+  });
+
+  html += `</table>`;
+
+  // Wizualizacja pionowa
+  html += `<div style="margin-top:20px;position:relative;padding-left:60px;padding-right:20px;min-height:${Math.max(200, H/3)}px;">`;
+
+  const scaleH = Math.max(200, Math.min(500, H * 0.6));
+  const scale  = scaleH / H;
+
+  // Linia pionowa (bok)
+  html += `<div style="position:absolute;left:58px;top:0;width:3px;height:${scaleH}px;background:var(--surface2);border-radius:2px;border:1px solid var(--border);"></div>`;
+
+  marks.forEach(m=>{
+    const yPx = scaleH - m.y * scale;
+    const color = m.type==='runner' ? 'rgba(79,193,247,1)'
+                : m.type==='shelf'  ? 'rgba(79,220,160,1)'
+                : 'var(--border)';
+    const w = m.type==='ref' ? '18px' : m.type==='runner' ? '28px' : '22px';
+    html += `<div style="position:absolute;left:50px;top:${yPx-1}px;display:flex;align-items:center;gap:6px;">
+      <div style="width:${w};height:2px;background:${color};"></div>
+      <span style="font-size:.7rem;color:${color};font-family:'JetBrains Mono',monospace;font-weight:700;white-space:nowrap;">${m.y}</span>
+    </div>`;
+  });
+
+  html += `</div></div>`;
+
+  out.innerHTML = html;
+}
+
+/* ===== ROZKROJ ===== */
+let rkParts=[];
+
+function importFromKonfig(){
+  try{
+    const cfg=collectConfig();
+    const {parts}=generateModuleData(cfg);
+    parts.filter(p=>p.t>0).forEach(np=>{
+      const ex=rkParts.find(p=>p.name===np.name&&p.w===np.w&&p.h===np.h&&p.t===np.t);
+      if(ex) ex.qty++;
+      else rkParts.push({name:np.name,w:np.w,h:np.h,t:np.t,qty:1,edgeL:0,edgeR:0,edgeT:0,edgeB:0});
+    });
+    renderRkParts();
+    alert('Zaimportowano '+parts.length+' detali!');
+  } catch(e){ alert('Najpierw oblicz modu\u0142 w Konfiguratorze!'); }
+}
+
+function addRkPart(){
+  rkParts.push({name:'Detal '+(rkParts.length+1),w:400,h:300,t:18,qty:1,edgeL:0,edgeR:0,edgeT:0,edgeB:0});
+  renderRkParts();
+}
+
+function removeRkPart(i){ rkParts.splice(i,1); renderRkParts(); }
+
+function renderRkParts(){
+  const el=document.getElementById('rk_parts_list');
+  if(!el) return;
+  if(!rkParts.length){
+    el.innerHTML='<div style="color:var(--muted);font-size:.75rem;padding:8px 0;">Brak detali. Dodaj r\u0119cznie lub importuj z Konfiguratora.</div>';
+    return;
+  }
+  const edgeLbl=['L','P','G','D'];
+  const edgeKeys=['edgeL','edgeR','edgeT','edgeB'];
+  el.innerHTML=rkParts.map((p,i)=>`
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:8px;margin-bottom:6px;">
+      <div style="display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center;margin-bottom:6px;">
+        <input value="${p.name}" oninput="rkParts[${i}].name=this.value"
+          style="padding:5px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.78rem;width:100%;">
+        <button onclick="removeRkPart(${i})" style="padding:4px 10px;background:var(--danger);border:none;border-radius:5px;color:#fff;cursor:pointer;">&#10005;</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:5px;margin-bottom:6px;">
+        ${[['D\u0142.(mm)','w'],['Szer.(mm)','h'],['Gr.(mm)','t'],['Ilo\u015b\u0107','qty']].map(([lbl,key])=>`
+          <div>
+            <div style="font-size:.58rem;color:var(--muted);">${lbl}</div>
+            <input type="number" value="${p[key]}" min="1" oninput="rkParts[${i}].${key}=+this.value"
+              style="width:100%;padding:5px 4px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.8rem;">
+          </div>`).join('')}
+      </div>
+      <div style="font-size:.6rem;color:var(--muted);margin-bottom:3px;">Kromka: ${edgeLbl.map((lbl,ei)=>`
+        <label style="margin-right:8px;cursor:pointer;">
+          <input type="checkbox" ${p[edgeKeys[ei]]?'checked':''} onchange="rkParts[${i}].${edgeKeys[ei]}=this.checked?1:0"> ${lbl}
+        </label>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function calcRozkroj(){
+  if(!rkParts.length){ alert('Dodaj detale!'); return; }
+  const PW=parseInt(document.getElementById('rk_pw').value)||2800;
+  const PH=parseInt(document.getElementById('rk_ph').value)||2070;
+  const SAW=parseInt(document.getElementById('rk_saw').value)||4;
+
+  // Rozwin wg qty
+  const expanded=[];
+  rkParts.forEach(p=>{ for(let q=0;q<p.qty;q++) expanded.push({...p}); });
+
+  // Grupuj po grubosci
+  const byT={};
+  expanded.forEach(p=>{ if(!byT[p.t]) byT[p.t]=[]; byT[p.t].push(p); });
+
+  // Kromka
+  const edgeTotals={};
+  rkParts.forEach(p=>{
+    const k=p.t+'mm';
+    if(!edgeTotals[k]) edgeTotals[k]={total:0,L:0,R:0,T:0,B:0};
+    edgeTotals[k].L+=p.edgeL*p.h*p.qty;
+    edgeTotals[k].R+=p.edgeR*p.h*p.qty;
+    edgeTotals[k].T+=p.edgeT*p.w*p.qty;
+    edgeTotals[k].B+=p.edgeB*p.w*p.qty;
+    edgeTotals[k].total+=(p.edgeL+p.edgeR)*p.h*p.qty+(p.edgeT+p.edgeB)*p.w*p.qty;
+  });
+
+  // Guillotine rozkroj
+  const sheets={};
+  Object.entries(byT).forEach(([t,parts])=>{
+    const sorted=[...parts].sort((a,b)=>b.w*b.h-a.w*a.h);
+    const sheetList=[];
+    sorted.forEach(part=>{
+      let placed=false;
+      for(const sheet of sheetList){
+        if(tryPlace(sheet,part,PW,PH,SAW)){ placed=true; break; }
+      }
+      if(!placed){
+        const sheet={placements:[],freeRects:[{x:0,y:0,w:PW,h:PH}]};
+        tryPlace(sheet,part,PW,PH,SAW);
+        sheetList.push(sheet);
+      }
+    });
+    sheets[t]=sheetList;
+  });
+
+  renderRozkrojResult(sheets,edgeTotals,PW,PH,SAW);
+}
+
+function tryPlace(sheet,part,PW,PH,SAW){
+  for(let ri=0;ri<sheet.freeRects.length;ri++){
+    const r=sheet.freeRects[ri];
+    // normalnie
+    if(r.w>=part.w+SAW&&r.h>=part.h+SAW){
+      sheet.placements.push({p:part,x:r.x,y:r.y,rw:part.w,rh:part.h});
+      sheet.freeRects.splice(ri,1);
+      if(r.w-part.w-SAW>10) sheet.freeRects.push({x:r.x+part.w+SAW,y:r.y,w:r.w-part.w-SAW,h:part.h});
+      if(r.h-part.h-SAW>10) sheet.freeRects.push({x:r.x,y:r.y+part.h+SAW,w:r.w,h:r.h-part.h-SAW});
+      return true;
+    }
+    // obrocony
+    if(r.w>=part.h+SAW&&r.h>=part.w+SAW){
+      sheet.placements.push({p:part,x:r.x,y:r.y,rw:part.h,rh:part.w});
+      sheet.freeRects.splice(ri,1);
+      if(r.w-part.h-SAW>10) sheet.freeRects.push({x:r.x+part.h+SAW,y:r.y,w:r.w-part.h-SAW,h:part.w});
+      if(r.h-part.w-SAW>10) sheet.freeRects.push({x:r.x,y:r.y+part.w+SAW,w:r.w,h:r.h-part.w-SAW});
+      return true;
+    }
+  }
+  return false;
+}
+
+function renderRozkrojResult(sheets,edgeTotals,PW,PH,SAW){
+  const el=document.getElementById('rk_result');
+  let totalSheets=0;
+  Object.values(sheets).forEach(s=>totalSheets+=s.length);
+
+  let html=`<div class="result-card" style="margin-top:12px;"><h2 style="margin-bottom:14px;">&#9986; Wyniki rozkroju</h2>`;
+
+  // Arkusze
+  const colors=['#4f8ef7','#f7c14f','#4fc97a','#f7504f','#c14ff7','#4ff7e8','#f78c4f'];
+  Object.entries(sheets).forEach(([t,sheetList])=>{
+    html+=`<h3 style="margin:14px 0 8px;color:var(--accent);">P\u0142yta ${t}mm — ${sheetList.length} szt.</h3>`;
+    sheetList.forEach((sheet,si)=>{
+      const used=sheet.placements.reduce((a,pl)=>a+pl.rw*pl.rh,0);
+      const pct=Math.round(used/(PW*PH)*100);
+      const cid=`rkc_${t}_${si}`;
+      const sc=Math.min(280/PW,180/PH);
+      const cw=Math.round(PW*sc), ch=Math.round(PH*sc);
+      html+=`<div style="margin-bottom:10px;">
+        <div style="font-size:.72rem;color:var(--muted);margin-bottom:4px;">
+          Arkusz ${si+1} — <strong style="color:${pct>75?'var(--success)':pct>50?'var(--warn)':'var(--danger)'};">${pct}%</strong> wykorzystania — ${sheet.placements.length} detali
+        </div>
+        <canvas id="${cid}" width="${cw}" height="${ch}" style="width:${cw}px;height:${ch}px;border:1px solid var(--border);border-radius:4px;display:block;margin-bottom:6px;"></canvas>
+        <table style="width:100%;font-size:.68rem;border-collapse:collapse;">
+          <tr style="color:var(--muted);"><th style="text-align:left;padding:2px;">Detal</th><th>W</th><th>H</th><th>X</th><th>Y</th></tr>
+          ${sheet.placements.map((pl,pi)=>`<tr style="border-top:1px solid var(--border);">
+            <td style="padding:3px 2px;">${pl.p.name}</td>
+            <td style="text-align:right;">${pl.rw}</td><td style="text-align:right;">${pl.rh}</td>
+            <td style="text-align:right;color:var(--muted);">${pl.x}</td><td style="text-align:right;color:var(--muted);">${pl.y}</td>
+          </tr>`).join('')}
+        </table>
+      </div>`;
+    });
+  });
+
+  // Kromka
+  const hasEdge=Object.values(edgeTotals).some(e=>e.total>0);
+  html+=`<h3 style="margin:16px 0 8px;color:var(--accent);">&#128156; Kromka</h3>`;
+  if(!hasEdge){
+    html+=`<div style="font-size:.75rem;color:var(--muted);">Brak zaznaczonych kraw\u0119dzi. Zaznacz L/P/G/D przy detalach.</div>`;
+  } else {
+    html+=`<table style="width:100%;font-size:.78rem;border-collapse:collapse;">
+      <tr style="color:var(--muted);font-size:.65rem;border-bottom:1px solid var(--border);">
+        <th style="text-align:left;padding:4px 2px;">Gr.</th>
+        <th style="text-align:right;">L</th><th style="text-align:right;">P</th>
+        <th style="text-align:right;">G</th><th style="text-align:right;">D</th>
+        <th style="text-align:right;color:var(--warn);">&#931; m (+5%)</th>
+      </tr>`;
+    Object.entries(edgeTotals).forEach(([k,e])=>{
+      if(!e.total) return;
+      html+=`<tr style="border-top:1px solid var(--border);">
+        <td style="padding:5px 2px;font-weight:700;">${k}</td>
+        <td style="text-align:right;">${(e.L/1000).toFixed(1)}m</td>
+        <td style="text-align:right;">${(e.R/1000).toFixed(1)}m</td>
+        <td style="text-align:right;">${(e.T/1000).toFixed(1)}m</td>
+        <td style="text-align:right;">${(e.B/1000).toFixed(1)}m</td>
+        <td style="text-align:right;font-weight:700;color:var(--warn);">${Math.ceil(e.total/1000*1.05)}m</td>
+      </tr>`;
+    });
+    html+=`</table>`;
+  }
+
+  // Akcesoria
+  const runnerPairs=rkParts.filter(p=>p.name.toLowerCase().includes('dno')).reduce((a,p)=>a+p.qty,0);
+  const fronts=rkParts.filter(p=>p.name.toLowerCase().includes('front')).reduce((a,p)=>a+p.qty,0);
+  const konfirmaty=Math.ceil(expanded_count()*2.5);
+  const wkrety=Math.ceil(konfirmaty*0.5);
+
+  html+=`<h3 style="margin:16px 0 8px;color:var(--accent);">&#128295; Akcesoria</h3>
+    <table style="width:100%;font-size:.82rem;border-collapse:collapse;">
+    ${[
+      ['P\u0142yty razem',totalSheets+' szt.','var(--accent)'],
+      ['Prowadnice',runnerPairs>0?runnerPairs+' par':'wg modu\u0142u','rgba(79,193,247,1)'],
+      ['Fronty',fronts>0?fronts+' szt.':'wg modu\u0142u','var(--warn)'],
+      ['Konfirmaty 7mm',konfirmaty+' szt.','var(--muted)'],
+      ['Wkr\u0119ty 3.5&#215;16',wkrety+' szt.','var(--muted)'],
+    ].map(([n,v,c])=>`<tr style="border-top:1px solid var(--border);">
+      <td style="padding:6px 2px;color:${c};">${n}</td>
+      <td style="text-align:right;font-weight:700;">${v}</td>
+    </tr>`).join('')}
+    </table>
+  </div>`;
+
+  el.innerHTML=html;
+
+  // Rysuj canvasy
+  setTimeout(()=>{
+    Object.entries(sheets).forEach(([t,sheetList])=>{
+      sheetList.forEach((sheet,si)=>{
+        const canvas=document.getElementById(`rkc_${t}_${si}`);
+        if(!canvas) return;
+        const ctx=canvas.getContext('2d');
+        const sc=Math.min(280/PW,180/PH);
+        ctx.fillStyle='#1c2030'; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.strokeStyle='#2a2f45'; ctx.strokeRect(0,0,canvas.width,canvas.height);
+        sheet.placements.forEach((pl,pi)=>{
+          const x=Math.round(pl.x*sc),y=Math.round(pl.y*sc);
+          const w=Math.round(pl.rw*sc),h=Math.round(pl.rh*sc);
+          ctx.fillStyle=colors[pi%colors.length]+'44';
+          ctx.fillRect(x,y,w,h);
+          ctx.strokeStyle=colors[pi%colors.length];
+          ctx.lineWidth=1; ctx.strokeRect(x,y,w,h);
+          if(w>24&&h>12){
+            ctx.fillStyle=colors[pi%colors.length];
+            ctx.font=`${Math.max(6,Math.min(9,w/9))}px monospace`;
+            ctx.textAlign='center'; ctx.textBaseline='middle';
+            ctx.fillText(pl.p.name.substring(0,10),x+w/2,y+h/2);
+          }
+        });
+      });
+    });
+  },100);
+}
+
+function expanded_count(){
+  return rkParts.reduce((a,p)=>a+p.qty,0);
+}
+
+/* ===== 1. SZPARGALKA WIERCENIA (Bohrschablone) ===== */
+function generateDrillSheet(cfg, runners){
+  const sd = systemData[cfg.system] || {};
+  const drillX = sd.drillX || 37;
+  // drillY = offset pionowy w systemie 32mm (zawsze 32 lub wielokrotnosc)
+  const holes = [];
+
+  // --- PROWADNICE ---
+  // Otwory mocuj\u0105ce: prz\u00f3d i ty\u0142, na konkretnej wysoko\u015bci od dna szuflady
+  // Standard: otw. PRZEDNI = y_prowadnicy + 16mm (Blum/Hettich/Grass)
+  //           otw. TYLNY   = y_prowadnicy + 16mm (ta sama wysokosc)
+  // r.y = d\u00f3l prowadnicy od dna wewn\u0119trznego korpusu
+  runners.forEach(r=>{
+    if(r.y===undefined) return;
+    holes.push({
+      type:'prowadnica',
+      label:`Sz.${r.drawerNum} prow. PRZOD`,
+      x: drillX,
+      y: r.y,
+      diameter: 5,
+      side:'bok',
+      color:'#cc2222'
+    });
+    holes.push({
+      type:'prowadnica',
+      label:`Sz.${r.drawerNum} prow. TYL`,
+      x: cfg.depth - drillX,
+      y: r.y,
+      diameter: 5,
+      side:'bok',
+      color:'#cc2222'
+    });
+  });
+
+  // --- ZAWIASY (Blum Clip Top 35mm kubek) ---
+  // Tylko jesli drzwi + zawiasy
+  const hasDoors = cfg.config==='Drzwi' || (cfg.type||'').includes('klap');
+  if(hasDoors && cfg.hingeType && cfg.hingeType!=='none'){
+    const frontH = cfg.config==='Drzwi' ? cfg.height - 4 : cfg.height - 4;
+    const hQty = cfg.hingeQty || (frontH>1400?4:frontH>900?3:2);
+    // Odleglosc od krawedzi: standard Blum = 3mm + polkubek 35mm => srodek = 22.5 => 22mm
+    const xHinge = 22; // od krawedzi boku (od przodu drzwi)
+    // Rozloz rownomiernie
+    // Dolny: 100mm od dolu frontu, gorny: 100mm od gory
+    const yPositions = [];
+    if(hQty===2){ yPositions.push(100); yPositions.push(frontH-100); }
+    else if(hQty===3){ yPositions.push(100); yPositions.push(Math.round(frontH/2)); yPositions.push(frontH-100); }
+    else { yPositions.push(100); yPositions.push(Math.round(frontH/3)); yPositions.push(Math.round(2*frontH/3)); yPositions.push(frontH-100); }
+
+    const frontCount = cfg.frontCount || 1;
+    yPositions.forEach((yF,i)=>{
+      // Y na boku = Y na froncie (liczone od dolu) przekonwertowane na bok
+      // na boku: od wienca dolnego = yF (jesli front wyregulowany od dolu)
+      holes.push({
+        type:'zawias_bok',
+        label:`Zawias ${i+1} – kubek w BOKU`,
+        x: xHinge,           // od krawedzi przodowej boku
+        y: yF,               // od dna (od wienca dolnego)
+        diameter: 35,        // kubek Blum 35mm
+        side:'bok',
+        color:'#e8a020'
+      });
+      holes.push({
+        type:'zawias_front',
+        label:`Zawias ${i+1} – montaz we FRONCIE`,
+        x: xHinge,
+        y: yF,
+        diameter:4,
+        side:'front',
+        color:'#e8a020'
+      });
+    });
+  }
+
+  // --- PERFORACJA 32mm (system konfirmatow bok-dno, bok-wieniec) ---
+  // Otwory konfirmat: Bok-Dno: X=8mm od dola boku, Y=8/32/64mm od przodu
+  const konfY = [8, 8+cfg.depth-18-8]; // przod i tyl
+  konfY.forEach((yK,i)=>{
+    holes.push({
+      type:'konfirmat',
+      label:`Konf. bok-dno ${i===0?'PRZOD':'TYL'}`,
+      x: yK,
+      y: 8,  // 8mm od dola boku (srodek dna 18mm/2 = 9, -1 = 8)
+      diameter: 5,
+      side:'bok',
+      color:'#1fba7c'
+    });
+    holes.push({
+      type:'konfirmat',
+      label:`Konf. bok-wieniec ${i===0?'PRZOD':'TYL'}`,
+      x: yK,
+      y: cfg.height - 8,
+      diameter: 5,
+      side:'bok',
+      color:'#1fba7c'
+    });
+  });
+
+  return holes;
+}
+
+function renderDrillSheet(holes, cfg){
+  if(!holes || holes.length===0) return '';
+  const runners = holes.filter(h=>h.type==='prowadnica');
+  const zawiasy = holes.filter(h=>h.type==='zawias_bok');
+  const konf    = holes.filter(h=>h.type==='konfirmat');
+
+  let out = `<div style="margin-top:14px;">
+    <h3 style="font-size:.85rem;letter-spacing:.1em;color:var(--info);margin-bottom:8px;">
+      SZPARGALKA WIERCENIA – BOK (${cfg.width}×${cfg.height}×${cfg.depth})
+    </h3>
+    <div style="font-size:.7rem;color:var(--muted);margin-bottom:8px;font-family:'JetBrains Mono',monospace;">
+      X = od krawedzi przedniej boku &nbsp;|&nbsp; Y = od wienca dolnego (dno wewnetrzne)
+    </div>
+    <table>
+    <tr>
+      <th>Element</th>
+      <th>X (mm)</th>
+      <th>Y od dna (mm)</th>
+      <th>&#216; (mm)</th>
+      <th>Typ</th>
+    </tr>`;
+
+  // Prowadnice - od dolu, kazdy otw\u00f3r osobno
+  const prow = holes.filter(h=>h.type==='prowadnica');
+  [...prow].sort((a,b)=>a.y-b.y).forEach(h=>{
+    out+=`<tr style="background:rgba(204,34,34,.07)">
+      <td style="color:#cc2222">${h.label}</td>
+      <td><strong>${h.x}</strong></td>
+      <td><strong style="color:#cc2222">${h.y}</strong></td>
+      <td>${h.diameter}</td>
+      <td>prow.</td>
+    </tr>`;
+  });
+
+  // Zawiasy
+  zawiasy.sort((a,b)=>a.y-b.y).forEach(h=>{
+    out+=`<tr style="background:rgba(232,160,32,.07)">
+      <td style="color:var(--accent)">${h.label}</td>
+      <td><strong>${h.x}</strong></td>
+      <td><strong style="color:var(--accent)">${h.y}</strong></td>
+      <td>${h.diameter}</td>
+      <td>zawias</td>
+    </tr>`;
+  });
+
+  // Konfirmaty
+  konf.sort((a,b)=>a.y-b.y).forEach(h=>{
+    out+=`<tr style="background:rgba(31,186,124,.07)">
+      <td style="color:var(--success)">${h.label}</td>
+      <td><strong>${h.x}</strong></td>
+      <td><strong style="color:var(--success)">${h.y}</strong></td>
+      <td>${h.diameter}</td>
+      <td>konf.</td>
+    </tr>`;
+  });
+
+  out+=`</table>`;
+
+  // Mini canvas - wizualizacja boku z otworami
+  out+=`<div style="margin-top:10px;overflow-x:auto;">
+    <canvas id="drillCanvas" style="background:#0a0d14;border-radius:6px;display:block;max-width:100%;"></canvas>
+  </div>
+  <div style="font-size:.7rem;color:var(--muted);margin-top:6px;font-family:'JetBrains Mono',monospace;">
+    <span style="display:inline-block;width:14px;height:7px;background:rgba(160,160,160,0.3);border:1px solid rgba(160,160,160,0.5);vertical-align:middle;margin-right:3px;"></span>prowadnica &nbsp;
+    <svg width="18" height="10" style="vertical-align:middle;margin-right:2px;"><line x1="0" y1="5" x2="18" y2="5" stroke="#cc2222" stroke-width="1.5" stroke-dasharray="4,3"/><circle cx="9" cy="5" r="2.5" fill="#cc2222"/></svg><span style="color:#cc2222">otw\u00f3r</span> &nbsp;&nbsp;
+    <span style="color:var(--accent)">&#9679;</span> zawias &nbsp;
+    <span style="color:var(--success)">&#9679;</span> konfirmat
+  </div>`;
+
+  out+=`</div>`;
+  return out;
+}
+
+function drawDrillCanvas(holes, cfg){
+  const canvas = document.getElementById('drillCanvas');
+  if(!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const maxW = Math.min(window.innerWidth - 40, 480);
+  const scale = Math.min(maxW / cfg.depth, 300 / cfg.height);
+
+  const cssW = Math.round(cfg.depth * scale) + 80;
+  const cssH = Math.round(cfg.height * scale) + 40;
+  canvas.width  = cssW * dpr;
+  canvas.height = cssH * dpr;
+  canvas.style.width  = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0,0,cssW,cssH);
+
+  const ox = 30, oy = 20;
+  const sx = x => ox + x * scale;
+  const sy = y => oy + (cfg.height - y) * scale; // Y od dolu
+
+  // Bok
+  ctx.strokeStyle='rgba(150,170,200,.4)';
+  ctx.lineWidth=1.5;
+  ctx.strokeRect(ox, oy, cfg.depth*scale, cfg.height*scale);
+
+
+  // Prowadnice: szary prostok\u0105t = cia\u0142o prowadnicy, czerwony pунктир = otwory
+  const prowRows = {};
+  holes.filter(h=>h.type==='prowadnica').forEach(h=>{
+    if(!prowRows[h.y]) prowRows[h.y] = [];
+    prowRows[h.y].push(h);
+  });
+
+  Object.entries(prowRows).forEach(([yStr, hs])=>{
+    const y = +yStr;
+    const cy = sy(y);
+    const runnerH = Math.max(4, 16 * scale); // wysoko\u015b\u0107 prowadnicy w px
+
+    // Szary prostok\u0105t = prowadnica
+    ctx.fillStyle = 'rgba(160,160,160,0.18)';
+    ctx.fillRect(ox, cy - runnerH, cfg.depth*scale, runnerH);
+    ctx.strokeStyle = 'rgba(160,160,160,0.40)';
+    ctx.lineWidth = 0.8;
+    ctx.strokeRect(ox, cy - runnerH, cfg.depth*scale, runnerH);
+
+    // Czerwona linia przerywana = otwory mocuj\u0105ce
+    ctx.save();
+    ctx.setLineDash([5,4]);
+    ctx.strokeStyle = '#cc2222';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(ox, cy);
+    ctx.lineTo(ox + cfg.depth*scale, cy);
+    ctx.stroke();
+    ctx.restore();
+
+    // Czerwone kropki w pozycjach X
+    hs.forEach(h=>{
+      const cx2 = sx(h.x);
+      ctx.beginPath();
+      ctx.arc(cx2, cy, 3, 0, Math.PI*2);
+      ctx.fillStyle = '#cc2222';
+      ctx.fill();
+    });
+
+    // Etykieta Y
+    ctx.fillStyle = '#cc2222';
+    ctx.font = `${Math.max(7,Math.min(9,scale*8))}px monospace`;
+    ctx.textAlign = 'left';
+    ctx.fillText(y+'mm', ox + cfg.depth*scale + 5, cy + 3);
+  });
+
+  // Zawiasy, konfirmaty — ko\u0142ka
+  holes.filter(h=>h.type!=='prowadnica').forEach(h=>{
+    if(h.side!=='bok') return;
+    const cx2 = sx(h.x);
+    const cy  = sy(h.y);
+    const r   = Math.max(3, (h.diameter/2) * scale);
+    ctx.beginPath();
+    ctx.arc(cx2, cy, r, 0, Math.PI*2);
+    ctx.fillStyle = h.color + '33';
+    ctx.fill();
+    ctx.strokeStyle = h.color;
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    ctx.fillStyle = h.color;
+    ctx.font = `${Math.max(7,Math.min(9,scale*8))}px monospace`;
+    ctx.textAlign = 'left';
+    ctx.fillText(h.y+'mm', cx2 + r + 2, cy + 3);
+  });
+
+  // Wymiary
+  ctx.fillStyle = 'rgba(150,170,200,.6)';
+  ctx.font = '8px monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText(cfg.depth+'mm', ox + cfg.depth*scale/2, oy + cfg.height*scale + 14);
+  ctx.save();
+  ctx.translate(12, oy + cfg.height*scale/2);
+  ctx.rotate(-Math.PI/2);
+  ctx.fillText(cfg.height+'mm', 0, 0);
+  ctx.restore();
+}
+
+
+/* ===== 2. ZAWIASY – KOORDINATY (integracja z renderDrillSheet) ===== */
+// Juz zintegrowane w generateDrillSheet powyzej
+
+
+/* ===== 4. LOCALSTORAGE – ZAPIS/ODCZYT PROJEKTU ===== */
+const LS_KEY = 'meble_pro_project_v1';
+
+function saveProject(){
+  if(project.length===0){ alert('Brak modulow do zapisania'); return; }
+  const data = {
+    client:   document.getElementById('clientName')?.value  || '',
+    projName: document.getElementById('projectName')?.value || '',
+    saved:    new Date().toISOString(),
+    modules:  project
+  };
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify(data));
+    const btn = document.getElementById('btnSaveProject');
+    if(btn){ btn.textContent='✅ Zapisano'; setTimeout(()=>btn.textContent='💾 Zapisz projekt',1500); }
+  } catch(e){
+    alert('Blad zapisu: '+e.message);
+  }
+}
+
+function loadProject(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw){ alert('Brak zapisanego projektu'); return; }
+    const data = JSON.parse(raw);
+    project = data.modules || [];
+    if(data.client){
+      const el=document.getElementById('clientName'); if(el) el.value=data.client;
+    }
+    if(data.projName){
+      const el=document.getElementById('projectName'); if(el) el.value=data.projName;
+    }
+    const saved = new Date(data.saved).toLocaleString('pl-PL');
+    const btn = document.getElementById('btnLoadProject');
+    if(btn){ btn.textContent=`✅ Wczytano (${project.length} mod.)`; setTimeout(()=>btn.textContent='📂 Wczytaj projekt',2000); }
+    document.getElementById('projectView').innerHTML=`<div class="warn" style="border-color:var(--success);color:var(--success);">Wczytano projekt: ${project.length} modulow (zapisany ${saved})</div>`;
+  } catch(e){
+    alert('Blad odczytu: '+e.message);
+  }
+}
+
+function clearProjectLS(){
+  project=[];
+  document.getElementById('projectView').innerHTML='';
+  document.getElementById('result').innerHTML='';
+  try{ localStorage.removeItem(LS_KEY); } catch(e){}
+}
+
+
+/* ===== 8. PERFORACJA 32mm ===== */
+function generatePerf32(cfg){
+  // Siatka otworow 32mm na boku
+  // Start: 37mm od wienca dolnego (standard europejski), krok 32mm
+  const startY = 37;
+  const step   = 32;
+  const endY   = cfg.height - 37;
+  const holes  = [];
+  // Dwie kolumny: przod (X=37mm) i tyl (X=depth-37mm)
+  const xFront = 37;
+  const xBack  = cfg.depth - 37;
+  let y = startY;
+  let n = 1;
+  while(y <= endY){
+    holes.push({ n, y, xFront, xBack });
+    y += step;
+    n++;
+  }
+  return holes;
+}
+
+function renderPerf32(cfg){
+  const holes = generatePerf32(cfg);
+  if(!holes.length) return '';
+  let out = `<div style="margin-top:14px;">
+    <h3 style="font-size:.85rem;letter-spacing:.1em;color:var(--muted);margin-bottom:6px;">
+      PERFORACJA 32mm – BOK
+    </h3>
+    <div style="font-size:.7rem;color:var(--muted);margin-bottom:6px;font-family:'JetBrains Mono',monospace;">
+      Start: 37mm od dna | Krok: 32mm | Kolumny: ${holes[0].xFront}mm i ${holes[0].xBack}mm od przodu
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;font-family:'JetBrains Mono',monospace;font-size:.72rem;">`;
+  holes.forEach(h=>{
+    out+=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:3px 7px;color:var(--text2);">
+      #${h.n}: <strong>${h.y}mm</strong>
+    </div>`;
+  });
+  out+=`</div>
+    <div style="margin-top:6px;font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;">
+      Lacznie: <strong>${holes.length}</strong> otworow × 2 kolumny = <strong>${holes.length*2} szt</strong> | srednica: 5mm
+    </div>
+  </div>`;
+  return out;
+}
+
+
+/* ===== 9. WALIDACJA KOLIZJI ===== */
+function checkCollisions(cfg, runners){
+  const warnings = [];
+  const sd = systemData[cfg.system] || {};
+
+  // --- Pomocnicze ---
+  const hasDoors = cfg.config==='Drzwi';
+  const hasShelves = cfg.shelfCount > 0;
+  const frontH = cfg.height - 4;
+  const hingeQty = cfg.hingeQty || (frontH>1400?4:frontH>900?3:2);
+  const hinge35Y = 22; // srodek kubka 35mm od krawedzi boku
+
+  // Pozycje zawiasow (Y od wienca dolnego, w skali frontu)
+  const hingeYs = [];
+  if(hasDoors && cfg.hingeType && cfg.hingeType!=='none'){
+    if(hingeQty===2){ hingeYs.push(100); hingeYs.push(frontH-100); }
+    else if(hingeQty===3){ hingeYs.push(100); hingeYs.push(Math.round(frontH/2)); hingeYs.push(frontH-100); }
+    else { hingeYs.push(100); hingeYs.push(Math.round(frontH/3)); hingeYs.push(Math.round(2*frontH/3)); hingeYs.push(frontH-100); }
+  }
+
+  // Pozycje prowadnic (Y od wienca dolnego)
+  const runnerYs = runners.filter(r=>r.y!==undefined).map(r=>r.y);
+
+  // Pozycje polek (rownomierne)
+  const shelfYs = [];
+  if(hasShelves){
+    const innerH = cfg.height - 36;
+    for(let i=1; i<=cfg.shelfCount; i++){
+      shelfYs.push(18 + Math.round((innerH / (cfg.shelfCount+1)) * i));
+    }
+  }
+
+  // === KOLIZJA 1: Prowadnica vs Zawias (kubek 35mm, strefa +/-40mm) ===
+  runnerYs.forEach(ry=>{
+    hingeYs.forEach(hy=>{
+      const dist = Math.abs(ry - hy);
+      if(dist < 40){
+        warnings.push({
+          level:'error',
+          code:'PROW_ZAWIAS',
+          msg:`Prowadnica Y=${ry}mm koliduje z zawiasem Y=${hy}mm (odstep ${dist}mm < 40mm)`,
+          fix:`Przesun prowadnice lub zmien wysokosc frontu szuflady`
+        });
+      }
+    });
+  });
+
+  // === KOLIZJA 2: Polka vs Zawias (strefa 35mm) ===
+  shelfYs.forEach(sy=>{
+    hingeYs.forEach(hy=>{
+      const dist = Math.abs(sy - hy);
+      if(dist < 35){
+        warnings.push({
+          level:'error',
+          code:'POLKA_ZAWIAS',
+          msg:`Polka Y=${sy}mm koliduje z zawiasem Y=${hy}mm (odstep ${dist}mm < 35mm)`,
+          fix:`Zmien liczbe lub pozycje polek`
+        });
+      }
+    });
+  });
+
+  // === KOLIZJA 3: Polka vs Prowadnica ===
+  shelfYs.forEach(sy=>{
+    runnerYs.forEach(ry=>{
+      const dist = Math.abs(sy - ry);
+      if(dist < 25){
+        warnings.push({
+          level:'error',
+          code:'POLKA_PROW',
+          msg:`Polka Y=${sy}mm koliduje z prowadnica Y=${ry}mm (odstep ${dist}mm < 25mm)`,
+          fix:`Zmien liczbe polek lub wysokosci szuflad`
+        });
+      }
+    });
+  });
+
+  // === KOLIZJA 4: Szuflada za szeroka/waska dla systemu ===
+  if(cfg.config==='Szuflady'){
+    if(sd.minWidth && cfg.width < sd.minWidth){
+      warnings.push({
+        level:'error', code:'WIDTH_MIN',
+        msg:`Szerokosc ${cfg.width}mm < min ${sd.minWidth}mm dla ${cfg.system}`,
+        fix:`Zmien system prowadnic lub zwieksz szerokosc`
+      });
+    }
+    if(sd.maxWidth && cfg.width > sd.maxWidth){
+      warnings.push({
+        level:'error', code:'WIDTH_MAX',
+        msg:`Szerokosc ${cfg.width}mm > max ${sd.maxWidth}mm dla ${cfg.system}`,
+        fix:`Zmien system prowadnic lub zmniejsz szerokosc`
+      });
+    }
+  }
+
+  // === KOLIZJA 5: Prowadnica za dluga dla glebokosci ===
+  if(cfg.config==='Szuflady' && cfg.runner > cfg.depth - 10){
+    warnings.push({
+      level:'error', code:'RUNNER_DEPTH',
+      msg:`Prowadnica ${cfg.runner}mm za dluga dla glebokosci ${cfg.depth}mm (min ${cfg.runner+10}mm)`,
+      fix:`Skroc prowadnice lub zwieksz glebokosc szafy`
+    });
+  }
+
+  // === KOLIZJA 6: Front szuflady za wysoki (suma) ===
+  if(cfg.config==='Szuflady'){
+    const golaOffset = cfg.type==='Dolna GOLA' ? 50 : 0;
+    const available = cfg.height - golaOffset - 4 - ((cfg.qty-1)*3);
+    const sum = cfg.frontHeights.reduce((a,b)=>a+b,0);
+    const diff = sum - available;
+    if(diff > 0){
+      warnings.push({
+        level:'error', code:'FRONT_SUM',
+        msg:`Suma frontow ${sum}mm przekracza dostepna wysokosc ${available}mm o ${diff}mm`,
+        fix:`Zmniejsz wysokosci frontow`
+      });
+    } else if(diff < -10){
+      warnings.push({
+        level:'warn', code:'FRONT_GAP',
+        msg:`Luza ${-diff}mm miedzy frontami a gabarytem szafy`,
+        fix:`Sprawdz wymiary frontow`
+      });
+    }
+  }
+
+  // === KOLIZJA 7: Glebokosc szuflady (box) vs glebokosc szafy ===
+  if(cfg.config==='Szuflady' && sd.offset){
+    const boxDepth = cfg.depth - sd.offset - 20; // ~20mm luz za szuflada
+    if(boxDepth < 200){
+      warnings.push({
+        level:'warn', code:'BOX_DEPTH',
+        msg:`Efektywna glebokosc szuflady ~${boxDepth}mm (offset ${sd.offset}mm + 20mm luz) – moze byc za mala`,
+        fix:`Rozwaaz glebokosc szafy min. ${sd.offset+220}mm`
+      });
+    }
+  }
+
+  // === KOLIZJA 8: Cargo – za mala szerokosc ===
+  if(cfg.type==='Cargo / Spacetower' && cfg.width > 400){
+    warnings.push({
+      level:'warn', code:'CARGO_WIDTH',
+      msg:`Cargo/Spacetower przy szerokosci ${cfg.width}mm – standard to max 300-400mm`,
+      fix:`Typowe Spacetower: 200-300mm szerokosci`
+    });
+  }
+
+  // === KOLIZJA 9: Polka vs Polka (za blisko) ===
+  for(let i=0; i<shelfYs.length-1; i++){
+    const dist = shelfYs[i+1] - shelfYs[i];
+    if(dist < 60){
+      warnings.push({
+        level:'warn', code:'POLKA_POLKA',
+        msg:`Polki za blisko siebie: ${shelfYs[i]}mm i ${shelfYs[i+1]}mm (odstep ${dist}mm < 60mm)`,
+        fix:`Zmniejsz liczbe polek`
+      });
+    }
+  }
+
+  // === KOLIZJA 10: Nozki vs Gole dno (Pod zmywark\u0119 bez nozek) ===
+  if(cfg.type==='Pod zmywark\u0119' && cfg.legType!=='none'){
+    warnings.push({
+      level:'warn', code:'ZMYW_NOZKI',
+      msg:`Szafka pod zmywark\u0119 z nozkami – zmywarka montowana bezposrednio na dno`,
+      fix:`Rozwaz usuniecie nozek lub uzyj regulowanej podstawy`
+    });
+  }
+
+  return warnings;
+}
+
+function renderCollisions(warnings){
+  if(!warnings || warnings.length===0){
+    return `<div style="margin-top:10px;padding:8px 12px;background:rgba(31,186,124,.1);border:1px solid var(--success);border-radius:6px;font-size:.75rem;font-family:'JetBrains Mono',monospace;color:var(--success);">
+      ✓ Brak kolizji – konfiguracja poprawna
+    </div>`;
+  }
+
+  const errors = warnings.filter(w=>w.level==='error');
+  const warns  = warnings.filter(w=>w.level==='warn');
+
+  let out = `<div style="margin-top:12px;">
+    <h3 style="font-size:.85rem;letter-spacing:.1em;color:var(--danger);margin-bottom:8px;">
+      ⚠ KOLIZJE / OSTRZEZENIA (${warnings.length})
+    </h3>`;
+
+  errors.forEach(w=>{
+    out+=`<div style="background:rgba(224,62,62,.1);border-left:3px solid var(--danger);border-radius:4px;padding:8px 10px;margin-bottom:6px;font-size:.75rem;font-family:'JetBrains Mono',monospace;">
+      <div style="color:var(--danger);font-weight:700;">[${w.code}] ${w.msg}</div>
+      <div style="color:var(--muted);margin-top:3px;">→ ${w.fix}</div>
+    </div>`;
+  });
+
+  warns.forEach(w=>{
+    out+=`<div style="background:rgba(232,160,32,.1);border-left:3px solid var(--accent);border-radius:4px;padding:8px 10px;margin-bottom:6px;font-size:.75rem;font-family:'JetBrains Mono',monospace;">
+      <div style="color:var(--accent2);font-weight:700;">[${w.code}] ${w.msg}</div>
+      <div style="color:var(--muted);margin-top:3px;">→ ${w.fix}</div>
+    </div>`;
+  });
+
+  out+=`</div>`;
+  return out;
+}
+
+
+/* ===== CSV EXPORT ===== */
+function exportCSV(parts, runners, cfg){
+  let csv = 'Lp;Element;Szerokosc_mm;Wysokosc_mm;Grubosc_mm\n';
+  let lp=1;
+  parts.filter(p=>p.t>0).forEach(p=>{
+    csv += `${lp++};${p.name};${p.w};${p.h};${p.t}\n`;
+  });
+  runners.forEach(r=>{
+    csv += `${lp++};Prowadnica ${r.length}mm;${r.length};;;`;
+    if(r.y!==undefined) csv += `;Y=${r.y}mm`;
+    csv += '\n';
+  });
+  const filename = `${cfg.type}_${cfg.width}x${cfg.height}x${cfg.depth}.csv`.replace(/\s+/g,'_');
+  const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=filename; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ===== CATEGORY CARD UI ===== */
+function toggleCat(catId){
+  const sub = document.getElementById(catId);
+  const arr = document.getElementById('arr-'+catId);
+  const card = sub ? sub.previousElementSibling : null;
+  if(!sub) return;
+  const isOpen = sub.classList.contains('open');
+  // Close all
+  document.querySelectorAll('.cat-sub').forEach(s=>s.classList.remove('open'));
+  document.querySelectorAll('.cat-arrow').forEach(a=>a.classList.remove('open'));
+  document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('cat-open'));
+  if(!isOpen){
+    sub.classList.add('open');
+    if(arr) arr.classList.add('open');
+    if(card) card.classList.add('cat-open');
+  }
+}
+
+function selectType(val, el){
+  // Update hidden select
+  const sel = document.getElementById('type');
+  if(sel){
+    for(let i=0;i<sel.options.length;i++){
+      if(sel.options[i].value===val||sel.options[i].text===val){
+        sel.selectedIndex=i; break;
+      }
+    }
+  }
+  // Update active state
+  document.querySelectorAll('.cat-sub-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  // Update breadcrumb
+  const bc = document.getElementById('breadcrumbType');
+  if(bc) bc.textContent = val;
+  // Trigger autoLogic
+  autoLogic();
+  // Stop propagation to parent cat-card
+  event.stopPropagation();
+}
+
+// On page load: open first category
+if(typeof window!=='undefined'&&window.addEventListener){
+  window.addEventListener('DOMContentLoaded', ()=>{ toggleCat('cat-dolne'); });
+}
+
+/* =====================================================================
+   3D WIDOK — Three.js  (full interactive)
+   ===================================================================== */
+let _3dRenderer=null, _3dScene=null, _3dCamera=null, _3dAnimId=null;
+let _3dDrag={active:false,x:0,y:0,rotX:0.25,rotY:0.30};
+let _3dZoom=1.4;
+let _3dFrontsOpen=false;
+let _3dBokiOn=true;
+let _3dFrontObjs=[];   // {mesh or pivot, type:'door'|'drawer', targetRot, targetPos, curRot, curPos}
+let _3dBokiObjs=[];    // side panel meshes
+let _3dUpdateCamera=null;
+
+function toggle3DFronts(){
+  _3dFrontsOpen=!_3dFrontsOpen;
+  const btn=document.getElementById('btn3DFront');
+  if(btn) btn.textContent=_3dFrontsOpen?'\uD83D\uDEAA Zamknij fronty':'\uD83D\uDEAA Otw\u00f3rz fronty';
+}
+function toggle3DBoki(){
+  _3dBokiOn=!_3dBokiOn;
+  _3dBokiObjs.forEach(m=>{ m.visible=_3dBokiOn; });
+  const btn=document.getElementById('btn3DBoki');
+  if(btn){
+    btn.textContent='\u25a1 Boki: '+(_3dBokiOn?'w\u0142':'wy\u0142');
+    btn.style.borderColor=_3dBokiOn?'var(--border)':'var(--accent)';
+    btn.style.color=_3dBokiOn?'var(--text2)':'var(--accent)';
+  }
+}
+
+function draw3D(cfg){
+  const wrap=document.getElementById('canvas3D');
+  const canvas=document.getElementById('threeCanvas');
+  if(!wrap||!canvas) return;
+  if(typeof THREE==='undefined'){ canvas.style.height='60px'; return; }
+
+  // Reset state
+  _3dFrontObjs=[]; _3dBokiObjs=[];
+  if(_3dAnimId){ cancelAnimationFrame(_3dAnimId); _3dAnimId=null; }
+  if(_3dRenderer){ _3dRenderer.dispose(); }
+
+  const W=wrap.clientWidth||wrap.parentElement.clientWidth||320;
+  const H=Math.round(Math.max(260, W*0.72));
+  canvas.width=W; canvas.height=H;
+  canvas.style.height=H+'px';
+
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true});
+  renderer.setSize(W,H); renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.shadowMap.enabled=true;
+  renderer.setClearColor(0x12141a,1);
+  _3dRenderer=renderer;
+
+  const scene=new THREE.Scene();
+  scene.fog=new THREE.Fog(0x12141a, 2000, 8000);
+  _3dScene=scene;
+
+  scene.add(new THREE.AmbientLight(0xffffff,0.20));
+  const sun=new THREE.DirectionalLight(0xffffff,0.85);
+  sun.castShadow=true;
+  sun.shadow.mapSize.set(1024,1024); scene.add(sun);
+  const fill=new THREE.DirectionalLight(0xaabbdd,0.30); scene.add(fill);
+  const rim=new THREE.DirectionalLight(0xfff0cc,0.15); scene.add(rim);
+
+  // === DIMENSIONS ===
+  const W3=cfg.width, H3=cfg.height, D3=cfg.depth, T=18;
+  const golaOff=(cfg.type==="\u0044\u006f\u006c\u006e\u0061 GOLA")?19:0;
+  const cx=W3/2, cy=H3/2, cz=D3/2;
+  const _wallTypes=["\u0057\u0069\u0073\u007a\u0105\u0063\u0061","\u0057\u0069\u0073\u007a\u0105\u0063\u0061 z klap\u0105","Pod okap","Naro\u017cna g\u00f3rna"];
+
+  // Ustaw \u015bwiat\u0142a po poznaniu wymiar\u00f3w
+  sun.position.set(W3*0.8, H3*1.5, D3*2.5);
+  fill.position.set(-W3, H3*0.5, D3*0.5);
+  rim.position.set(0, -H3, -D3);
+
+  const camera=new THREE.PerspectiveCamera(40,W/H,1,20000);
+  _3dCamera=camera;
+
+  // === MATERIALS ===
+  const korpMat =new THREE.MeshStandardMaterial({color:0xc8b888,roughness:0.65,metalness:0.0});
+  const plecyMat=new THREE.MeshStandardMaterial({color:0xb0a070,roughness:0.80,metalness:0.0});
+  const shelfMat=new THREE.MeshStandardMaterial({color:0xd4c498,roughness:0.55,metalness:0.0});
+  const frontMat=new THREE.MeshStandardMaterial({color:0x3a2808,roughness:0.25,metalness:0.05});
+  const frontMat2=new THREE.MeshStandardMaterial({color:0x4a3410,roughness:0.25,metalness:0.05});
+  const drawerMat=new THREE.MeshStandardMaterial({color:0x7a5010,roughness:0.28,metalness:0.06});
+  const legMat  =new THREE.MeshStandardMaterial({color:0x707070,roughness:0.30,metalness:0.75});
+  const innerMat=new THREE.MeshStandardMaterial({color:0xa89060,roughness:0.70,metalness:0.0});
+  const edgeMat =new THREE.LineBasicMaterial({color:0x000000,transparent:true,opacity:0.18});
+
+  function mkBox(w,h,d,mat,x,y,z,cast=true){
+    const geo=new THREE.BoxGeometry(w,h,d);
+    const m=new THREE.Mesh(geo,mat);
+    m.position.set(x,y,z); m.castShadow=cast; m.receiveShadow=true;
+    scene.add(m);
+    // Edge lines for panel separation
+    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(geo),edgeMat);
+    m.add(edges);
+    return m;
+  }
+
+  // === KORPUS ===
+  // Boki
+  const bokL=mkBox(T,H3,D3,korpMat, T/2,cy,cz);
+  const bokP=mkBox(T,H3,D3,korpMat, W3-T/2,cy,cz);
+  _3dBokiObjs=[bokL,bokP];
+
+  // Dno
+  if(cfg.type!=="Pod zmywark\u0119")
+    mkBox(W3-2*T,T,D3,korpMat, cx,T/2+golaOff,cz);
+  // Wieniec
+  mkBox(W3-2*T,T,D3,korpMat, cx,H3-T/2,cz);
+  // Plecy
+  mkBox(W3-2*T,H3-2*T,3,plecyMat, cx,cy,1.5);
+
+  // === P\u00d3\u0141KI ===
+  const innerH=H3-2*T-golaOff;
+  if(cfg.shelfCount>0){
+    const sc=cfg.shelfCount;
+    for(let i=1;i<=sc;i++){
+      const sy=T+golaOff+Math.round((innerH/(sc+1))*i);
+      mkBox(W3-2*T-2,T,D3-20,shelfMat, cx,sy,cz+10);
+    }
+  }
+
+  // === UCHWYT helper ===
+  const handleMat=new THREE.MeshStandardMaterial({color:0x1c1c1c,roughness:0.15,metalness:0.90});
+  function mkHandle(parent,hx,hy,hz,hw,hh,hd){
+    const g=new THREE.BoxGeometry(hw,hh,hd);
+    const m=new THREE.Mesh(g,handleMat); m.position.set(hx,hy,hz);
+    m.castShadow=true; parent.add(m);
+  }
+  function addDoorHandle(doorMesh,fw,fh,side){
+    const hx=(side==='left')?fw/2-30:-fw/2+30;
+    mkHandle(doorMesh,hx,-fh/4,T+7,10,128,10);
+  }
+  function addDrawerHandle(frontMesh){
+    mkHandle(frontMesh,0,0,T/2+7,160,10,10);
+  }
+
+  // === FRONTY / SZUFLADY ===
+  const frontZ=D3+T/2;
+  const frontYStart=2+golaOff;
+  const frontH3=H3-4-golaOff;
+
+  if(cfg.config==="Drzwi"){
+    const fh=frontH3;
+    const fy=frontYStart+fh/2;
+    if(cfg.frontCount===2){
+      const luz=2, tot=W3-4-luz;
+      const fw1=Math.floor(tot/2), fw2=tot-fw1;
+      // Drzwi LEWE — pivot na lewej krawedzi; rotacja +Y otwiera prawy bok do przodu
+      const pivL=new THREE.Group();
+      pivL.position.set(2,fy,D3); scene.add(pivL);
+      const geoL=new THREE.BoxGeometry(fw1,fh,T);
+      const dL=new THREE.Mesh(geoL,frontMat);
+      dL.position.set(fw1/2,0,T/2); dL.castShadow=true;
+      dL.add(new THREE.LineSegments(new THREE.EdgesGeometry(geoL),edgeMat));
+      addDoorHandle(dL,fw1,fh,'left');
+      pivL.add(dL);
+      // Drzwi PRAWE — pivot na prawej krawedzi; rotacja -Y otwiera lewy bok do przodu
+      const pivR=new THREE.Group();
+      pivR.position.set(W3-2,fy,D3); scene.add(pivR);
+      const geoR=new THREE.BoxGeometry(fw2,fh,T);
+      const dR=new THREE.Mesh(geoR,frontMat2);
+      dR.position.set(-fw2/2,0,T/2); dR.castShadow=true;
+      dR.add(new THREE.LineSegments(new THREE.EdgesGeometry(geoR),edgeMat));
+      addDoorHandle(dR,fw2,fh,'right');
+      pivR.add(dR);
+      _3dFrontObjs.push({pivot:pivL,type:'door',side:'left', curRot:0});
+      _3dFrontObjs.push({pivot:pivR,type:'door',side:'right',curRot:0});
+    } else {
+      const fw=W3-4;
+      const piv=new THREE.Group();
+      piv.position.set(2,fy,D3); scene.add(piv);
+      const geoD=new THREE.BoxGeometry(fw,fh,T);
+      const d=new THREE.Mesh(geoD,frontMat);
+      d.position.set(fw/2,0,T/2); d.castShadow=true;
+      d.add(new THREE.LineSegments(new THREE.EdgesGeometry(geoD),edgeMat));
+      addDoorHandle(d,fw,fh,'left');
+      piv.add(d);
+      _3dFrontObjs.push({pivot:piv,type:'door',side:'left',curRot:0});
+    }
+
+  } else if(cfg.config==="Szuflady"&&cfg.frontHeights&&cfg.frontHeights.length){
+    const fhArr=[...cfg.frontHeights]; // [0]=dol, [qty-1]=gora
+    const GAP=3;
+    let yPos=frontYStart;
+    fhArr.forEach((fh,i)=>{
+      const fw=W3-4;
+      const boxD=(cfg.runner||450)*0.88;
+      const dtArr=cfg.drawerTypes?[...cfg.drawerTypes]:[];
+      const boxH=(dtArr[i]==='N'?86:64);
+      const isLast=(i===fhArr.length-1);
+      const frontMesh=mkBox(fw,fh,T,drawerMat,cx,yPos+fh/2,frontZ);
+      addDrawerHandle(frontMesh);
+      const innerBox=mkBox(fw-6,boxH,boxD,innerMat,cx,yPos+fh/2,D3-boxD/2+4);
+      innerBox.visible=false;
+      _3dFrontObjs.push({
+        type:'drawer',frontMesh,innerBox,
+        startZ:frontZ,openZ:frontZ+boxD*0.80,
+        curZ:frontZ,yCenter:yPos+fh/2
+      });
+      yPos+=fh+(isLast?0:GAP);
+    });
+  }
+
+  if(cfg.legType&&cfg.legType!=='none'&&!_wallTypes.includes(cfg.type)){
+    const legH=cfg.legType.includes('150')?150:100;
+    [[T+20,T+20],[W3-T-20,T+20],[T+20,D3-T-20],[W3-T-20,D3-T-20]].forEach(([lx,lz])=>{
+      const g=new THREE.CylinderGeometry(12,12,legH,12);
+      const m=new THREE.Mesh(g,legMat); m.position.set(lx,-legH/2,lz);
+      m.castShadow=true; scene.add(m);
+    });
+  }
+
+  // Grid
+  const legOff=cfg.legType&&cfg.legType!=='none'&&!_wallTypes.includes(cfg.type)
+    ?(cfg.legType.includes('150')?-150:-100):0;
+  const gr=new THREE.GridHelper(Math.max(W3,D3)*3,14,0x1e2535,0x161b26);
+  gr.position.set(cx,legOff,cz); scene.add(gr);
+
+  // === KAMERA ===
+  const maxDim=Math.max(W3,H3,D3);
+  const baseDist=maxDim*1.8;
+  function updateCamera(){
+    const dist=baseDist*_3dZoom;
+    const rx=_3dDrag.rotX, ry=_3dDrag.rotY;
+    camera.position.set(
+      cx+dist*Math.sin(ry)*Math.cos(rx),
+      cy+dist*Math.sin(rx),
+      cz+dist*Math.cos(ry)*Math.cos(rx)
+    );
+    camera.lookAt(cx,cy,cz);
+  }
+  _3dUpdateCamera=updateCamera;
+  updateCamera();
+
+  // === ANIMACJA ===
+  // Lewe drzwi: pivot na lewej kraw\u0119dzi, mesh idzie w prawo → otwiera si\u0119 przez UJEMNY obr\u00f3t Y (prawa kraw\u0119d\u017a idzie do przodu)
+  // Prawe drzwi: pivot na prawej kraw\u0119dzi, mesh idzie w lewo → otwiera si\u0119 przez DODATNI obr\u00f3t Y
+  const OPEN_DOOR_ANGLE=Math.PI*0.53; // ~95°
+
+  function animate(){
+    _3dAnimId=requestAnimationFrame(animate);
+    const speed=0.08;
+    _3dFrontObjs.forEach(obj=>{
+      if(obj.type==='door'){
+        // left door: pivot at left edge, mesh goes right → positive Y rotates right edge forward (+Z) ✅
+        // right door: pivot at right edge, mesh goes left → negative Y rotates left edge forward (+Z) ✅
+        const target=_3dFrontsOpen?(obj.side==='right'?-OPEN_DOOR_ANGLE:OPEN_DOOR_ANGLE):0;
+        obj.curRot+=(target-obj.curRot)*speed;
+        obj.pivot.rotation.y=obj.curRot;
+      } else if(obj.type==='drawer'){
+        const target=_3dFrontsOpen?obj.openZ:obj.startZ;
+        obj.curZ+=(target-obj.curZ)*speed;
+        const dz=obj.curZ-obj.startZ;
+        obj.frontMesh.position.z=obj.curZ;
+        obj.innerBox.position.z=obj.startZ-((cfg.runner||450)*0.88)/2+4+dz;
+        obj.innerBox.visible=dz>10;
+      }
+    });
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  // === INTERAKCJA ===
+  function onDown(e){ _3dDrag.active=true; const s=e.touches?e.touches[0]:e; _3dDrag.x=s.clientX; _3dDrag.y=s.clientY; }
+  function onMove(e){
+    if(!_3dDrag.active) return; e.preventDefault();
+    const s=e.touches?e.touches[0]:e;
+    _3dDrag.rotY+=(s.clientX-_3dDrag.x)*0.007;
+    _3dDrag.rotX+=(s.clientY-_3dDrag.y)*0.007;
+    _3dDrag.rotX=Math.max(-1.3,Math.min(1.3,_3dDrag.rotX));
+    _3dDrag.x=s.clientX; _3dDrag.y=s.clientY;
+    updateCamera();
+  }
+  function onUp(){ _3dDrag.active=false; }
+  function onWheel(e){ e.preventDefault(); _3dZoom*=1+e.deltaY*0.001; _3dZoom=Math.max(0.4,Math.min(5,_3dZoom)); updateCamera(); }
+
+  if(canvas._cleanup){ canvas._cleanup(); }
+  const _wu=()=>{ _3dDrag.active=false; };
+  window.addEventListener('mouseup',_wu);
+  canvas.addEventListener('mousedown',onDown);
+  canvas.addEventListener('mousemove',onMove);
+  canvas.addEventListener('touchstart',onDown,{passive:true});
+  canvas.addEventListener('touchmove',onMove,{passive:false});
+  canvas.addEventListener('touchend',onUp);
+  canvas.addEventListener('wheel',onWheel,{passive:false});
+  canvas._cleanup=()=>{
+    window.removeEventListener('mouseup',_wu);
+    ['mousedown','mousemove','touchstart','touchmove','touchend','wheel'].forEach(ev=>canvas.removeEventListener(ev,null));
+  };
+
+  // Sync boki visibility
+  _3dBokiObjs.forEach(m=>{ m.visible=_3dBokiOn; });
+  const bb=document.getElementById('btn3DBoki');
+  if(bb) bb.textContent='\u25a1 Boki: '+(_3dBokiOn?'w\u0142':'wy\u0142');
+  const bf=document.getElementById('btn3DFront');
+  if(bf) bf.textContent=_3dFrontsOpen?'\uD83D\uDEAA Zamknij fronty':'\uD83D\uDEAA Otw\u00f3rz fronty';
+}
+
+
+</script>
+</body>
+</html>
