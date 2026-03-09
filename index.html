@@ -891,6 +891,7 @@ input[type=text]::placeholder{ color:var(--muted); }
   <button id="mainTabKonfig" class="main-tab-btn active" onclick="switchMainTab('konfig')">&#9881; Konfig</button>
   <button id="mainTabRozm" class="main-tab-btn" onclick="switchMainTab('rozm')">&#128208; Rozmiarka</button>
   <button id="mainTabRozkroj" class="main-tab-btn" onclick="switchMainTab('rozkroj')">&#9986; Rozkr&#243;j</button>
+
 </div>
 
 <!-- SEKCJA KONFIGURATOR -->
@@ -1529,6 +1530,116 @@ document.getElementById('chkCokol').addEventListener('change', function(){
   <div id="rk_result"></div>
 
 </div><!-- /sectionRozkroj -->
+
+<!-- ── FLOATING RENDER BUTTON ── -->
+<button id="floatRenderBtn" onclick="toggleRenderDrawer()"
+  style="position:fixed;bottom:20px;right:20px;z-index:200;
+    width:56px;height:56px;border-radius:50%;border:none;cursor:pointer;
+    background:linear-gradient(135deg,#d4a840,#a07820);
+    box-shadow:0 4px 20px rgba(160,120,32,.55),0 1px 0 rgba(255,255,255,.2) inset;
+    color:#fff;font-size:1.3rem;display:flex;align-items:center;justify-content:center;
+    transition:all .2s;" title="Рендер / Шпаргалка">
+  📐
+</button>
+
+<!-- ── RENDER DRAWER ── -->
+<div id="renderDrawer" style="
+  position:fixed;bottom:0;left:0;right:0;z-index:190;
+  height:92vh;
+  background:var(--bg2);
+  border-top:2px solid rgba(200,152,64,.35);
+  border-radius:18px 18px 0 0;
+  box-shadow:0 -8px 48px rgba(0,0,0,.7);
+  transform:translateY(100%);
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;
+  overflow:hidden;">
+
+  <!-- handle bar -->
+  <div onclick="toggleRenderDrawer()" style="
+    flex-shrink:0;padding:14px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:12px;
+    border-bottom:1px solid var(--border);background:var(--surface);">
+    <div style="width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;"></div>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.85rem;letter-spacing:.15em;color:var(--accent2);">📐 РЕНДЕР / ШПАРГАЛКА</span>
+    <div style="width:40px;height:4px;background:rgba(255,255,255,.15);border-radius:2px;"></div>
+  </div>
+
+  <!-- JSON INPUT PANEL -->
+  <div style="flex-shrink:0;padding:12px 14px;background:#0d1117;border-bottom:1px solid var(--border);">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#79c0ff;letter-spacing:.08em;margin-bottom:6px;">
+      // Вставте JSON проєкту — такий самий формат як у панелі збірки
+    </div>
+    <div style="display:flex;gap:8px;align-items:flex-start;">
+      <textarea id="renderJson" rows="3"
+        style="flex:1;padding:8px 10px;background:#161b22;border:1px solid #30363d;border-radius:6px;
+          color:#79c0ff;font-family:'JetBrains Mono',monospace;font-size:.7rem;
+          resize:none;line-height:1.5;outline:none;"
+        placeholder='[ { "code": "SD-01", "name": "Шафка нижня", "H": 740, "W": 600, "D": 560, "section": "Dolne", "parts": [...] } ]'></textarea>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <button onclick="loadRenderJson()"
+          style="padding:9px 16px;background:linear-gradient(135deg,#1a5276,#2e86c1);border:none;border-radius:6px;
+            color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.82rem;
+            letter-spacing:.1em;cursor:pointer;white-space:nowrap;">
+          ▶ ЗАВАНТАЖИТИ
+        </button>
+        <button onclick="clearRenderJson()"
+          style="padding:7px 16px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:6px;
+            color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.75rem;
+            letter-spacing:.08em;cursor:pointer;">
+          ✕ ОЧИСТИТИ
+        </button>
+      </div>
+    </div>
+    <div id="renderJsonErr" style="display:none;margin-top:6px;padding:6px 10px;background:rgba(192,57,43,.1);border:1px solid rgba(192,57,43,.3);border-radius:5px;color:#e07070;font-family:'JetBrains Mono',monospace;font-size:.66rem;"></div>
+  </div>
+
+  <!-- SCROLLABLE CONTENT -->
+  <div id="rndApp" style="flex:1;overflow-y:auto;padding:14px 14px 40px;"></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     RENDER TAB SECTION (legacy compat — hidden)
+════════════════════════════════════════════════ -->
+<div id="sectionRender" style="display:none;"></div>
+
+<style>
+.rnd-zone-header{display:flex;align-items:center;gap:10px;padding:18px 0 10px;}
+.rnd-zone-dot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
+.rnd-zone-name{font-family:'Barlow Condensed',sans-serif;font-size:.88rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;}
+.rnd-zone-line{flex:1;height:1px;background:var(--border);}
+.rnd-zone-count{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--muted);letter-spacing:.1em;}
+.rnd-drawing-frame{background:#07090e;border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow-x:auto;padding:16px 12px 10px;box-shadow:0 8px 32px rgba(0,0,0,.5);margin-bottom:4px;}
+.rnd-drawing-frame svg{display:block;margin:0 auto;}
+.rnd-drawing-cap{text-align:center;font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-top:6px;}
+.rnd-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin-bottom:4px;}
+.rnd-card{background:var(--surface);border:1px solid var(--border);border-radius:9px;overflow:hidden;}
+.rnd-card-head{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--border);}
+.rnd-card-code{font-family:'JetBrains Mono',monospace;font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:4px;}
+.rnd-card-name{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.6);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.rnd-card-dims{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--accent2);font-weight:700;white-space:nowrap;}
+.rnd-card-body{padding:9px 12px;}
+.rnd-sh-label{font-family:'JetBrains Mono',monospace;font-size:.55rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:5px;}
+.rnd-sh-label::before{content:'';display:inline-block;width:7px;height:2px;background:currentColor;border-radius:1px;}
+table.rnd-table{width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:.67rem;margin-bottom:8px;}
+table.rnd-table th{background:rgba(255,255,255,.03);color:var(--muted);padding:4px 7px;font-size:.54rem;letter-spacing:.1em;text-transform:uppercase;font-weight:400;border-bottom:1px solid rgba(255,255,255,.05);text-align:center;}
+table.rnd-table th:first-child{text-align:left;}
+table.rnd-table td{padding:4px 7px;border-bottom:1px solid rgba(255,255,255,.03);text-align:center;}
+table.rnd-table td:first-child{text-align:left;color:rgba(255,255,255,.5);}
+table.rnd-table tr:last-child td{border-bottom:none;}
+.rnd-val-red{color:#e05050;font-weight:700;}
+.rnd-val-gold{color:var(--accent2);font-weight:700;}
+.rnd-val-muted{color:rgba(255,255,255,.35);}
+.rnd-no-data{font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--muted);font-style:italic;padding:4px 0;}
+.rnd-info-tag{display:inline-block;padding:2px 7px;border-radius:4px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);color:rgba(255,255,255,.3);font-family:'JetBrains Mono',monospace;font-size:.57rem;letter-spacing:.04em;margin-bottom:6px;}
+.rnd-summary{padding:14px 16px;background:rgba(200,152,64,.05);border:1px solid rgba(200,152,64,.18);border-radius:9px;display:flex;gap:20px;flex-wrap:wrap;align-items:center;margin-top:20px;}
+.rnd-sum-stat{text-align:center;}
+.rnd-sum-num{font-size:1.6rem;font-weight:800;color:var(--accent2);line-height:1;display:block;}
+.rnd-sum-lbl{font-family:'JetBrains Mono',monospace;font-size:.54rem;color:var(--muted);letter-spacing:.1em;display:block;margin-top:2px;}
+.rnd-legend{font-family:'JetBrains Mono',monospace;font-size:.54rem;color:var(--muted);letter-spacing:.04em;line-height:1.9;margin-left:auto;}
+.rnd-empty{text-align:center;padding:40px 20px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--muted);letter-spacing:.08em;}
+</style>
+
 
 </div><!-- /container -->
 
@@ -4140,8 +4251,9 @@ function switchMainTab(tab){
   document.getElementById('sectionKonfig').style.display  = tab==='konfig'  ? '' : 'none';
   document.getElementById('sectionRozm').style.display    = tab==='rozm'    ? '' : 'none';
   document.getElementById('sectionRozkroj').style.display = tab==='rozkroj' ? '' : 'none';
+  document.getElementById('sectionRender').style.display  = tab==='render'  ? '' : 'none';
 
-  ['Konfig','Rozm','Rozkroj'].forEach(id=>{
+  ['Konfig','Rozm','Rozkroj','Render'].forEach(id=>{
     const btn=document.getElementById('mainTab'+id);
     if(!btn) return;
     btn.classList.toggle('active', tab===id.toLowerCase());
@@ -4149,6 +4261,7 @@ function switchMainTab(tab){
 
   if(tab==='rozm') calcRozm();
   if(tab==='rozkroj') renderRkParts();
+  if(tab==='render') initRenderTab();
 }
 
 
@@ -5636,6 +5749,83 @@ function toggleJsonPanel(){
   }
 }
 
+function buildJsonCheatSheets(c) {
+  var parts = c.parts || [];
+  var H = c.H || 0;
+  var html = '';
+
+  // ── ШПАРГАЛКА ПОЛИЦЬ ──
+  var shelfParts = parts.filter(function(p) {
+    var a = (p.action || p.name || '').toLowerCase();
+    return a.indexOf('\u00f3\u0142k') !== -1 || a.indexOf('half') !== -1 || a.indexOf('p\u00f3\u0142k') !== -1 || /p.{0,2}lk/i.test(a);
+  });
+  var shelfQty = shelfParts.reduce(function(s, p) { return s + (parseInt(p.qty) || 1); }, 0);
+
+  if (shelfQty > 0 && H > 36) {
+    var innerH = H - 36;
+    var spacing = Math.round(innerH / (shelfQty + 1));
+    html += '<div style="padding:10px 14px;border-top:2px solid #2980b9;background:linear-gradient(135deg,#eaf4fb,#f0f8ff);">';
+    html += '<div style="font-size:.72rem;font-weight:800;color:#1a6fa8;letter-spacing:.1em;margin-bottom:8px;font-family:monospace;">📌 ПОЗИЦІЇ ПОЛИЦЬ</div>';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:.76rem;">';
+    html += '<thead><tr style="background:#2980b9;">';
+    html += '<th style="padding:6px 8px;color:#fff;text-align:left;">Полиця</th>';
+    html += '<th style="padding:6px 8px;color:#fff;text-align:center;">Від дна ▲ (мм)</th>';
+    html += '<th style="padding:6px 8px;color:#fff;text-align:center;">Від верху ▼ (мм)</th>';
+    html += '<th style="padding:6px 8px;color:#fff;text-align:center;">Крок (мм)</th>';
+    html += '</tr></thead><tbody>';
+    for (var i = 1; i <= shelfQty; i++) {
+      var yB = Math.round(innerH / (shelfQty + 1) * i);
+      var yT = innerH - yB;
+      var bg = i % 2 === 0 ? '#dbeeff' : '#fff';
+      html += '<tr style="background:' + bg + ';">';
+      html += '<td style="padding:5px 8px;font-weight:700;color:#1a5276;">Полиця ' + i + ' <span style="color:#aaa;font-size:.7rem;">(знизу)</span></td>';
+      html += '<td style="padding:5px 8px;text-align:center;font-weight:900;color:#c0392b;font-family:monospace;font-size:.9rem;">' + yB + '</td>';
+      html += '<td style="padding:5px 8px;text-align:center;color:#555;font-family:monospace;">' + yT + '</td>';
+      html += '<td style="padding:5px 8px;text-align:center;color:#888;font-family:monospace;">' + spacing + '</td>';
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+    html += '<div style="font-size:.67rem;color:#888;margin-top:5px;font-family:monospace;">Y = отвір під кілочок · від внутр. поверхні дна · внутр. H = <b>' + innerH + '</b> мм</div>';
+    html += '</div>';
+  }
+
+  // ── ШПАРГАЛКА НАПРАВЛЯЮЧИХ ШУХЛЯД ──
+  var drawerFronts = parts.filter(function(p) {
+    var a = (p.action || p.name || '');
+    return /^Front\s+\d+$/i.test(a) || /^Fronty?\s+szuflad/i.test(a) || /^Front\s+szuflady/i.test(a);
+  });
+
+  if (drawerFronts.length > 0 && H > 0) {
+    var GAP = 12;
+    var mark = 2;
+    html += '<div style="padding:10px 14px;border-top:2px solid #e67e22;background:linear-gradient(135deg,#fef9f0,#fff8ee);">';
+    html += '<div style="font-size:.72rem;font-weight:800;color:#c0560a;letter-spacing:.1em;margin-bottom:8px;font-family:monospace;">📍 КООРДИНАТИ НАПРАВЛЯЮЧИХ</div>';
+    html += '<table style="width:100%;border-collapse:collapse;font-size:.76rem;">';
+    html += '<thead><tr style="background:#e67e22;">';
+    html += '<th style="padding:6px 8px;color:#fff;text-align:left;">Шухляда</th>';
+    html += '<th style="padding:6px 8px;color:#fff;text-align:center;">Низ напр. від дна (мм)</th>';
+    html += '<th style="padding:6px 8px;color:#fff;text-align:center;">Висота фронту (мм)</th>';
+    html += '</tr></thead><tbody>';
+    for (var j = 0; j < drawerFronts.length; j++) {
+      var fp = drawerFronts[j];
+      var frontH = fp.h || fp.l || 0;
+      var runnerY = mark;
+      var bg2 = j % 2 === 0 ? '#fff' : '#fff3e6';
+      html += '<tr style="background:' + bg2 + ';">';
+      html += '<td style="padding:5px 8px;font-weight:700;color:#7d3c00;">Шухляда ' + (j + 1) + ' <span style="color:#aaa;font-size:.7rem;">(знизу)</span></td>';
+      html += '<td style="padding:5px 8px;text-align:center;font-weight:900;color:#e67e22;font-family:monospace;font-size:.9rem;">' + runnerY + '</td>';
+      html += '<td style="padding:5px 8px;text-align:center;color:#555;font-family:monospace;">' + frontH + '</td>';
+      html += '</tr>';
+      mark += frontH + GAP;
+    }
+    html += '</tbody></table>';
+    html += '<div style="font-size:.67rem;color:#888;margin-top:5px;font-family:monospace;">Y = низ направляючої від верхньої поверхні нижнього віньця · зазор між фронтами: 12 мм</div>';
+    html += '</div>';
+  }
+
+  return html;
+}
+
 function loadProjektJson(){
   var raw=(document.getElementById('projektJson')||{}).value||'';
   raw=raw.trim();
@@ -5656,8 +5846,20 @@ function loadProjektJson(){
     h+='<td style="padding:7px 8px;font-weight:800;color:'+sc(c.section)+';">'+(c.code||'-')+'</td><td style="padding:7px 8px;">'+(c.name||'')+'</td><td style="padding:7px;text-align:center;font-family:monospace;">'+(c.H||'-')+'</td><td style="padding:7px;text-align:center;font-family:monospace;">'+(c.W||'-')+'</td><td style="padding:7px;text-align:center;font-family:monospace;">'+(c.D||'-')+'</td><td style="padding:7px;text-align:center;font-weight:700;">'+((c.parts||[]).length)+'</td></tr>';
   });
   h+='</tbody></table></div>';
+  window._cd = window._cd || {};
   corp.forEach(function(c,ci){
     var color=sc(c.section);var parts=c.parts||[];var uid='pc_'+ci;
+    var _sqty = (c.parts||[]).reduce(function(s,p){
+      var a = (p.action||p.name||'');
+      var isShelf = false;
+      for(var _i=0;_i<a.length-1;_i++){
+        var _c1=a.charCodeAt(_i), _c2=a.charCodeAt(_i+1);
+        // ł(322)+k(107) or l(108)+k(107)
+        if((_c1===322||_c1===108)&&(_c2===107)){isShelf=true;break;}
+      }
+      return s + (isShelf ? (p.qty||1) : 0);
+    }, 0);
+    window._cd[uid+'_3d'] = {H:c.H||0,W:c.W||0,D:c.D||0,parts:parts,code:c.code||'',section:c.section||'',shelfQty:_sqty};
     var rows=parts.map(function(p,pi){
       var id=uid+'_p'+pi;var bg=pi%2===0?'#fff':'#f8f8f8';
       var dim=(p.l&&p.w)?(p.l+'×'+p.w+(p.t?'×'+p.t:'')):(p.dim||'-');
@@ -5665,16 +5867,575 @@ function loadProjektJson(){
       return '<tr style="background:'+bg+';" id="row_'+id+'">'+
         '<td style="text-align:center;padding:5px 4px;"><span style="display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;background:'+col+';color:#fff;font-size:.65rem;font-weight:800;">'+(pi+1)+'</span></td>'+
         '<td style="padding:5px 8px;font-weight:800;font-size:.8rem;color:'+col+';white-space:nowrap;">'+(p.action||p.name||'-')+'</td>'+
-        '<td style="padding:5px 8px;font-family:monospace;font-size:.82rem;font-weight:700;">'+dim+'</td>'+
+        '<td style="padding:5px 8px;font-family:monospace;font-size:.88rem;font-weight:900;color:#e8a020;letter-spacing:.04em;text-shadow:0 0 8px rgba(232,160,32,.3);">'+dim+'</td>'+
         '<td style="text-align:center;font-weight:800;color:'+col+';">'+(p.qty||1)+'</td>'+
         '<td style="text-align:center;padding:5px;"><input type="checkbox" id="'+id+'" style="width:18px;height:18px;accent-color:#1a9260;cursor:pointer;" onchange="var r=document.getElementById(\'row_'+id+'\');r.style.opacity=this.checked?\'.3\':\'1\';r.style.textDecoration=this.checked?\'line-through\':\'none\';"></td>'+
         '<td style="padding:5px 8px;font-size:.72rem;color:#5a5a6a;font-family:monospace;">'+(p.note||'')+'</td></tr>';
     }).join('');
-    h+='<div id="corp_'+ci+'" style="margin-bottom:12px;border-radius:10px;overflow:hidden;border:2px solid '+color+';"><div style="background:'+color+';padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="var b=document.getElementById(\''+uid+'_b\');b.style.display=b.style.display===\'none\'?\'block\':\'none\';"><div><div style="color:#fff;font-weight:800;font-size:1rem;">'+(c.code||'')+' — '+(c.name||'')+'</div>'+(c.H&&c.W?'<div style="color:rgba(255,255,255,.7);font-size:.78rem;">'+c.H+'×'+c.W+'×'+(c.D||'?')+'mm · '+parts.length+' części</div>':'')+'</div><span style="color:#fff;font-size:1.4rem;">▼</span></div><div id="'+uid+'_b" style="display:none;background:#fff;"><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.78rem;"><thead><tr style="background:#1a252f;"><th style="padding:7px 4px;color:rgba(255,255,255,.6);">#</th><th style="padding:7px 8px;color:rgba(255,255,255,.6);text-align:left;">CZYNNOŚĆ</th><th style="padding:7px 8px;color:rgba(255,255,255,.6);text-align:left;">WYMIAR</th><th style="padding:7px 4px;color:rgba(255,255,255,.6);">SZT</th><th style="padding:7px 4px;color:rgba(255,255,255,.6);">☐</th><th style="padding:7px 8px;color:rgba(255,255,255,.6);text-align:left;">UWAGI</th></tr></thead><tbody>'+rows+'</tbody></table></div><div style="padding:10px;background:#f5f5f7;display:flex;gap:8px;border-top:1px solid #e0e0e0;"><button onclick="document.querySelectorAll(\'#'+uid+'_b input\').forEach(function(cb){cb.checked=false;var r=document.getElementById(\'row_\'+cb.id);if(r){r.style.opacity=\'1\';r.style.textDecoration=\'none\';}})" style="padding:6px 14px;font-size:.75rem;background:#fff;border:1px solid #ccc;border-radius:5px;cursor:pointer;">↺ Reset</button><button onclick="var d=document.querySelectorAll(\'#'+uid+'_b input:checked\').length,a=document.querySelectorAll(\'#'+uid+'_b input[type=checkbox]\').length;alert(\''+(c.code||'')+': \'+d+\'/\'+a+\' (\'+Math.round(d/(a||1)*100)+\'%)\');" style="padding:6px 14px;font-size:.75rem;background:#fff;border:1px solid #ccc;border-radius:5px;cursor:pointer;">✔ Postęp</button></div></div></div>';
+    h+='<div id="corp_'+ci+'" style="margin-bottom:12px;border-radius:10px;overflow:hidden;border:2px solid '+color+';"><div style="background:'+color+';padding:12px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="var b=document.getElementById(\''+uid+'_b\');b.style.display=b.style.display===\'none\'?\'block\':\'none\';"><div><div style="color:#fff;font-weight:800;font-size:1rem;">'+(c.code||'')+' — '+(c.name||'')+'</div>'+(c.H&&c.W?'<div style="color:rgba(255,255,255,.7);font-size:.78rem;">'+c.H+'×'+c.W+'×'+(c.D||'?')+'mm · '+parts.length+' części</div>':'')+'</div><span style="color:#fff;font-size:1.4rem;">▼</span></div><div id="'+uid+'_b" style="display:none;background:#fff;"><div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.78rem;"><thead><tr style="background:#1a252f;"><th style="padding:7px 4px;color:rgba(255,255,255,.6);">#</th><th style="padding:7px 8px;color:rgba(255,255,255,.6);text-align:left;">CZYNNOŚĆ</th><th style="padding:7px 8px;color:rgba(255,255,255,.6);text-align:left;">WYMIAR</th><th style="padding:7px 4px;color:rgba(255,255,255,.6);">SZT</th><th style="padding:7px 4px;color:rgba(255,255,255,.6);">☐</th><th style="padding:7px 8px;color:rgba(255,255,255,.6);text-align:left;">UWAGI</th></tr></thead><tbody>'+rows+'</tbody></table></div>'+buildJsonCheatSheets(c)+'<div style="padding:10px;background:#f5f5f7;display:flex;gap:8px;border-top:1px solid #e0e0e0;"><button onclick="document.querySelectorAll(\'#'+uid+'_b input\').forEach(function(cb){cb.checked=false;var r=document.getElementById(\'row_\'+cb.id);if(r){r.style.opacity=\'1\';r.style.textDecoration=\'none\';}})" style="padding:6px 14px;font-size:.75rem;background:#fff;border:1px solid #ccc;border-radius:5px;cursor:pointer;">↺ Reset</button><button onclick="var d=document.querySelectorAll(\'#'+uid+'_b input:checked\').length,a=document.querySelectorAll(\'#'+uid+'_b input[type=checkbox]\').length;alert(\''+(c.code||'')+': \'+d+\'/\'+a+\' (\'+Math.round(d/(a||1)*100)+\'%)\');" style="padding:6px 14px;font-size:.75rem;background:#fff;border:1px solid #ccc;border-radius:5px;cursor:pointer;">✔ Postęp</button>'+
+    '<button onclick="toggleCorpus3D(\''+uid+'_3d\','+c.H+','+c.W+','+c.D+')" style="padding:6px 14px;font-size:.75rem;background:#1a252f;border:1px solid #2e86c1;border-radius:5px;cursor:pointer;color:#79c0ff;font-weight:700;">&#9650; 3D</button>'+
+    '</div>'+
+    '<div id="'+uid+'_3d" style="display:none;background:#0d1117;padding:8px;border-top:2px solid #2e86c1;">'+
+    '<canvas id="'+uid+'_canvas" style="width:100%;height:280px;display:block;border-radius:6px;touch-action:none;"></canvas>'+
+    '</div>'+
+    '</div></div>';
   });
   el.innerHTML=h;
   document.getElementById('projektResult').scrollIntoView({behavior:'smooth',block:'start'});
 }
+
+/* ── CORPUS 3D ── */
+var _3dInstances = {};
+
+function showCorpus3D(containerId) {
+  var c = (window._cd||{})[containerId];
+  if (!c) { alert('Brak danych dla '+containerId); return; }
+  toggleCorpus3D(containerId, c.H||400, c.W||600, c.D||560, c.parts||[]);
+}
+
+function toggleCorpus3D(containerId, H, W, D, parts) {
+  var el = document.getElementById(containerId);
+  if (!el) return;
+  if (el.style.display === 'none') {
+    el.style.display = 'block';
+    var canvasId = containerId.replace('_3d','_canvas');
+    setTimeout(function(){ initCorpus3D(canvasId, H, W, D, parts||[]); }, 60);
+  } else {
+    el.style.display = 'none';
+    var inst = _3dInstances[containerId];
+    if (inst) { if(inst.animId) cancelAnimationFrame(inst.animId); inst.renderer.dispose(); delete _3dInstances[containerId]; }
+  }
+}
+
+function initCorpus3D(canvasId, H, W, D, parts) {
+  if (typeof THREE === 'undefined') { return; }
+  var canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  var containerId = canvasId.replace('_canvas','_3d');
+  var prev = _3dInstances[containerId];
+  if (prev) { if(prev.animId) cancelAnimationFrame(prev.animId); prev.renderer.dispose(); }
+
+  var pw = canvas.parentElement.clientWidth - 16;
+  var ph = 300;
+  canvas.width = pw; canvas.height = ph;
+
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  renderer.setSize(pw, ph);
+  renderer.setClearColor(0x0d1117, 1);
+
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(42, pw/ph, 1, 8000);
+
+  var maxDim = Math.max(H||1, W||1, D||1);
+  var SC = 180 / maxDim;
+  var sH = H*SC, sW = W*SC, sD = D*SC, T = 18*SC;
+
+  // ── Materials ──────────────────────────────────────────────────────
+  var matWall  = new THREE.MeshPhongMaterial({color:0x1a6fa8, transparent:true, opacity:0.88, shininess:40});
+  var matShelf = new THREE.MeshPhongMaterial({color:0x5dade2, transparent:true, opacity:0.85, shininess:30});
+  var matBack  = new THREE.MeshPhongMaterial({color:0x0d3b5e, transparent:true, opacity:0.75});
+  var matFront = new THREE.MeshPhongMaterial({color:0xc49a3c, transparent:true, opacity:0.90, shininess:60});
+  var matEdge  = new THREE.LineBasicMaterial({color:0x79c0ff, linewidth:1});
+
+  function box(gW,gH,gD, x,y,z, mat) {
+    var g = new THREE.BoxGeometry(gW,gH,gD);
+    var m = new THREE.Mesh(g, mat);
+    m.position.set(x,y,z);
+    scene.add(m);
+    var el = new THREE.EdgesGeometry(g);
+    var ln = new THREE.LineSegments(el, matEdge);
+    ln.position.set(x,y,z);
+    scene.add(ln);
+  }
+
+  // ── Parse parts ────────────────────────────────────────────────────
+  function hasAction(kw) {
+    return parts.some(function(p){
+      var a = (p.action||p.name||'').toLowerCase();
+      return kw.some(function(k){ return a.includes(k) || a.replace(/[^a-z0-9]/g,'').includes(k.replace(/[^a-z0-9]/g,'')); });
+    });
+  }
+  function partsBy(kw) {
+    return parts.filter(function(p){
+      var a = (p.action||p.name||'').toLowerCase();
+      return kw.some(function(k){ return a.includes(k); });
+    });
+  }
+
+  var hasPlecy  = hasAction(['plecy']);
+  var hasFront  = hasAction(['front','drzwi','klapa']);
+  // Get shelfQty from pre-computed _cd data
+  var _cdEntry = (window._cd||{})[containerId];
+  var hasDrawer = hasAction(['szuflad','fronty szuflad']);
+
+  // ── Structure ──────────────────────────────────────────────────────
+  // Boki
+  box(T,sH,sD, -sW/2+T/2, 0, 0, matWall);
+  box(T,sH,sD,  sW/2-T/2, 0, 0, matWall);
+  // Wieniec dolny
+  box(sW-T*2, T, sD, 0, -sH/2+T/2, 0, matWall);
+  // Wieniec górny
+  box(sW-T*2, T, sD, 0,  sH/2-T/2, 0, matWall);
+
+  // Plecy HDF
+  if (hasPlecy) {
+    var bT = 3*SC;
+    box(sW, sH, bT, 0, 0, -sD/2+bT/2, matBack);
+  }
+
+  // Półki
+  var shelfQty = (_cdEntry && _cdEntry.shelfQty) ? _cdEntry.shelfQty : 0;
+  // Update canvas title to show shelf count
+  canvas.title = 'Polki: ' + shelfQty;
+  if (shelfQty > 0) {
+    var shT = T * 0.8; // normal shelf thickness
+    var innerH = sH - T * 2;
+    var step = innerH / (shelfQty + 1);
+    var matS = new THREE.MeshPhongMaterial({color:0xf39c12, emissive:0x8b5a00, shininess:100});
+    for (var si = 0; si < shelfQty; si++) {
+      var sy = -sH/2 + T + step * (si + 1);
+      var sg = new THREE.BoxGeometry(sW - T*2, shT, sD - T*2);
+      var smesh = new THREE.Mesh(sg, matS);
+      smesh.position.set(0, sy, 0);
+      scene.add(smesh);
+      var sedge = new THREE.EdgesGeometry(sg);
+      var sline = new THREE.LineSegments(sedge, new THREE.LineBasicMaterial({color:0xffff00}));
+      sline.position.set(0, sy, 0);
+      scene.add(sline);
+    }
+  }
+
+  // Szuflady (fronty jako poziome pasy)
+  if (hasDrawer) {
+    var drawParts = partsBy(['fronty szuflad','front szuflad']);
+    var dQty = drawParts.length > 0 ? (drawParts[0].qty||2) : 2;
+    var dH = (sH - T*2) / dQty;
+    for (var di=0; di<dQty; di++) {
+      var dy = -sH/2 + T + dH*(di+0.5);
+      var dg = new THREE.BoxGeometry(sW-T*2-2*SC, dH-2*SC, T*0.5);
+      var dm = new THREE.Mesh(dg, matFront);
+      dm.position.set(0, dy, sD/2 + T*0.25);
+      scene.add(dm);
+      var de = new THREE.EdgesGeometry(dg);
+      var dl = new THREE.LineSegments(de, new THREE.LineBasicMaterial({color:0xe8a020}));
+      dl.position.copy(dm.position);
+      scene.add(dl);
+    }
+  }
+
+  // Front/drzwi — lekko otwarte
+  if (hasFront && !hasDrawer) {
+    var fg = new THREE.BoxGeometry(sW-T*2-2*SC, sH-T*2-2*SC, T*0.5);
+    var fm = new THREE.Mesh(fg, matFront);
+    fm.position.set(sW*0.1, 0, sD/2 + sW*0.1);
+    fm.rotation.y = -0.28;
+    scene.add(fm);
+    var fe = new THREE.EdgesGeometry(fg);
+    var fl = new THREE.LineSegments(fe, new THREE.LineBasicMaterial({color:0xe8a020}));
+    fl.position.copy(fm.position);
+    fl.rotation.copy(fm.rotation);
+    scene.add(fl);
+  }
+
+  // ── Dimension labels ─────────────────────────────────────────────
+  function makeLabel(text, bgColor, txtColor) {
+    var tc = document.createElement('canvas');
+    tc.width = 320; tc.height = 72;
+    var ctx = tc.getContext('2d');
+    // background pill
+    ctx.fillStyle = bgColor || '#1a3a4a';
+    ctx.beginPath();
+    ctx.roundRect(4, 4, 312, 64, 12);
+    ctx.fill();
+    // border
+    ctx.strokeStyle = txtColor || '#e8a020';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(4, 4, 312, 64, 12);
+    ctx.stroke();
+    // text
+    ctx.font = 'bold 28px Arial, sans-serif';
+    ctx.fillStyle = txtColor || '#e8a020';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(text, 160, 38);
+    var tex = new THREE.CanvasTexture(tc);
+    tex.needsUpdate = true;
+    var mat = new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false, sizeAttenuation:true});
+    var sprite = new THREE.Sprite(mat);
+    sprite.scale.set(60, 14, 1);
+    return sprite;
+  }
+
+  // ВИС — left side, middle height
+  var lH = makeLabel('ВИС '+H+' мм', '#0d2233', '#5dade2');
+  lH.position.set(-sW/2 - 32, 0, 0);
+  scene.add(lH);
+
+  // ШИР — top center
+  var lW = makeLabel('ШИР '+W+' мм', '#2a1a00', '#e8a020');
+  lW.position.set(0, sH/2 + 16, 0);
+  scene.add(lW);
+
+  // ГЛ — right side, bottom
+  var lD = makeLabel('ГЛ '+D+' мм', '#0d2a0d', '#27ae60');
+  lD.position.set(sW/2 + 32, -sH/4, sD/4);
+  scene.add(lD);
+
+  if (shelfQty > 0) {
+    var lS = makeLabel(shelfQty+' пол.', '#1a1a2a', '#79c0ff');
+    lS.position.set(0, 0, sD/2 + 12);
+    scene.add(lS);
+  }
+
+  // ── Camera ─────────────────────────────────────────────────────────
+  var camDist = Math.max(sW, sH, sD) * 1.8;
+  camera.position.set(camDist*0.7, camDist*0.5, camDist*1.2);
+  camera.lookAt(0, 0, 0);
+
+  // ── Lights ─────────────────────────────────────────────────────────
+  scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+  var dl = new THREE.DirectionalLight(0xffffff, 0.9);
+  dl.position.set(200, 300, 250);
+  scene.add(dl);
+  var dl2 = new THREE.DirectionalLight(0x3399ff, 0.3);
+  dl2.position.set(-150, -100, -100);
+  scene.add(dl2);
+
+  // ── Touch / mouse rotate ───────────────────────────────────────────
+  var drag = {on:false, x:0, y:0, rx:0, ry:0};
+  var pivot = new THREE.Group();
+  var toMove = scene.children.filter(function(o){ return o !== dl && o !== dl2; });
+  toMove.forEach(function(o){ scene.remove(o); pivot.add(o); });
+  scene.add(pivot);
+  // No initial rotation — camera position handles the view angle
+  pivot.rotation.x = 0;
+  pivot.rotation.y = 0;
+
+  function rot(){ pivot.rotation.x=drag.rx; pivot.rotation.y=drag.ry; }
+  function ps(ex,ey){ drag.on=true; drag.x=ex; drag.y=ey; }
+  function pm(ex,ey){ if(!drag.on) return; drag.ry+=(ex-drag.x)*0.009; drag.rx+=(ey-drag.y)*0.009; drag.x=ex; drag.y=ey; rot(); }
+  function pe(){ drag.on=false; }
+
+  canvas.addEventListener('mousedown', function(e){ps(e.clientX,e.clientY);});
+  canvas.addEventListener('mousemove', function(e){pm(e.clientX,e.clientY);});
+  canvas.addEventListener('mouseup', pe);
+  canvas.addEventListener('touchstart', function(e){if(e.touches.length===1){e.preventDefault();ps(e.touches[0].clientX,e.touches[0].clientY);}},{passive:false});
+  canvas.addEventListener('touchmove',  function(e){if(e.touches.length===1){e.preventDefault();pm(e.touches[0].clientX,e.touches[0].clientY);}},{passive:false});
+  canvas.addEventListener('touchend', pe);
+
+  var animId;
+  function animate(){ animId=requestAnimationFrame(animate); renderer.render(scene,camera); }
+  animate();
+  _3dInstances[containerId] = {renderer:renderer, animId:animId};
+}
+
+/* ═══════════════════════════════════════════════════════
+   RENDER TAB — рендер + шпаргалка
+═══════════════════════════════════════════════════════ */
+var _renderInited = false;
+
+/* ══════════════════════════════════════════════
+   RENDER DRAWER — floating panel
+══════════════════════════════════════════════ */
+var _drawerOpen = false;
+
+function toggleRenderDrawer(){
+  _drawerOpen = !_drawerOpen;
+  var d = document.getElementById('renderDrawer');
+  var b = document.getElementById('floatRenderBtn');
+  d.style.transform = _drawerOpen ? 'translateY(0)' : 'translateY(100%)';
+  b.innerHTML = _drawerOpen ? '✕' : '📐';
+  b.style.background = _drawerOpen
+    ? 'linear-gradient(135deg,#6b2020,#a02828)'
+    : 'linear-gradient(135deg,#d4a840,#a07820)';
+  if(_drawerOpen && !document.getElementById('rndApp').innerHTML){
+    document.getElementById('rndApp').innerHTML = '<div class="rnd-empty">📋 Вставте JSON проєкту вище і натисніть ▶ ЗАВАНТАЖИТИ</div>';
+  }
+}
+
+function clearRenderJson(){
+  document.getElementById('renderJson').value = '';
+  document.getElementById('renderJsonErr').style.display = 'none';
+  document.getElementById('rndApp').innerHTML = '<div class="rnd-empty">📋 Вставте JSON проєкту вище і натисніть ▶ ЗАВАНТАЖИТИ</div>';
+}
+
+function loadRenderJson(){
+  var raw = (document.getElementById('renderJson')||{}).value||'';
+  raw = raw.trim();
+  var errEl = document.getElementById('renderJsonErr');
+  errEl.style.display = 'none';
+  if(!raw){ errEl.textContent='⚠ Вставте JSON!'; errEl.style.display='block'; return; }
+  var corp;
+  try{ corp = JSON.parse(raw); }
+  catch(e){ errEl.textContent='⚠ Помилка JSON: '+e.message; errEl.style.display='block'; return; }
+  if(!Array.isArray(corp)||!corp.length){ errEl.textContent='⚠ JSON повинен бути масивом []'; errEl.style.display='block'; return; }
+
+  // convert JSON parts → MODULES format
+  var MODULES = corp.map(function(c){
+    var parts = c.parts||[];
+    // count shelves
+    var shelves = parts.reduce(function(s,p){
+      var a=(p.action||p.name||'').toLowerCase();
+      if(/p.{0,2}lk|półk|полиц/i.test(a)) return s+(p.qty||1);
+      return s;
+    },0);
+    // find drawers
+    var drawerParts = parts.filter(function(p){
+      var a=(p.action||p.name||'').toLowerCase();
+      return /fronty?\s+szuflad|szuflad/i.test(a);
+    });
+    var drawers = drawerParts.length>0 ? (drawerParts[0].qty||0) : 0;
+    var drawerH = drawerParts.length>0 ? (drawerParts[0].l||drawerParts[0].h||135) : 0;
+    // fronts
+    var frontParts = parts.filter(function(p){
+      var a=(p.action||p.name||'');
+      return /^fronty?(\s+\d+)?$|^drzwi/i.test(a);
+    });
+    var fronts = frontParts.map(function(p){
+      return {qty:p.qty||1, h:p.l||p.h||0};
+    });
+    return {
+      code: c.code||'?',
+      name: c.name||'',
+      H: c.H||0, W: c.W||0, D: c.D||0,
+      section: c.section||'Dolne',
+      shelves: shelves,
+      drawers: drawers,
+      drawerH: drawerH,
+      fronts: fronts
+    };
+  });
+
+  buildRenderContent(MODULES);
+}
+
+/* ── legacy: keep initRenderTab so switchMainTab doesn't crash ── */
+function initRenderTab(){ /* no-op — drawer based now */ }
+
+function buildRenderContent(MODULES){
+  var PAL = {
+    Dolne:    {color:'#2e86c1',bg:'rgba(46,134,193,.1)', label:'#79c0ff'},
+    Wiszące:  {color:'#e67e22',bg:'rgba(230,126,34,.1)', label:'#f0a050'},
+    Słupki:   {color:'#27ae60',bg:'rgba(39,174,96,.1)',  label:'#52d68a'},
+    Regał:    {color:'#8e44ad',bg:'rgba(142,68,173,.1)', label:'#c39bd3'},
+    Garderoba:{color:'#d4ac0d',bg:'rgba(212,172,13,.1)', label:'#f7dc6f'},
+    Korytarz: {color:'#2eaaa8',bg:'rgba(46,170,168,.1)', label:'#6ee7e5'},
+  };
+  var ZONE_UA = {Dolne:'Кухня нижні',Wiszące:'Кухня верхні',Słupki:'Слупки',Regał:'Стелажі',Garderoba:'Гардероб',Korytarz:'Коридор'};
+
+  // detect zones in order they appear
+  var seenZones=[], zoneMap={};
+  MODULES.forEach(function(m){
+    if(!zoneMap[m.section]){ zoneMap[m.section]=[]; seenZones.push(m.section); }
+    zoneMap[m.section].push(m);
+  });
+
+  var NS='http://www.w3.org/2000/svg';
+  function svgEl(tag,attrs,par){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(par)par.appendChild(e);return e;}
+  function svgR(x,y,w,h,a,p){return svgEl('rect',Object.assign({x:x,y:y,width:w,height:h},a),p);}
+  function svgL(x1,y1,x2,y2,a,p){return svgEl('line',Object.assign({x1:x1,y1:y1,x2:x2,y2:y2},a),p);}
+  function svgT(x,y,t,a,p){var e=svgEl('text',Object.assign({x:x,y:y},a),p);e.textContent=t;return e;}
+  function svgC(cx,cy,r,a,p){return svgEl('circle',Object.assign({cx:cx,cy:cy,r:r},a),p);}
+
+  function mkSVG(id,w,h){
+    var s=document.getElementById(id);
+    if(!s) return null;
+    s.setAttribute('width',w);s.setAttribute('height',h);s.setAttribute('viewBox','0 0 '+w+' '+h);
+    svgR(0,0,w,h,{fill:'#07090e'},s);
+    var defs=svgEl('defs',{},s);
+    var pat=svgEl('pattern',{id:'rp_'+id,width:28,height:28,patternUnits:'userSpaceOnUse'},defs);
+    svgR(0,0,28,28,{fill:'none'},pat);
+    svgL(0,0,0,28,{stroke:'rgba(255,255,255,.02)','stroke-width':'.5'},pat);
+    svgL(0,0,28,0,{stroke:'rgba(255,255,255,.02)','stroke-width':'.5'},pat);
+    svgR(0,0,w,h,{fill:'url(#rp_'+id+')'},s);
+    return s;
+  }
+
+  function drawBox(svg,x,y,pw,ph,sec,code,hf,fc,isDr,sh,lbl){
+    var p=PAL[sec]||PAL.Dolne,g=svgEl('g',{},svg);
+    svgR(x+3,y+3,pw,ph,{fill:'rgba(0,0,0,.35)',rx:'2'},g);
+    svgR(x,y,pw,ph,{fill:'rgba(14,16,26,1)',stroke:p.color,'stroke-width':'1.2',rx:'2'},g);
+    svgR(x+2,y+2,pw-4,Math.min(ph*.04,5),{fill:'rgba(255,255,255,.05)',rx:'1'},g);
+    if(isDr){
+      var dq=Math.max(2,Math.round(ph/40)),dh=Math.round((ph-4)/dq)-2;
+      for(var di=0;di<dq;di++){
+        var dy=y+ph-(di+1)*(dh+2)-2;
+        svgR(x+3,dy,pw-6,dh,{fill:p.bg.replace('.1','.3'),stroke:p.color,'stroke-width':'.6',rx:'1'},g);
+        svgR(x+pw/2-14,dy+dh/2-2,28,4,{fill:'rgba(255,255,255,.22)',rx:'2'},g);
+      }
+    } else if(hf){
+      var fc2=Math.min(fc||1,2),gap2=fc2>1?3:0,fw=Math.round((pw-6-gap2*(fc2-1))/fc2);
+      for(var fi=0;fi<fc2;fi++){
+        var fx2=x+3+fi*(fw+gap2),fh2=ph-6,fy2=y+3;
+        svgR(fx2,fy2,fw,fh2,{fill:p.bg.replace('.1','.35'),stroke:p.color,'stroke-width':'.7',rx:'1'},g);
+        svgR(fx2+3,fy2+3,fw-6,fh2-6,{fill:'none',stroke:p.color,'stroke-width':'.3','stroke-dasharray':'2,2','opacity':'.35',rx:'1'},g);
+        svgR(fx2+fw/2-2,fy2+fh2*.6,4,Math.min(16,fh2*.18),{fill:'rgba(255,255,255,.25)',rx:'2'},g);
+        svgC(fx2+6,fy2+fh2*.22,2.5,{fill:'none',stroke:'rgba(255,255,255,.18)','stroke-width':'.7'},g);
+        if(fh2>70) svgC(fx2+6,fy2+fh2*.72,2.5,{fill:'none',stroke:'rgba(255,255,255,.18)','stroke-width':'.7'},g);
+      }
+    } else if(sh>0){
+      var step2=Math.round((ph-12)/(sh+1));
+      for(var si=1;si<=sh;si++){svgR(x+3,y+ph-6-step2*si-2,pw-6,2,{fill:'rgba(255,255,255,.13)',rx:'0'},g);}
+    }
+    svgT(x+pw/2,y+13,code,{fill:p.label,'font-family':'JetBrains Mono,monospace','font-size':'8','font-weight':'700','text-anchor':'middle'},g);
+    if(lbl) svgT(x+pw/2,y+ph-4,lbl,{fill:'rgba(255,255,255,.16)','font-family':'JetBrains Mono,monospace','font-size':'6','text-anchor':'middle'},g);
+    return g;
+  }
+
+  function dimW2(svg,x1,x2,y,lbl,above){
+    var yo=above?y-7:y+7,dr=above?-1:1;
+    svgL(x1,y,x1,yo,{stroke:'rgba(200,152,64,.4)','stroke-width':'.6'},svg);
+    svgL(x2,y,x2,yo,{stroke:'rgba(200,152,64,.4)','stroke-width':'.6'},svg);
+    svgL(x1,yo,x2,yo,{stroke:'rgba(200,152,64,.4)','stroke-width':'.6'},svg);
+    svgT((x1+x2)/2,yo+(above?-2:10),lbl,{fill:'#c89840','font-family':'JetBrains Mono,monospace','font-size':'7.5','font-weight':'700','text-anchor':'middle'},svg);
+  }
+  function floor2(svg,x1,x2,y){svgR(x1,y,x2-x1,6,{fill:'#12131e',stroke:'rgba(255,255,255,.06)','stroke-width':'.5'},svg);svgL(x1,y,x2,y,{stroke:'rgba(255,255,255,.09)','stroke-width':'.7'},svg);}
+  function ceil2(svg,x1,x2,y){svgR(x1,y-3,x2-x1,3,{fill:'rgba(255,255,255,.025)'},svg);svgL(x1,y,x2,y,{stroke:'rgba(255,255,255,.04)','stroke-width':'.6','stroke-dasharray':'5,4'},svg);}
+  function counter2(svg,x1,x2,y){svgR(x1,y-8,x2-x1,8,{fill:'#18202e'},svg);svgL(x1,y-8,x2,y-8,{stroke:'rgba(200,152,64,.2)','stroke-width':'.6'},svg);}
+  function legs2(svg,x,fy,w,lh){var pp=[x+6,x+w-6];if(w>150)pp.splice(1,0,x+w/2);pp.forEach(function(lx){svgR(lx-2,fy-lh,4,lh,{fill:'rgba(255,255,255,.09)',rx:'1'},svg);});}
+
+  // build per-zone elevation SVGs
+  var svgIdCounter = 0;
+
+  function buildZoneElevation(mods, zone){
+    var p = PAL[zone]||PAL.Dolne;
+    var SC = 1;
+    // pick scale so max height fits ~220px
+    var maxH = Math.max.apply(null, mods.map(function(m){return m.H;}));
+    SC = Math.min(0.22, 180/maxH);
+    var mm = function(v){return Math.round(v*SC);};
+    var PAD=28, LEG=100;
+    var totalW = mods.reduce(function(s,m){return s+m.W+2;},0)-2;
+    var svgW = mm(totalW)+PAD*2+24;
+    var svgH = mm(maxH+(maxH>800?0:LEG))+PAD+18;
+    var id='rnd_zone_svg_'+(svgIdCounter++);
+
+    var html='<div class="rnd-drawing-frame"><svg id="'+id+'" xmlns="http://www.w3.org/2000/svg"></svg></div>';
+
+    // draw after DOM insert
+    setTimeout(function(){
+      var svg=mkSVG(id,svgW,svgH);
+      if(!svg) return;
+      var flY=svgH-14;
+      floor2(svg,PAD,svgW-PAD,flY);
+      var isUpper=(['Wiszące'].indexOf(zone)>=0);
+      if(isUpper) ceil2(svg,PAD,svgW-PAD,22);
+      var cx=PAD;
+      mods.forEach(function(m){
+        var pw=mm(m.W),ph=mm(m.H);
+        var needLeg=(m.H<=900&&!isUpper);
+        var bBot=needLeg?flY-mm(LEG):flY;
+        var hasFront=m.fronts&&m.fronts.length>0;
+        var fc=hasFront?m.fronts[0].qty:0;
+        drawBox(svg,cx,bBot-ph,pw,ph,zone,m.code,hasFront,fc,m.drawers>0,m.shelves,m.W+'×'+m.H);
+        if(needLeg) legs2(svg,cx,flY,pw,mm(LEG));
+        dimW2(svg,cx,cx+pw,flY+8,m.W+'',false);
+        cx+=pw+2;
+      });
+      // counter for lower cabs
+      if(!isUpper){
+        var counterMods=mods.filter(function(m){return m.H<=900;});
+        if(counterMods.length){
+          var cx2=PAD;
+          var x1c=null,x2c=null;
+          mods.forEach(function(m){var pw2=mm(m.W);if(m.H<=900){if(x1c===null)x1c=cx2;x2c=cx2+pw2;}cx2+=pw2+2;});
+          if(x1c!==null) counter2(svg,x1c,x2c,flY-mm(LEG)-mm(mods.filter(function(m){return m.H<=900;})[0].H));
+        }
+      }
+      dimW2(svg,PAD,cx-2,22,totalW+' мм',true);
+    },80);
+
+    return html;
+  }
+
+  // ── BUILD HTML ──
+  var html = '';
+
+  // Render views per zone
+  html += '<div style="font-family:JetBrains Mono,monospace;font-size:.58rem;color:var(--accent);letter-spacing:.18em;text-transform:uppercase;padding:4px 0 12px;">▶ Фасадні види</div>';
+
+  seenZones.forEach(function(zone){
+    var mods=zoneMap[zone], p=PAL[zone]||PAL.Dolne;
+    html+='<div class="rnd-zone-header"><div class="rnd-zone-dot" style="background:'+p.color+'"></div>';
+    html+='<div class="rnd-zone-name" style="color:'+p.color+'">'+(ZONE_UA[zone]||zone)+'</div>';
+    html+='<div class="rnd-zone-line" style="background:'+p.color+'22"></div>';
+    html+='<div class="rnd-zone-count">'+mods.length+' корп.</div></div>';
+    html += buildZoneElevation(mods, zone);
+  });
+
+  // ── CHEATSHEET ──
+  html += '<div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--border);font-family:JetBrains Mono,monospace;font-size:.58rem;color:var(--accent);letter-spacing:.18em;text-transform:uppercase;margin-bottom:12px;">📌 Шпаргалка свердління</div>';
+
+  var totalSh=0, totalDr=0;
+  seenZones.forEach(function(zone){
+    var mods=zoneMap[zone], p=PAL[zone]||PAL.Dolne;
+    html+='<div class="rnd-zone-header"><div class="rnd-zone-dot" style="background:'+p.color+'"></div>';
+    html+='<div class="rnd-zone-name" style="color:'+p.color+'">'+(ZONE_UA[zone]||zone)+'</div>';
+    html+='<div class="rnd-zone-line" style="background:'+p.color+'22"></div>';
+    html+='<div class="rnd-zone-count">'+mods.length+' КОРП.</div></div>';
+    html+='<div class="rnd-cards">';
+    mods.forEach(function(mod){
+      totalSh+=mod.shelves;
+      if(mod.drawers>0) totalDr+=mod.drawers;
+      var innerH=mod.H-36;
+      html+='<div class="rnd-card"><div class="rnd-card-head" style="background:'+p.bg+';border-bottom-color:'+p.color+'33;">';
+      html+='<span class="rnd-card-code" style="background:'+p.color+'22;color:'+p.color+';border:1px solid '+p.color+'44;">'+mod.code+'</span>';
+      html+='<span class="rnd-card-name">'+mod.name+'</span>';
+      html+='<span class="rnd-card-dims">'+mod.H+'×'+mod.W+'</span>';
+      html+='</div><div class="rnd-card-body">';
+
+      if(mod.shelves>0){
+        var step=Math.round(innerH/(mod.shelves+1));
+        html+='<div class="rnd-sh-label" style="color:'+p.color+'99;">📌 Позиції полиць</div>';
+        html+='<table class="rnd-table"><thead><tr><th>Полиця</th><th>▲ Від дна</th><th>▼ Від верху</th><th>Крок</th></tr></thead><tbody>';
+        for(var si=1;si<=mod.shelves;si++){
+          var yb=Math.round(innerH/(mod.shelves+1)*si),yt=innerH-yb;
+          html+='<tr><td>Пол.'+si+'</td><td><span class="rnd-val-red">'+yb+'</span> мм</td><td><span class="rnd-val-muted">'+yt+'</span> мм</td><td><span class="rnd-val-muted">'+step+'</span> мм</td></tr>';
+        }
+        html+='</tbody></table><div class="rnd-info-tag">Внутр. H = '+innerH+' мм</div>';
+      }
+
+      if(mod.drawers>0){
+        var mark=2,GAP=12;
+        html+='<div class="rnd-sh-label" style="color:#e8b84a99;">📍 Координати направляючих</div>';
+        html+='<table class="rnd-table"><thead><tr><th>Шухляда</th><th>▲ Низ напр.</th><th>H фронту</th></tr></thead><tbody>';
+        for(var di=0;di<mod.drawers;di++){
+          html+='<tr><td>Шух.'+(di+1)+'</td><td><span class="rnd-val-gold">'+mark+'</span> мм</td><td><span class="rnd-val-muted">'+mod.drawerH+'</span> мм</td></tr>';
+          mark+=mod.drawerH+GAP;
+        }
+        html+='</tbody></table><div class="rnd-info-tag">Зазор: 12 мм</div>';
+      }
+
+      if(!mod.shelves&&!mod.drawers){
+        html+='<div class="rnd-no-data">— полиць / шухляд немає</div>';
+      }
+
+      if(mod.fronts&&mod.fronts.length>0){
+        var tf=mod.fronts.reduce(function(s,f){return s+f.qty;},0);
+        var fhh=mod.fronts[0].h, hngs=fhh>1200?3:2;
+        html+='<div class="rnd-sh-label" style="color:rgba(156,163,175,.6);margin-top:2px;">🔩 Завіси</div>';
+        html+='<table class="rnd-table"><thead><tr><th>Фронтів</th><th>Висота</th><th>Завіс</th></tr></thead><tbody>';
+        html+='<tr><td>'+tf+' шт</td><td class="rnd-val-muted">'+fhh+' мм</td><td><span class="rnd-val-muted">'+hngs+' шт</span></td></tr>';
+        html+='</tbody></table>';
+      }
+      html+='</div></div>';
+    });
+    html+='</div>';
+  });
+
+  html+='<div class="rnd-summary">';
+  html+='<div style="font-family:JetBrains Mono,monospace;font-size:.54rem;color:rgba(200,152,64,.5);letter-spacing:.15em;">ПІДСУМОК</div>';
+  html+='<div class="rnd-sum-stat"><span class="rnd-sum-num">'+MODULES.length+'</span><span class="rnd-sum-lbl">корпусів</span></div>';
+  html+='<div class="rnd-sum-stat"><span class="rnd-sum-num" style="color:#e05050">'+totalSh+'</span><span class="rnd-sum-lbl">полиць</span></div>';
+  html+='<div class="rnd-sum-stat"><span class="rnd-sum-num" style="color:#52d68a">'+(totalSh*2)+'</span><span class="rnd-sum-lbl">отворів</span></div>';
+  if(totalDr>0) html+='<div class="rnd-sum-stat"><span class="rnd-sum-num" style="color:var(--accent2)">'+totalDr+'</span><span class="rnd-sum-lbl">шухляд</span></div>';
+  html+='<div class="rnd-legend">Y полиць = від внутр. пов. дна<br>Y напр. = від верхньої пов. нижнього вінця<br>Внутр. H = H − 36 мм</div>';
+  html+='</div>';
+
+  document.getElementById('rndApp').innerHTML = html;
+}
+
 </script>
 </body>
 </html>
