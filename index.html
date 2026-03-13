@@ -858,7 +858,7 @@ input[type=text]::placeholder{ color:var(--muted); }
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
   <script>
     // SW only on real hosting (not preview)
-    if('serviceWorker' in navigator && location.protocol!=='blob:' && !location.hostname.includes('claudeusercontent')){
+    if('serviceWorker' in navigator && location.protocol==='https:' && !location.hostname.includes('claudeusercontent')){
       window.addEventListener('load', ()=>{
         navigator.serviceWorker.register('./sw.js')
           .then(r=>console.log('SW registered'))
@@ -1120,7 +1120,7 @@ input[type=text]::placeholder{ color:var(--muted); }
     <!-- Konstrukcja + fronty below -->
     <div style="padding:12px 18px 14px;border-top:1px solid var(--border);">
       <label>Konstrukcja</label>
-      <select id="config" onchange="updateDrawerSelectors()">
+      <select id="config" onchange="updateDrawerSelectors();autoLogic();">
         <option>Drzwi</option>
         <option>Szuflady</option>
       </select>
@@ -1132,17 +1132,80 @@ input[type=text]::placeholder{ color:var(--muted); }
     </div>
   </div>
 
+  <!-- MATERIAŁY — pokazuje się po wyborze typu -->
+  <div class="card" id="matZone" style="margin-bottom:10px;display:none;">
+    <h3 style="margin-bottom:10px;">🎨 Materiały</h3>
+    <div class="grid" style="gap:8px;">
+      <div>
+        <label>Płyta korpusowa</label>
+        <select id="matCorpus" onchange="saveMat()" style="font-size:.82rem;">
+          <optgroup label="— Standard —">
+            <option value="BIAŁY 18mm (standard)">⬜ Biały 18mm — 27,00 zł/m²</option>
+            <option value="SZARY jasny 18mm">🔘 Szary jasny 18mm — 30,00 zł/m²</option>
+            <option value="ANTRACYT/CZARNY 18mm">⬛ Antracyt/Czarny 18mm — 35,00 zł/m²</option>
+            <option value="BEŻ / KREM 18mm">🟡 Beż/Krem 18mm — 32,00 zł/m²</option>
+            <option value="GREIGE / TAUPE 18mm">🟤 Greige/Taupe 18mm — 34,00 zł/m²</option>
+          </optgroup>
+          <optgroup label="— Dekory drewniane —">
+            <option value="DĄB jasny 18mm">🟤 Dąb jasny 18mm — 38,00 zł/m²</option>
+            <option value="DĄB ciemny 18mm">🟫 Dąb ciemny 18mm — 44,00 zł/m²</option>
+            <option value="JESION / JESION wędz. 18mm">🟤 Jesion 18mm — 42,00 zł/m²</option>
+            <option value="ORZECH 18mm">🟫 Orzech 18mm — 48,00 zł/m²</option>
+            <option value="BETON / KAMIEŃ 18mm">⬜ Beton/Kamień 18mm — 36,00 zł/m²</option>
+          </optgroup>
+          <optgroup label="— WM-Format (z faktur) —">
+            <option value="BIAŁY W960 18mm (WMF)">⬜ Biały W960 18mm — 24,20 zł/m²</option>
+            <option value="KASIMIR U702 ST9 (WMF)">🟫 Kasimir U702 — 32,80 zł/m²</option>
+            <option value="DĄB H2033 ST10 (WMF)">🟤 Dąb H2033 — 51,86 zł/m²</option>
+            <option value="CZERWONY U335 (WMF)">🔴 Czerwony U335 — 52,64 zł/m²</option>
+          </optgroup>
+          <optgroup label="— Inne —">
+            <option value="BIAŁY 16mm">⬜ Biały 16mm — 22,00 zł/m²</option>
+            <option value="HDF 3mm biały">⬜ HDF 3mm — 9,00 zł/m²</option>
+          </optgroup>
+        </select>
+      </div>
+      <div>
+        <label>Front / PCV</label>
+        <select id="matFront" onchange="saveMat()" style="font-size:.82rem;">
+          <option value="none">— Brak frontu / jak korpus</option>
+          <optgroup label="— PCV foliowany 100–200 zł/m² —">
+            <option value="PCV_BIALY">PCV Biały gładki — 130 zł/m²</option>
+            <option value="PCV_MAT">PCV Mat soft-touch — 145 zł/m²</option>
+            <option value="PCV_DECO_DAB">PCV Dekor Dąb — 155 zł/m²</option>
+            <option value="PCV_DECO_BET">PCV Dekor Beton — 155 zł/m²</option>
+            <option value="PCV_KOLOR">PCV Kolor RAL — 165 zł/m²</option>
+          </optgroup>
+          <optgroup label="— MDF Lakierowany 220–320 zł/m² —">
+            <option value="MDF_LAK_BIALY">MDF Lakier Biały mat — 240 zł/m²</option>
+            <option value="MDF_LAK_POLYS">MDF Lakier Biały połysk — 280 zł/m²</option>
+            <option value="MDF_LAK_KOLOR_MAT">MDF Lakier Kolor mat — 260 zł/m²</option>
+            <option value="MDF_LAK_KOLOR_POL">MDF Lakier Kolor połysk — 300 zł/m²</option>
+          </optgroup>
+          <optgroup label="— Akryl / Premium —">
+            <option value="AKRYL_BIALY">Akryl Biały wysoki połysk — 320 zł/m²</option>
+            <option value="AKRYL_KOLOR">Akryl Kolor wysoki połysk — 360 zł/m²</option>
+            <option value="SZKLO">Szkło / Aluminium — 420 zł/m²</option>
+            <option value="FORNIR">Fornir naturalny — 380 zł/m²</option>
+            <option value="LAMINAT">Laminat (jak korpus) — 30 zł/m²</option>
+          </optgroup>
+        </select>
+      </div>
+    </div>
+    <div id="matPreview" style="margin-top:8px;padding:7px 10px;border-radius:6px;font-size:.72rem;font-family:'JetBrains Mono',monospace;background:var(--surface2);color:var(--muted);display:none;"></div>
+  </div>
+
   <!-- Prawa kolumna -->
   <div class="card">
     <h3>Wymiary (mm)</h3>
 
     <label>Wysoko&#347;&#263;</label>
     <input type="number" id="height" value="720" min="300" max="2400" oninput="updateDrawerSelectors()">
-    <div id="quickHeights" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;"></div>
+    <div id="quickHeights" style="display:none;"></div>
 
     <label>Szeroko&#347;&#263;</label>
     <input type="number" id="width" value="600" min="300" max="1200">
-    <div id="quickWidths" style="display:flex;flex-wrap:wrap;gap:4px;margin-top:5px;"></div>
+    <div id="quickWidths" style="display:none;"></div>
 
     <label>G&#322;&#281;boko&#347;&#263;</label>
     <input type="number" id="depth" value="560" min="200" max="800">
@@ -1283,141 +1346,223 @@ input[type=text]::placeholder{ color:var(--muted); }
     </select>
   </div>
 
-  <!-- TIP-ON / SERVO-DRIVE -->
-  <div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;">
-    <label class="chk-label">
-      <input type="checkbox" id="chkTipOn">
-      <span>Push-to-open / TIP-ON</span>
-    </label>
-    <label class="chk-label">
-      <input type="checkbox" id="chkLed">
-      <span>&#128161; O&#347;wietlenie LED</span>
-    </label>
-    <label class="chk-label">
-      <input type="checkbox" id="chkCokol">
-      <span>&#9644; Coko&#322; (listwa)</span>
-    </label>
-  </div>
-  <!-- Cokół options -->
-  <div id="cokolRow" style="display:none;margin-top:10px;">
-    <div class="grid2" style="gap:8px;">
-      <div>
-        <label>Wysoko&#347;&#263; coko&#322;u (mm)</label>
-        <select id="cokolH">
-          <option value="100" selected>100 mm (standard)</option>
-          <option value="80">80 mm</option>
-          <option value="120">120 mm</option>
-          <option value="150">150 mm</option>
-        </select>
-      </div>
-      <div>
-        <label>Materia&#322; coko&#322;u</label>
-        <select id="cokolMat">
-          <option value="hdf">HDF 3mm</option>
-          <option value="mdf16">MDF 16mm</option>
-          <option value="wiorowa18">Wi&#243;rowa 18mm</option>
-        </select>
-      </div>
-    </div>
+  <!-- TIP-ON / LED / Cokół — приховані, можна увімкнути пізніше -->
+  <input type="checkbox" id="chkTipOn" style="display:none;">
+  <input type="checkbox" id="chkLed" style="display:none;">
+  <input type="checkbox" id="chkCokol" style="display:none;">
+  <div id="cokolRow" style="display:none;">
+    <select id="cokolH"><option value="100" selected>100 mm</option><option value="80">80 mm</option><option value="120">120 mm</option><option value="150">150 mm</option></select>
+    <select id="cokolMat"><option value="hdf">HDF 3mm</option><option value="mdf16">MDF 16mm</option><option value="wiorowa18">Wiórowa 18mm</option></select>
   </div>
 </div>
 
-<script>
-document.getElementById('chkCokol').addEventListener('change', function(){
-  document.getElementById('cokolRow').style.display = this.checked ? 'block' : 'none';
-});
-</script>
 
-<!-- === PROJEKT INFO === -->
-<div class="card" style="margin-bottom:16px;" id="projektCard">
-  <h3>Projekt</h3>
-  <div class="grid">
-    <div>
-      <label>Klient</label>
-      <input type="text" id="clientName" placeholder="Nazwisko klienta">
-    </div>
-    <div>
-      <label>Nr projektu</label>
-      <input type="text" id="projectName" placeholder="np. KCH-2026-01">
-    </div>
-  </div>
-  <div style="margin-top:8px;">
-    <label>Uwagi</label>
-    <input type="text" id="moduleNote" placeholder="np. szafka zlewozmywakowa, strona lewa">
-  </div>
-</div>
 
-<!-- QUICK ACTIONS -->
-<div class="card" style="margin-bottom:10px;padding:14px 16px;">
-  <h3 style="margin-bottom:12px;">&#9889; Szybkie akcje</h3>
+<!-- ═══════════════════════════════════════════════════════
+     ГОЛОВНІ ДІЇ — великі кнопки, легко влучити пальцем
+     ═══════════════════════════════════════════════════════ -->
 
-  <div class="micro-label">Dodaj N kopii naraz</div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;">
-    <button class="qa-btn" onclick="batchAdd(2)">&#215;2</button>
-    <button class="qa-btn" onclick="batchAdd(3)">&#215;3</button>
-    <button class="qa-btn" onclick="batchAdd(4)">&#215;4</button>
-    <button class="qa-btn" onclick="batchAdd(5)">&#215;5</button>
-  </div>
-
-  <div class="micro-label">Warianty</div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;">
-    <button class="qa-btn qa-btn-blue" onclick="addMirrored()" title="Dodaj lustrzaną kopię (L→P)">&#8596; LUSTRO</button>
-    <button class="qa-btn qa-btn-blue" onclick="swapConfig()" title="Przełącz Drzwi ↔ Szuflady">&#8644; DRZWI&#8596;SZ.</button>
-    <button class="qa-btn qa-btn-green" onclick="cloneToWiszaca()" title="Kopia z typem Wisząca">&#8593; WISZ. KOPIA</button>
-  </div>
-</div>
-
-<!-- MAIN ACTION -->
+<!-- 1. ГОЛОВНА КНОПКА — найбільша, золота -->
 <button class="btn-primary" onclick="calcAndAdd()"
-  style="width:100%;padding:14px;font-size:1rem;letter-spacing:.12em;margin-bottom:8px;">
-  + OBLICZ &amp; DODAJ
+  style="width:100%;padding:18px;font-size:1.15rem;letter-spacing:.14em;margin-bottom:10px;border-radius:12px;">
+  ＋ ДОДАТИ ШАФКУ
 </button>
-<div class="buttons" style="margin-bottom:8px;">
-  <button class="btn-success" onclick="repeatLast()">&#8635; Ще раз</button>
-  <button class="btn-secondary" onclick="resetForm()">&#8635; Нова</button>
-</div>
-<button class="btn-outline-gold" onclick="calculate()">🔧 TYLKO OBLICZ</button>
-<div class="buttons" style="margin-bottom:8px;">
-  <button class="btn-secondary proj-btn" onclick="showProject()">📊 PROJEKT</button>
-  <button class="btn-danger" onclick="clearProjectLS()" style="max-width:54px;padding:10px 8px;">🗑</button>
-</div>
-<div class="buttons" style="margin-bottom:10px;">
-  <button class="btn-success" onclick="copyModule()">📋 KOPIUJ MODUŁ</button>
-  <button class="btn-blue" onclick="showTemplates()">📦 SZABLONY KUCHNI</button>
-</div>
 
-
-<button onclick="toggleJsonPanel()" id="btnJsonPanel"
-  style="width:100%;margin-bottom:8px;padding:12px;background:linear-gradient(135deg,#0d3b5e,#1a6fa8);border:2px solid #2e86c1;border-radius:8px;color:#79c0ff;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;display:flex;align-items:center;justify-content:center;gap:8px;">
-  <span>&#128203;</span> <span>WKLEJ JSON PROJEKTU</span> <span id="jsonPanelArrow">&#9660;</span>
-</button>
-<div id="jsonPanel" style="display:none;margin-bottom:12px;background:#0d1117;border:2px solid #30363d;border-radius:8px;padding:12px;">
-  <div style="font-size:.7rem;color:#79c0ff;font-family:'JetBrains Mono',monospace;margin-bottom:8px;letter-spacing:.05em;">// Wklej JSON wygenerowany przez AI</div>
-  <textarea id="projektJson" rows="8"
-    style="width:100%;padding:10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#79c0ff;font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical;line-height:1.5;outline:none;"
-    placeholder="[ { &quot;code&quot;: &quot;SD-01&quot;, &quot;name&quot;: &quot;Szafka dolna&quot;, &quot;H&quot;: 740, &quot;W&quot;: 600, &quot;D&quot;: 560, &quot;section&quot;: &quot;Dolne&quot;, &quot;parts&quot;: [...] } ]"></textarea>
-  <button onclick="loadProjektJson()"
-    style="width:100%;margin-top:10px;padding:14px;background:linear-gradient(135deg,#1a5276,#2e86c1);border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:1rem;letter-spacing:.12em;cursor:pointer;text-transform:uppercase;">
-    &#9654; ZAŁADUJ I POKAŻ ZBIÓRKĘ
+<!-- 2. ЩЕ РАЗ + НОВА — часті дії на об'єкті -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+  <button class="btn-success" onclick="repeatLast()"
+    style="padding:15px 8px;font-size:.95rem;border-radius:10px;letter-spacing:.08em;">
+    &#8635; ЩЕ РАЗ
   </button>
+  <button class="btn-secondary" onclick="resetForm()"
+    style="padding:15px 8px;font-size:.95rem;border-radius:10px;letter-spacing:.08em;">
+    &#8635; НОВА
+  </button>
+</div>
+
+<!-- 3. ПРОЄКТ + ВИДАЛИТИ — переглянути що вже є -->
+<div style="display:grid;grid-template-columns:1fr auto auto;gap:8px;margin-bottom:14px;">
+  <button class="btn-secondary proj-btn" onclick="showProject()"
+    style="padding:14px;font-size:.95rem;border-radius:10px;letter-spacing:.08em;">
+    📊 ПРОЄКТ <span id="projCountBadge" style="background:var(--accent);color:#000;border-radius:4px;padding:1px 6px;font-size:.8rem;margin-left:4px;font-weight:900;display:none;">0</span>
+  </button>
+  <button id="btnUndo" onclick="_historyUndo()" disabled
+    style="padding:14px 16px;background:rgba(127,140,141,.1);border:1px solid rgba(127,140,141,.3);border-radius:10px;color:#7f8c8d;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;cursor:pointer;opacity:.35;"
+    title="Скасувати">↩</button>
+  <button class="btn-danger" onclick="clearProjectLS()"
+    style="padding:14px 18px;border-radius:10px;font-size:1rem;">🗑</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     ТЕГИ — одним дотиком, перед додаванням
+     ═══════════════════════════════════════════════════════ -->
+<div style="margin-bottom:14px;">
+  <div class="micro-label">🏷 Група</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px;">
+    <button id="tag_dolne"   class="tag-btn active-tag" onclick="setTag('dolne')"   style="padding:10px 4px;font-size:.78rem;">↓ DOLNE</button>
+    <button id="tag_wiszace" class="tag-btn"            onclick="setTag('wiszace')" style="padding:10px 4px;font-size:.78rem;">↑ WISZ.</button>
+    <button id="tag_slupki"  class="tag-btn"            onclick="setTag('slupki')"  style="padding:10px 4px;font-size:.78rem;">▐ SŁUP.</button>
+    <button id="tag_agd"     class="tag-btn"            onclick="setTag('agd')"     style="padding:10px 4px;font-size:.78rem;">⚙ AGD</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     ШВИДКІ ВАРІАНТИ — компактно, другий ряд
+     ═══════════════════════════════════════════════════════ -->
+<div style="margin-bottom:14px;">
+  <div class="micro-label">⚡ Швидко</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:6px;">
+    <button class="qa-btn" onclick="batchAdd(2)" style="padding:10px 4px;">×2</button>
+    <button class="qa-btn" onclick="batchAdd(3)" style="padding:10px 4px;">×3</button>
+    <button class="qa-btn" onclick="batchAdd(4)" style="padding:10px 4px;">×4</button>
+    <button class="qa-btn" onclick="batchAdd(5)" style="padding:10px 4px;">×5</button>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;">
+    <button class="qa-btn qa-btn-blue" onclick="addMirrored()"    style="padding:10px 4px;font-size:.72rem;">↔ LUSTRO</button>
+    <button class="qa-btn qa-btn-blue" onclick="swapConfig()"     style="padding:10px 4px;font-size:.72rem;">⇄ DR↔SZ</button>
+    <button class="qa-btn qa-btn-green" onclick="cloneToWiszaca()" style="padding:10px 4px;font-size:.72rem;">↑ WISZ.</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     ЗБЕРЕЖЕННЯ — середня важливість
+     ═══════════════════════════════════════════════════════ -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+  <button id="btnSaveProject" class="proj-btn" onclick="saveProject()"
+    style="padding:12px;font-size:.85rem;border-radius:9px;">
+    💾 ЗАПИСАТИ
+  </button>
+  <button id="btnLoadProject" class="proj-btn" onclick="loadProject()"
+    style="padding:12px;font-size:.85rem;border-radius:9px;">
+    📂 ВІДКРИТИ
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     ⚙ ІНСТРУМЕНТИ — розгортається, ховаємо рідкісні дії
+     ═══════════════════════════════════════════════════════ -->
+<button onclick="toggleToolsPanel()" id="btnToolsPanel"
+  style="width:100%;margin-bottom:6px;padding:13px 14px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:9px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.85rem;letter-spacing:.1em;cursor:pointer;text-align:left;position:relative;box-sizing:border-box;">
+  ⚙ ІНСТРУМЕНТИ
+  <span id="toolsPanelArrow" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);font-size:.75rem;pointer-events:none;">▼</span>
+</button>
+<div id="toolsPanel" style="display:none;margin-bottom:12px;padding:10px;background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:9px;">
+
+  <!-- Dane klienta -->
+  <div style="border-bottom:1px solid var(--border);padding-bottom:10px;margin-bottom:10px;">
+    <div class="micro-label" style="margin-bottom:6px;">👤 ДАНІ ПРОЄКТУ</div>
+    <input type="text" id="clientName" placeholder="Nazwisko klienta"
+      style="width:100%;padding:9px 12px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:7px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;margin-bottom:6px;box-sizing:border-box;">
+    <input type="text" id="projectName" placeholder="Nr projektu np. KCH-2026-01"
+      style="width:100%;padding:9px 12px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:7px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;margin-bottom:6px;box-sizing:border-box;">
+    <input type="text" id="moduleNote" placeholder="Uwagi np. szafka zlewozmywakowa"
+      style="width:100%;padding:9px 12px;background:rgba(255,255,255,.06);border:1px solid var(--border);border-radius:7px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-size:.9rem;box-sizing:border-box;">
+  </div>
+
+  <!-- Шаблони + Копія -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:8px;">
+    <button class="btn-success" onclick="copyModule()"
+      style="padding:11px 6px;font-size:.8rem;border-radius:8px;">
+      📋 КОПІЯ МОДУЛЯ
+    </button>
+    <button class="btn-blue" onclick="showTemplates()"
+      style="padding:11px 6px;font-size:.8rem;border-radius:8px;">
+      📦 ШАБЛОНИ
+    </button>
+  </div>
+
+  <!-- Тільки облік -->
+  <button class="btn-outline-gold" onclick="calculate()"
+    style="width:100%;margin-bottom:8px;padding:11px;font-size:.82rem;">
+    🔧 ТІЛЬКИ ОБЛІК (без додавання)
+  </button>
+
+  <!-- JSON / файли — найрідкісніші дії -->
+  <div style="border-top:1px solid var(--border);padding-top:8px;margin-top:4px;">
+    <div class="micro-label" style="margin-bottom:6px;">JSON / файли</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px;">
+      <button onclick="exportProjectJSON()"
+        style="padding:10px 6px;background:rgba(46,204,113,.12);border:1px solid rgba(46,204,113,.35);border-radius:7px;color:#2ecc71;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.06em;cursor:pointer;">
+        📤 EXPORT .json
+      </button>
+      <button onclick="importProjectJSON()"
+        style="padding:10px 6px;background:rgba(230,126,34,.12);border:1px solid rgba(230,126,34,.35);border-radius:7px;color:#e67e22;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.06em;cursor:pointer;">
+        📥 IMPORT .json
+      </button>
+    </div>
+    <button onclick="toggleJsonPanel()" id="btnJsonPanel"
+      style="width:100%;padding:10px;background:rgba(121,192,255,.08);border:1px solid rgba(121,192,255,.25);border-radius:7px;color:#79c0ff;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:.78rem;letter-spacing:.08em;cursor:pointer;display:flex;align-items:center;justify-content:space-between;">
+      <span>📋 WKLEJ / BOM / AI PROMPT</span>
+      <span id="jsonPanelArrow">▼</span>
+    </button>
+  </div>
+
+</div>
+
+<!-- JSON Panel (вкладений в інструменти, але окремий div) -->
+<div id="jsonPanel" style="display:none;margin-bottom:12px;background:#0d1117;border:2px solid #30363d;border-radius:8px;padding:12px;">
+
+  <!-- tabs -->
+  <div style="display:flex;gap:6px;margin-bottom:10px;">
+    <button onclick="jsonSetMode('bom')" id="jsonTabBom"
+      style="flex:1;padding:7px 4px;background:#1a5276;border:2px solid #2e86c1;border-radius:6px;color:#79c0ff;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.75rem;letter-spacing:.06em;cursor:pointer;">
+      📋 BOM
+    </button>
+    <button onclick="jsonSetMode('project')" id="jsonTabProject"
+      style="flex:1;padding:7px 4px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#555;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.75rem;letter-spacing:.06em;cursor:pointer;">
+      📥 PROJEKT
+    </button>
+    <button onclick="jsonSetMode('prompt')" id="jsonTabPrompt"
+      style="flex:1;padding:7px 4px;background:#0d1117;border:1px solid #30363d;border-radius:6px;color:#555;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.75rem;letter-spacing:.06em;cursor:pointer;">
+      🤖 AI
+    </button>
+  </div>
+
+  <!-- BOM mode -->
+  <div id="jsonModeBom">
+    <textarea id="projektJson" rows="6" oninput="validateJson(this,'jsonValidBom')"
+      style="width:100%;padding:10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#79c0ff;font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical;line-height:1.5;outline:none;box-sizing:border-box;"
+      placeholder='[{"code":"SD-01","name":"Szafka dolna","H":740,"W":600,"D":560,"section":"Dolne","parts":[...]}]'></textarea>
+    <div id="jsonValidBom" style="font-size:.68rem;font-family:'JetBrains Mono',monospace;margin-top:4px;min-height:16px;"></div>
+    <button onclick="loadProjektJson()"
+      style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,#1a5276,#2e86c1);border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;">
+      ▶ ZAŁADUJ BOM
+    </button>
+  </div>
+
+  <!-- PROJEKT mode -->
+  <div id="jsonModeProject" style="display:none;">
+    <textarea id="projektJsonProject" rows="6" oninput="validateJson(this,'jsonValidProject')"
+      style="width:100%;padding:10px;background:#161b22;border:1px solid #30363d;border-radius:6px;color:#e67e22;font-family:'JetBrains Mono',monospace;font-size:.72rem;resize:vertical;line-height:1.5;outline:none;box-sizing:border-box;"
+      placeholder='{"modules":[{"type":"Dolna","width":600,"height":720,"depth":560,...}]}'></textarea>
+    <div id="jsonValidProject" style="font-size:.68rem;font-family:'JetBrains Mono',monospace;margin-top:4px;min-height:16px;"></div>
+    <button onclick="loadJsonToProject()"
+      style="width:100%;margin-top:8px;padding:12px;background:linear-gradient(135deg,#7d3c00,#e67e22);border:none;border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.95rem;letter-spacing:.1em;cursor:pointer;text-transform:uppercase;">
+      📥 ZAŁADUJ DO PROJEKTU
+    </button>
+    <div id="projektResultProject" style="margin-top:10px;"></div>
+  </div>
+
+  <!-- AI mode -->
+  <div id="jsonModePrompt" style="display:none;">
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;">
+      <button onclick="copyAiPrompt('bom')"
+        style="padding:11px;background:rgba(46,204,113,.15);border:1px solid rgba(46,204,113,.5);border-radius:7px;color:#2ecc71;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.88rem;letter-spacing:.06em;cursor:pointer;">
+        📋 PROMPT → BOM (розкрій)
+      </button>
+      <button onclick="copyAiPrompt('project')"
+        style="padding:11px;background:rgba(230,126,34,.12);border:1px solid rgba(230,126,34,.4);border-radius:7px;color:#e67e22;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.88rem;letter-spacing:.06em;cursor:pointer;">
+        📋 PROMPT → PROJEKT (список шафок)
+      </button>
+    </div>
+    <div id="aiPromptPreview" style="background:#161b22;border:1px solid #30363d;border-radius:6px;padding:10px;font-family:'JetBrains Mono',monospace;font-size:.65rem;color:#8b949e;white-space:pre-wrap;max-height:180px;overflow-y:auto;display:none;"></div>
+    <div id="aiPromptCopyMsg" style="font-size:.75rem;color:#2ecc71;margin-top:6px;text-align:center;display:none;">✅ Скопійовано!</div>
+  </div>
+
   <div id="projektResult" style="margin-top:12px;"></div>
 </div>
 
-<!-- TAGI -->
-<div style="margin-bottom:12px;">
-  <div class="micro-label">🏷 Grupa modułu (auto)</div>
-  <div style="display:flex;gap:6px;flex-wrap:wrap;">
-    <button id="tag_dolne"   class="tag-btn active-tag" onclick="setTag('dolne')">↓ DOLNE</button>
-    <button id="tag_wiszace" class="tag-btn" onclick="setTag('wiszace')">↑ WISZĄCE</button>
-    <button id="tag_slupki"  class="tag-btn" onclick="setTag('slupki')">▐ SŁUPKI</button>
-    <button id="tag_agd"     class="tag-btn" onclick="setTag('agd')">⚙ AGD</button>
-  </div>
-</div>
-
-<div class="buttons" style="margin-bottom:8px;">
-  <button id="btnSaveProject" class="proj-btn" onclick="saveProject()">💾 ZAPISZ PROJEKT</button>
-  <button id="btnLoadProject" class="proj-btn" onclick="loadProject()">📂 WCZYTAJ PROJEKT</button>
-</div>
+<input type="file" id="importJsonFile" accept=".json" style="display:none" onchange="handleImportJSON(this)">
 
 <div id="result"></div>
 
@@ -1651,151 +1796,192 @@ const systemData={
   Antaro:{
     brand:'Blum',
     types:{N:68, M:84, C:148, D:196},
+    // presets[qty] = масив варіантів, кожен = types[] від горнього до нижнього
+    presets:{
+      1:[['C'],['M'],['D']],
+      2:[['N','C'],['M','C'],['N','D'],['C','C']],
+      3:[['N','C','C'],['N','M','C'],['M','C','C'],['N','C','D']],
+      4:[['N','N','C','C'],['N','M','C','C'],['N','N','M','C']]
+    },
     offset:38, minWidth:270, maxWidth:700,
     lengths:[270,300,350,400,450,500,550,600],
-    drillX:37, drillY:32,        // x od przodu boku, y=32mm system
-    sideOffset:0,                // prowadnica flush z bokiem
-    pushOpen:false,
+    drillX:37, drillY:32, sideOffset:0, pushOpen:false,
     note:'Blumotion/TipOn opcjonalnie'
   },
-  // Tandembox: identyczny montaz jak Antaro, rozni sie designem
   Tandembox:{
     brand:'Blum',
     types:{N:68, M:84, C:148, D:196},
+    presets:{
+      1:[['C'],['M'],['D']],
+      2:[['N','C'],['M','C'],['N','D'],['C','C']],
+      3:[['N','C','C'],['N','M','C'],['M','C','C'],['N','C','D']],
+      4:[['N','N','C','C'],['N','M','C','C'],['N','N','M','C']]
+    },
     offset:38, minWidth:270, maxWidth:700,
     lengths:[270,300,350,400,450,500,550,600],
-    drillX:37, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:37, drillY:32, sideOffset:0, pushOpen:false,
     note:'Wersja ze sciankami metalowymi'
   },
-  // Merivobox: offset=42mm, typy E/M/K/H (wyzsze niz Antaro)
   Merivobox:{
     brand:'Blum',
     types:{E:90, M:130, K:180, H:250},
+    presets:{
+      1:[['K'],['M'],['H']],
+      2:[['E','K'],['M','K'],['E','H'],['K','K']],
+      3:[['E','K','K'],['E','M','K'],['M','K','K'],['E','K','H']],
+      4:[['E','E','K','K'],['E','M','K','K'],['E','E','M','K']]
+    },
     offset:42, minWidth:350, maxWidth:800,
     lengths:[270,300,350,400,450,500,550,600],
-    drillX:42, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:42, drillY:32, sideOffset:0, pushOpen:false,
     note:'System pelnometalowy, wysokie boki'
   },
-  // Legrabox: offset=38mm, typy N/M/C/F
   Legrabox:{
     brand:'Blum',
     types:{N:66, M:90, C:177, F:241},
+    presets:{
+      1:[['C'],['M'],['F']],
+      2:[['N','C'],['M','C'],['N','F'],['C','C']],
+      3:[['N','C','C'],['N','M','C'],['M','C','C'],['N','C','F']],
+      4:[['N','N','C','C'],['N','M','C','C'],['N','N','M','C']]
+    },
     offset:38, minWidth:270, maxWidth:700,
     lengths:[270,300,350,400,450,500,550,600],
-    drillX:37, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:37, drillY:32, sideOffset:0, pushOpen:false,
     note:'Legrabox Pure / Free'
   },
 
   // === HETTICH ===
-  // InnoTech Atira: offset=44mm, typy wg wysokosci A/B/C
   'InnoTech Atira':{
     brand:'Hettich',
     types:{A:69, B:99, C:144},
+    presets:{
+      1:[['C'],['B'],['A']],
+      2:[['A','C'],['B','C'],['A','B'],['C','C']],
+      3:[['A','C','C'],['A','B','C'],['B','C','C']],
+      4:[['A','A','C','C'],['A','B','C','C'],['A','A','B','C']]
+    },
     offset:44, minWidth:250, maxWidth:700,
     lengths:[270,300,350,400,450,500,550,600],
-    drillX:44, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:44, drillY:32, sideOffset:0, pushOpen:false,
     note:'Quadro V6 / SilentSystem'
   },
-  // ArciTech: offset=47mm, typy D/E/F (design drawer)
   ArciTech:{
     brand:'Hettich',
     types:{D:94, E:126, F:176},
+    presets:{
+      1:[['F'],['E'],['D']],
+      2:[['D','F'],['E','F'],['D','E'],['F','F']],
+      3:[['D','F','F'],['D','E','F'],['E','F','F']],
+      4:[['D','D','F','F'],['D','E','F','F'],['D','D','E','F']]
+    },
     offset:47, minWidth:250, maxWidth:700,
     lengths:[270,300,350,400,450,500,550,600],
-    drillX:47, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:47, drillY:32, sideOffset:0, pushOpen:false,
     note:'System wysokich bokow, InvisaMount'
   },
 
   // === GRASS ===
-  // Vionaro: offset=38mm, typy H84/H92/H128/H202
   Vionaro:{
     brand:'Grass',
     types:{H84:84, H92:92, H128:128, H202:202},
+    presets:{
+      1:[['H128'],['H92'],['H202']],
+      2:[['H84','H128'],['H92','H128'],['H84','H202'],['H128','H128']],
+      3:[['H84','H128','H128'],['H84','H92','H128'],['H92','H128','H128'],['H84','H128','H202']],
+      4:[['H84','H84','H128','H128'],['H84','H92','H128','H128'],['H84','H84','H92','H128']]
+    },
     offset:38, minWidth:250, maxWidth:650,
     lengths:[270,300,350,400,450,500,550],
-    drillX:38, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:38, drillY:32, sideOffset:0, pushOpen:false,
     note:'Tiomos soft-close opcjonalnie'
   },
-  // Nova Pro Scala: offset=37mm, ekonomiczna seria
   'Nova Pro Scala':{
     brand:'Grass',
     types:{H86:86, H131:131, H176:176},
+    presets:{
+      1:[['H131'],['H86'],['H176']],
+      2:[['H86','H131'],['H131','H131'],['H86','H176']],
+      3:[['H86','H131','H131'],['H86','H86','H131'],['H86','H131','H176']],
+      4:[['H86','H86','H131','H131'],['H86','H86','H86','H131']]
+    },
     offset:37, minWidth:250, maxWidth:600,
     lengths:[270,300,350,400,450,500,550],
-    drillX:37, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:37, drillY:32, sideOffset:0, pushOpen:false,
     note:'Seria ekonomiczna, Dynalock'
   },
-  // Dynapro: offset=37mm, pelna extensja
   Dynapro:{
     brand:'Grass',
     types:{H83:83, H128:128, H173:173},
+    presets:{
+      1:[['H128'],['H83'],['H173']],
+      2:[['H83','H128'],['H128','H128'],['H83','H173']],
+      3:[['H83','H128','H128'],['H83','H83','H128'],['H83','H128','H173']],
+      4:[['H83','H83','H128','H128'],['H83','H83','H83','H128']]
+    },
     offset:37, minWidth:250, maxWidth:600,
     lengths:[270,300,350,400,450,500,550],
-    drillX:37, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:37, drillY:32, sideOffset:0, pushOpen:false,
     note:'100% wysuw, Dynalock soft-close'
   },
 
   // === GTV ===
-  // GTV Axis Pro: offset=37mm, ekonomiczna alternatywa
   'GTV Axis Pro':{
     brand:'GTV',
     types:{H86:86, H116:116, H136:136, H196:196},
+    presets:{
+      1:[['H136'],['H116'],['H196']],
+      2:[['H86','H136'],['H116','H136'],['H86','H196'],['H136','H136']],
+      3:[['H86','H136','H136'],['H86','H116','H136'],['H116','H136','H136'],['H86','H136','H196']],
+      4:[['H86','H86','H136','H136'],['H86','H116','H136','H136'],['H86','H86','H116','H136']]
+    },
     offset:37, minWidth:250, maxWidth:600,
     lengths:[270,300,350,400,450,500,550],
-    drillX:37, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:37, drillY:32, sideOffset:0, pushOpen:false,
     note:'Push-to-open dostepny'
   },
-  // GTV Vertico: offset=35mm, budzetowa
   'GTV Vertico':{
     brand:'GTV',
     types:{H84:84, H120:120, H168:168},
+    presets:{
+      1:[['H120'],['H84'],['H168']],
+      2:[['H84','H120'],['H120','H120'],['H84','H168']],
+      3:[['H84','H120','H120'],['H84','H84','H120'],['H84','H120','H168']],
+      4:[['H84','H84','H120','H120'],['H84','H84','H84','H120']]
+    },
     offset:35, minWidth:250, maxWidth:600,
     lengths:[270,300,350,400,450,500],
-    drillX:35, drillY:32,
-    sideOffset:0,
-    pushOpen:true,
+    drillX:35, drillY:32, sideOffset:0, pushOpen:true,
     note:'TipOn wbudowany'
   },
 
   // === DTC ===
-  // DTC Mova: offset=37mm, pelna extensja
   'DTC Mova':{
     brand:'DTC',
     types:{H86:86, H136:136, H186:186},
+    presets:{
+      1:[['H136'],['H86'],['H186']],
+      2:[['H86','H136'],['H136','H136'],['H86','H186']],
+      3:[['H86','H136','H136'],['H86','H86','H136'],['H86','H136','H186']],
+      4:[['H86','H86','H136','H136'],['H86','H86','H86','H136']]
+    },
     offset:37, minWidth:250, maxWidth:600,
     lengths:[270,300,350,400,450,500,550],
-    drillX:37, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:37, drillY:32, sideOffset:0, pushOpen:false,
     note:'Soft-close, pelna extensja'
   },
-  // DTC Slimbox: offset=35mm, plytkie szuflady
   'DTC Slimbox':{
     brand:'DTC',
     types:{H68:68, H84:84, H118:118},
+    presets:{
+      1:[['H118'],['H84'],['H68']],
+      2:[['H68','H118'],['H84','H118'],['H118','H118']],
+      3:[['H68','H118','H118'],['H68','H84','H118'],['H84','H118','H118']],
+      4:[['H68','H68','H118','H118'],['H68','H84','H118','H118']]
+    },
     offset:35, minWidth:250, maxWidth:600,
     lengths:[270,300,350,400,450,500],
-    drillX:35, drillY:32,
-    sideOffset:0,
-    pushOpen:false,
+    drillX:35, drillY:32, sideOffset:0, pushOpen:false,
     note:'Seria slim do plytkich szafek'
   }
 };
@@ -1826,35 +2012,137 @@ function autoLogic(){
     // Sekcja pojawi się przez updateDrawerSelectors() jeśli config=Szuflady
   }
 
-  // Presets wymiar\u00f3w
-  if(t==="Wisz\u0105ca")                  {heightEl.value=720;  depthEl.value=320;}
-  if(t==="Pod zmywark\u0119")             {heightEl.value=720;  depthEl.value=560;}
-  if(t==="Dolna"||t==="Dolna GOLA")      {heightEl.value=720;  depthEl.value=560;}
-  if(t==="S\u0142upek pod piekarnik")    {heightEl.value=2130; depthEl.value=560;}
-  if(t==="S\u0142upek pod zmywark\u0119") {heightEl.value=2130; depthEl.value=560;}
-  if(t==="S\u0142upek pod lod\u00f3wk\u0119"){heightEl.value=2130;depthEl.value=600;}
-  if(t==="S\u0142upek pe\u0142ny (z p\u00f3\u0142kami)"){heightEl.value=2130;depthEl.value=560;
-    const sc=document.getElementById("shelfCount"); if(sc&&sc.value<2) sc.value=4;
+  // =============================================
+  // TYPOSZEREG PL — standardy wymiarów szafek
+  // Dolne:  korpus H=720, montaż z nóżkami 150mm = 870mm / z cokołem 100mm = 820mm
+  // Górne:  H=610 / 710 / 900mm, D=320mm
+  // Słupki: H=2100/2130mm, D=560mm
+  // Szerokości standard: 300/400/450/500/600/800mm
+  // =============================================
+  const widthEl = document.getElementById("width");
+  const _W = widthEl ? parseInt(widthEl.value)||600 : 600;
+
+  // --- DOLNE (korpus 720mm) ---
+  if(t==="Dolna"||t==="Dolna GOLA"){
+    heightEl.value=720; depthEl.value=560;
+    if(widthEl&&![300,400,450,500,600,800].includes(_W)) widthEl.value=600;
   }
-  if(t==="Naro\u017cna dolna \u015alepa"||t==="Naro\u017cna dolna L"){heightEl.value=720;depthEl.value=560;}
-  if(t==="Wisz\u0105ca z klap\u0105")  {heightEl.value=400;  depthEl.value=350;}
-  if(t==="Pod okap")           {heightEl.value=400;  depthEl.value=350;}
-  if(t==="S\u0142upek MIX (szuflady+drzwi)"){heightEl.value=2130;depthEl.value=560;}
-  if(t==="Cargo / Spacetower"){heightEl.value=2130;depthEl.value=560;}
-  if(t==="Naro\u017cna g\u00f3rna")       {heightEl.value=720;  depthEl.value=320;}
-  if(t==="S\u0142upek AGD (piekarnik w kolumnie)"){heightEl.value=2130;depthEl.value=560;}
-  if(t==="S\u0142upek z koszami / relingami"){heightEl.value=2130;depthEl.value=560;}
-  if(t==="S\u0142upek piekarnik + piekarnik"){heightEl.value=2130;depthEl.value=560;}
+  if(t==="Pod zmywarkę"){
+    heightEl.value=720; depthEl.value=560;
+    if(widthEl) widthEl.value=600; cfgEl.value="Drzwi";
+  }
+  if(t.startsWith("AGD")){
+    heightEl.value=720; depthEl.value=560;
+    if(widthEl) widthEl.value=600;
+  }
+
+  // --- GÓRNE ---
+  if(t==="Wisząca"){
+    // standard PL: W../61=610, W../71=710, W../90=900
+    if(![610,710,900].includes(parseInt(heightEl.value))) heightEl.value=610;
+    depthEl.value=320;
+    if(widthEl&&![300,400,450,500,600,800,1000].includes(_W)) widthEl.value=600;
+  }
+  if(t==="Wisząca z klapą"){
+    heightEl.value=400; depthEl.value=350;
+    if(widthEl&&![600,800,900,1000].includes(_W)) widthEl.value=600;
+  }
+  if(t==="Pod okap"){
+    heightEl.value=400; depthEl.value=350;
+    if(widthEl) widthEl.value=600;
+  }
+  if(t==="Narożna górna"){
+    if(![610,710,900].includes(parseInt(heightEl.value))) heightEl.value=610;
+    depthEl.value=320; if(widthEl) widthEl.value=900;
+  }
+
+  // --- SŁUPKI ---
+  if(t==="Słupek pod piekarnik"){
+    heightEl.value=2130; depthEl.value=560;
+    if(widthEl) widthEl.value=600; cfgEl.value="Drzwi";
+  }
+  if(t==="Słupek pod zmywarkę"){
+    heightEl.value=2130; depthEl.value=560;
+    if(widthEl) widthEl.value=600; cfgEl.value="Drzwi";
+  }
+  if(t==="Słupek pod lodówkę"){
+    heightEl.value=2130; depthEl.value=600;
+    if(widthEl) widthEl.value=600; cfgEl.value="Drzwi";
+  }
+  if(t==="Słupek pełny (z półkami)"){
+    heightEl.value=2130; depthEl.value=560;
+    if(widthEl&&![300,400,600].includes(_W)) widthEl.value=300;
+    const sc=document.getElementById("shelfCount"); if(sc&&parseInt(sc.value)<2) sc.value=4;
+    cfgEl.value="Drzwi";
+  }
+  if(t==="Słupek MIX (szuflady+drzwi)"){
+    heightEl.value=2130; depthEl.value=560; if(widthEl) widthEl.value=600;
+  }
+  if(t==="Cargo / Spacetower"){
+    heightEl.value=2130; depthEl.value=560;
+    if(widthEl) widthEl.value=600; cfgEl.value="Szuflady";
+  }
+  if(t==="Słupek AGD (piekarnik w kolumnie)"){
+    heightEl.value=2130; depthEl.value=560;
+    if(widthEl) widthEl.value=600; cfgEl.value="Drzwi";
+  }
+  if(t==="Słupek z koszami / relingami"){
+    heightEl.value=2130; depthEl.value=560;
+    if(widthEl) widthEl.value=600; cfgEl.value="Drzwi";
+  }
+  if(t==="Słupek piekarnik + piekarnik"){
+    heightEl.value=2130; depthEl.value=560;
+    if(widthEl) widthEl.value=600; cfgEl.value="Drzwi";
+  }
+
+  // --- NAROŻNE ---
+  if(t==="Narożna dolna Ślepa"||t==="Narożna dolna L"){
+    heightEl.value=720; depthEl.value=560;
+    if(widthEl) widthEl.value=900; cfgEl.value="Drzwi";
+  }
+
+  // --- INFO TYPOSZEREG pod polami wymiarów ---
+  const _typoMap={
+    'Dolna':          '📐 Dolna: korpus 720mm | montaż 820mm (+nóżki) | D=560 | W=300–800',
+    'Dolna GOLA':     '📐 Dolna GOLA: korpus 720mm | D=560 | bez cokołu',
+    'Pod zmywarkę':   '📐 Pod zmywarkę: H=720, W=600, D=560',
+    'Wisząca':        '📐 Górna W../61=610 / W../71=710 / W../90=900 | D=320 | W=300–800',
+    'Wisząca z klapą':'📐 Górna klapa: H=400, D=350, W=600–1000',
+    'Pod okap':       '📐 Pod okap: H=400, D=350, W=600',
+    'Narożna górna':  '📐 Narożna górna: H=610/710/900, D=320, W=900',
+    'Narożna dolna Ślepa':'📐 Narożna dolna ślepa: H=720, D=560, W=900',
+    'Narożna dolna L':'📐 Narożna dolna L: H=720, D=560, W=900',
+    'Słupek pełny (z półkami)':'📐 Słupek: H=2130, D=560, W=300–600',
+    'Słupek pod piekarnik':'📐 Słupek AGD: H=2130, D=560, W=600',
+    'Słupek pod lodówkę':'📐 Słupek lodówka: H=2130, D=600, W=600',
+    'Cargo / Spacetower':'📐 Cargo: H=2130, D=560, W=600',
+  };
+  try{
+    let _ti=document.getElementById('_typoInfo');
+    if(!_ti){
+      _ti=document.createElement('div');
+      _ti.id='_typoInfo';
+      _ti.style.cssText='font-size:.68rem;color:var(--accent2);padding:5px 10px;background:rgba(200,152,64,.07);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;margin:4px 0 6px;font-family:monospace;line-height:1.4;';
+      const hEl=document.getElementById('height');
+      if(hEl&&hEl.closest('.dim-card')){
+        hEl.closest('.dim-card').before(_ti);
+      } else if(hEl&&hEl.parentNode){
+        hEl.parentNode.before(_ti);
+      }
+    }
+    const _tiTxt=_typoMap[t]||'';
+    _ti.textContent=_tiTxt; _ti.style.display=_tiTxt?'block':'none';
+  }catch(_e){ /* ignore typo info errors */ }
 
   // Polki
   // Typy ktore maja polki (widoczny shelvesCard)
   const shelfTypes=["Wisz\u0105ca","Wisz\u0105ca z klap\u0105","Pod okap","Dolna","Dolna GOLA",
     "S\u0142upek pe\u0142ny (z p\u00f3\u0142kami)","S\u0142upek z koszami / relingami","Naro\u017cna g\u00f3rna"];
   // Narozna dolna slepa/L i Slupek pod AGD nie maja polek
-  const hasShelvesUI = shelfTypes.includes(t);
+  const configVal2 = document.getElementById("config").value;
+  const hasShelvesUI = shelfTypes.includes(t) && configVal2 !== "Szuflady";
   shelvesCard.style.display = hasShelvesUI ? "block" : "none";
   if(!hasShelvesUI){
-    // Reset polek jesli typ nie obsluguje
     const sc=document.getElementById("shelfCount");
     if(sc) sc.value=0;
   }
@@ -1953,7 +2241,7 @@ function applyLayoutDist(layout){
   const H=parseInt(document.getElementById("height").value)||720;
   const golaOffset=(document.getElementById("type").value==="Dolna GOLA")?50:0;
   const qty=layout.qty;
-  const available=H-golaOffset-4-((qty-1)*3);
+  const available=H-golaOffset-2-((qty-1)*3); // 2=до вінця, 3=між фронтами
 
   let heights=[];
   if(layout.dist==="equal"){
@@ -2068,126 +2356,109 @@ function updateDrawerSelectors(){
 
   const H=parseInt(document.getElementById("height").value)||720;
   const golaOffset=(document.getElementById("type").value==="Dolna GOLA")?50:0;
-  const available=H-golaOffset-4-((qty-1)*3);
+  const available=H-golaOffset-2-((qty-1)*3);
   const autoFrontH=Math.max(100, Math.floor(available/qty));
 
-  // === TYPY SZUFLAD — oryginalne etykiety H86/H116/H136/H196 ===
-  const typeKeys=Object.keys(systemData[system].types);
+  // === РОЗКЛАД ШУХЛЯД — візуальні картки з мм від низу ===
+  const sysD2 = systemData[system];
+  const typeKeys = Object.keys(sysD2.types);
+  const tSizes = sysD2.types;
 
-  const typePresets=[];
-
-  if(qty===1){
-    typeKeys.forEach(t=>typePresets.push({label:t, types:[t]}));
-  } else if(qty===2){
-    typeKeys.forEach(t=>typePresets.push({label:`${t}-${t}`, types:[t,t]}));
-    for(let a=0;a<typeKeys.length;a++)
-      for(let b=a+1;b<typeKeys.length;b++)
-        typePresets.push({label:`${typeKeys[b]}-${typeKeys[a]}`, types:[typeKeys[b],typeKeys[a]]});
-  } else if(qty===3){
-    typeKeys.forEach(t=>typePresets.push({label:`${t}-${t}-${t}`, types:[t,t,t]}));
-    for(let big=typeKeys.length-1;big>0;big--)
-      for(let sm=0;sm<big;sm++)
-        typePresets.push({
-          label:`${typeKeys[big]}-${typeKeys[big]}-${typeKeys[sm]}`,
-          types:[typeKeys[big],typeKeys[big],typeKeys[sm]]
-        });
-  } else if(qty===4){
-    typeKeys.forEach(t=>typePresets.push({label:`${t}×4`, types:[t,t,t,t]}));
-    for(let big=typeKeys.length-1;big>0;big--)
-      typePresets.push({
-        label:`${typeKeys[big]}×3+${typeKeys[0]}`,
-        types:[typeKeys[big],typeKeys[big],typeKeys[big],typeKeys[0]]
-      });
+  function calcFrontHeights(types){
+    const H2=parseInt(document.getElementById("height").value)||720;
+    const golaOff2=(document.getElementById("type").value==="Dolna GOLA")?50:0;
+    const GAP2=3; // зазор між фронтами
+    const avail2=H2-golaOff2-2-((types.length-1)*GAP2); // 2=до вінця зверху
+    const backHs2=types.map(t=>tSizes[t]||68);
+    const minF=backHs2.map(b=>b+50);
+    const totalMin2=minF.reduce((a,b)=>a+b,0);
+    let hh;
+    if(totalMin2>=avail2){
+      // мінімуми перевищують — розподілити avail2 пропорційно мінімумам
+      hh=minF.map((m,i)=>i<types.length-1?Math.floor(avail2*m/totalMin2):0);
+      hh[hh.length-1]=avail2-hh.slice(0,-1).reduce((a,b)=>a+b,0);
+    } else {
+      const extra2=avail2-totalMin2;
+      hh=minF.map((m)=>m+Math.floor(extra2*m/totalMin2));
+      // корекція останнього щоб сума = avail2 точно
+      const s2=hh.slice(0,-1).reduce((a,b)=>a+b,0);
+      hh[hh.length-1]=avail2-s2;
+    }
+    return hh; // [gorny..dolny], sum завжди = avail2
   }
 
-  if(typePresets.length>0){
-    const tpLabel=document.createElement("div");
-    tpLabel.style.cssText="font-size:.75rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;margin-top:12px;";
-    tpLabel.textContent="Typ korpusu szuflady";
-    container.appendChild(tpLabel);
-
-    const tpRow=document.createElement("div");
-    tpRow.id="typePrevRow";
-    tpRow.style.cssText="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:12px;";
-
-    typePresets.forEach((p,idx)=>{
-      const btn=document.createElement("button");
-      btn.className="type-preset-btn";
-      btn.textContent=p.label;
-      const isFirst=idx===0;
-      btn.style.cssText=`padding:5px 11px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.75rem;cursor:pointer;transition:all .15s;border:1px solid ${isFirst?"var(--accent2)":"var(--border)"};background:${isFirst?"rgba(247,193,79,.15)":"var(--surface2)"};color:${isFirst?"var(--accent2)":"var(--muted)"};`;
-      btn.onclick=()=>{
-        document.querySelectorAll('.type-preset-btn').forEach(b=>{
-          b.style.background='var(--surface2)';
-          b.style.color='var(--muted)';
-          b.style.borderColor='var(--border)';
-        });
-        btn.style.background='rgba(247,193,79,.15)';
-        btn.style.color='var(--accent2)';
-        btn.style.borderColor='var(--accent2)';
-
-        // Ustaw typy
-        p.types.forEach((t,i)=>{
-          const sel=document.getElementById("drawerType_"+(i+1));
-          if(sel) sel.value=t;
-        });
-
-        // Auto-wylicz optymalne wysokosci front\u00f3w
-        // front min = backH + 20 (mocowanie) + 30 (wewnetrzna) = backH + 50
-        // rozklad: gorny (ma\u0142y front) = jego backH + 50, reszta = r\u00f3wno z pozosta\u0142ej wys.
-        const sysD = systemData[system];
-        const H = parseInt(document.getElementById("height").value)||720;
-        const golaOff = (document.getElementById("type").value==="Dolna GOLA")?50:0;
-        const GAP = 3;
-        const available = H - golaOff - 4 - ((qty-1)*GAP);
-
-        // backH dla kazdego pola (od do\u0142u: pole i → p.types[qty-1-i])
-        // p.types[0] = g\u00f3rny (field_qty), p.types[qty-1] = dolny (field_1)
-        const backHs = p.types.map(t=>sysD.types[t]||68);
-        const minFronts = backHs.map(b=>b+50); // min front dla ka\u017cdego
-
-        // Rozdziel: najpierw daj minimum ka\u017cdemu, reszt\u0119 podziel proporcjonalnie
-        const totalMin = minFronts.reduce((a,b)=>a+b,0);
-        let heights;
-        if(totalMin > available){
-          // Za ma\u0142o miejsca — daj po minimum
-          heights = [...minFronts];
-          // Korekta sumy (ostatni bierze reszt\u0119)
-          const diff = available - totalMin;
-          heights[heights.length-1] = Math.max(minFronts[heights.length-1], heights[heights.length-1]+diff);
-        } else {
-          const extra = available - totalMin;
-          // Rozdziel extra proporcjonalnie do minFronts
-          const totalMinF = totalMin;
-          heights = minFronts.map((m,i)=>{
-            const share = Math.floor(extra * m / totalMinF);
-            return m + share;
-          });
-          // Korekta zaokr\u0105glenia
-          const sum = heights.reduce((a,b)=>a+b,0);
-          heights[heights.length-1] += (available - sum);
-        }
-
-        // heights[0] = g\u00f3rny (field_qty), heights[qty-1] = dolny (field_1)
-        heights.forEach((h,i)=>{
-          const fieldIdx = qty - i; // heights[0]→field_qty (g\u00f3rny), heights[qty-1]→field_1 (dolny)
-          const el = document.getElementById("drawerFrontH_"+fieldIdx);
-          if(el) el.value = Math.max(minFronts[i], h);
-        });
-
-        // Pokaz podpowied\u017a min pod ka\u017cdym polem
-        for(let i=1;i<=qty;i++){
-          const hint = document.getElementById("frontHint_"+i);
-          const typeIdx = qty - i; // field_i odpowiada heights[qty-i] i types[qty-i]
-          const bH = backHs[typeIdx]||68;
-          if(hint) hint.textContent = `min ${bH+50}mm (korpus ${bH}mm)`;
-        }
-
-        updateHeightSum();
-      };
-      tpRow.appendChild(btn);
+  function applyTypeLayout(types, cardEl){
+    document.querySelectorAll('.drawer-layout-card').forEach(b=>{
+      b.style.borderColor='var(--border)';b.style.background='var(--surface2)';
     });
-    container.appendChild(tpRow);
+    if(cardEl){cardEl.style.borderColor='var(--accent2)';cardEl.style.background='rgba(247,193,79,.08)';}
+    const hh=calcFrontHeights(types);
+    // types[0]=горній → drawerType_qty, types[qty-1]=нижній → drawerType_1
+    types.forEach((t,i)=>{
+      const fieldIdx=types.length-i; // types[0]→qty, types[qty-1]→1
+      const sel=document.getElementById("drawerType_"+fieldIdx);
+      if(sel)sel.value=t;
+    });
+    // hh[0]=горній → drawerFrontH_qty (та сама логіка)
+    hh.forEach((h,i)=>{
+      const fieldIdx=types.length-i;
+      const el=document.getElementById("drawerFrontH_"+fieldIdx);
+      if(el)el.value=Math.max(100,h);
+    });
+    updateHeightSum();
+  }
+
+  // Будуємо пресети з systemData.presets
+  const layoutPresets=[];
+  const rawPresets = (sysD2.presets && sysD2.presets[qty]) || null;
+  const tB=typeKeys[typeKeys.length>1?typeKeys.length-1:0];
+  const tS=typeKeys[0];
+
+  if(rawPresets){
+    rawPresets.forEach(types=>layoutPresets.push({types}));
+  } else {
+    // fallback якщо presets не задані
+    if(qty===1) typeKeys.forEach(t=>layoutPresets.push({types:[t]}));
+    else { layoutPresets.push({types:Array(qty).fill(tB)}); if(tB!==tS) layoutPresets.push({types:[tS,...Array(qty-1).fill(tB)]}); }
+  }
+
+  if(layoutPresets.length>0){
+    const lbl=document.createElement("div");
+    lbl.style.cssText="font-size:.72rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;margin-top:14px;font-family:'Barlow Condensed',sans-serif;font-weight:700;";
+    lbl.textContent="⚡ РОЗКЛАД ШУХЛЯД (від низу ↑)";
+    container.appendChild(lbl);
+
+    const row=document.createElement("div");
+    row.style.cssText="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;";
+
+    layoutPresets.forEach((p,idx)=>{
+      const hh=calcFrontHeights(p.types);
+      const fromBottom=[...hh].reverse(); // [dolny, ..., gorny]
+      const total=fromBottom.reduce((a,b)=>a+b,0);
+      const maxH=100;
+      let svgY=maxH;
+      const rects=fromBottom.map((h,i)=>{
+        const hPx=Math.max(14,Math.round(h/total*maxH));
+        svgY-=hPx;
+        const isTop=(i===fromBottom.length-1);
+        const col=isTop?'rgba(247,193,79,.2)':'rgba(74,144,217,.2)';
+        const bCol=isTop?'#f7c14f':'#4a90d9';
+        const r=`<rect x="2" y="${svgY+1}" width="54" height="${hPx-3}" rx="2" fill="${col}" stroke="${bCol}" stroke-width="1.2"/>
+<text x="29" y="${svgY+hPx/2+4}" text-anchor="middle" font-size="9" font-family="JetBrains Mono,monospace" fill="#ccc" font-weight="700">${h}</text>`;
+        return r;
+      }).join('');
+
+      const card=document.createElement("div");
+      card.className="drawer-layout-card";
+      card.innerHTML=`<svg width="58" height="${maxH}" viewBox="0 0 58 ${maxH}">${rects}</svg><div style="font-size:.6rem;color:var(--muted);text-align:center;font-family:'JetBrains Mono',monospace;margin-top:3px;">∑${total}</div>`;
+      card.style.cssText="cursor:pointer;padding:6px;border-radius:8px;border:1px solid "+(idx===0?"var(--accent2)":"var(--border)")+";background:"+(idx===0?"rgba(247,193,79,.08)":"var(--surface2)")+";transition:all .15s;user-select:none;";
+      card.onclick=()=>applyTypeLayout(p.types, card);
+      row.appendChild(card);
+    });
+    container.appendChild(row);
+
+    // Автозастосувати перший
+    applyTypeLayout(layoutPresets[0].types, row.firstChild);
   }
 
   // === POLA SZUFLAD ===
@@ -2218,8 +2489,8 @@ function updateDrawerSelectors(){
     inp.min=100; inp.max=400;
     inp.value=autoFrontH;
     inp.placeholder=`${autoFrontH} mm`;
-    inp.style.cssText="padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.82rem;";
-    inp.title="Wysoko\u015b\u0107 frontu (mm)";
+    inp.style.cssText="padding:10px 12px;background:var(--bg);border:2px solid var(--accent2);border-radius:6px;color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;width:100%;box-sizing:border-box;";
+    inp.title="Висота фронту mm — авто";
     inp.oninput=updateHeightSum;
     row.appendChild(inp);
     div.appendChild(row);
@@ -2227,7 +2498,7 @@ function updateDrawerSelectors(){
     // Podpowied\u017a min (uzupe\u0142niana po wyborze typu)
     const hint=document.createElement("div");
     hint.id="frontHint_"+i;
-    hint.style.cssText="font-size:.7rem;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px;";
+    hint.style.cssText="display:none;";
     div.appendChild(hint);
     container.appendChild(div);
   }
@@ -2252,7 +2523,7 @@ function updateHeightSum(){
   const qty=parseInt(document.getElementById("qty").value)||3;
   const H=parseInt(document.getElementById("height").value)||720;
   const golaOffset=(document.getElementById("type").value==="Dolna GOLA")?50:0;
-  const available=H-golaOffset-4-((qty-1)*3);
+  const available=H-golaOffset-2-((qty-1)*3);
 
   let sum=0;
   for(let i=1;i<=qty;i++){
@@ -2558,7 +2829,8 @@ function generateModuleData(cfg){
 
   /* === SZUFLADY (tylko standardowe) === */
   if(cfg.config==="Szuflady" && !isSlupek && !isNarozna && !isCargo){
-    const sysInfo=systemData[cfg.system];
+    const sysInfo=systemData[cfg.system]||systemData['Antaro'];
+    if(!sysInfo) throw 'Nieznany system prowadnic: '+cfg.system;
 
     if(cfg.width<sysInfo.minWidth)
       throw `Szeroko\u015b\u0107 za ma\u0142a dla systemu ${cfg.system} (min ${sysInfo.minWidth} mm)`;
@@ -2581,7 +2853,7 @@ function generateModuleData(cfg){
 
     // Zawsze u\u017cywaj r\u0119cznych wysoko\u015bci front\u00f3w
     const frontHeights=cfg.frontHeights;
-    const available=cfg.height-golaOffset-4-((cfg.qty-1)*3);
+    const available=cfg.height-golaOffset-2-((cfg.qty-1)*3);
     const sum=frontHeights.reduce((a,b)=>a+b,0);
     if(sum>available)
       throw `Suma front\u00f3w (${sum}mm) przekracza dost\u0119pn\u0105 wysoko\u015b\u0107 (${available}mm)`;
@@ -2594,12 +2866,12 @@ function generateModuleData(cfg){
     // -  1:   = 2 (  )
     // -  2:   = _ + __ + 12
     // - 12 = 3    + 9  
-    const GAP = 12; // 3mm + 9mm
+    const GAP = 12; // від низу провідниці до низу наступної
 
     // frontHeights[0] = dolny (szuflada 1 od dolu), frontHeights[qty-1] = gorny
     const fhFromBottom = [...frontHeights]; // juz od dolu → [dol, srodek, ..., gora]
 
-    let mark = 2 + golaOffset; // od dna wewnetrznego
+    let mark = golaOffset; // P1 від 0
     const runnerYs = []; // od dolu: runnerYs[0]=dolny, runnerYs[qty-1]=gorny
 
     for(let i=0;i<cfg.qty;i++){
@@ -2612,10 +2884,11 @@ function generateModuleData(cfg){
 
     for(let i=0;i<cfg.qty;i++){
       const frontH=frontHeights[i];
-      const backH=sysInfo.types[cfg.drawerTypes[i]];
+      const _typeKey=cfg.drawerTypes[i]||(Object.keys(sysInfo.types)[0]);
+      const backH=sysInfo.types[_typeKey]||68;
 
       if(frontH<backH+20)
-        throw `Szuflada ${i+1}: front za niski dla typu (${cfg.drawerTypes[i]}) – min ${backH+20}mm`;
+        throw `Szuflada ${i+1}: front za niski dla typu (${_typeKey}) – min ${backH+20}mm`;
 
       const internal=frontH-backH-20;
       if(internal<30)
@@ -2733,7 +3006,12 @@ function collectConfig(){
   if(configVal==="Szuflady"){
     for(let i=1;i<=qtyVal;i++){
       const el=document.getElementById("drawerType_"+i);
-      drawerTypes.push(el?el.value:"N");
+      const sys=document.getElementById("system").value;
+      const sysTypes=systemData[sys]?Object.keys(systemData[sys].types):['N'];
+      // fallback: якщо значення порожнє або невалідне — беремо перший тип системи
+      let tVal=el?el.value:'';
+      if(!tVal||!systemData[sys]||!systemData[sys].types[tVal]) tVal=sysTypes[0];
+      drawerTypes.push(tVal);
       const hEl=document.getElementById("drawerFrontH_"+i);
       frontHeights.push(hEl?parseInt(hEl.value)||200:200);
     }
@@ -2780,7 +3058,9 @@ function collectConfig(){
     cokolMat:    document.getElementById("cokolMat")?.value || 'hdf',
     note:        noteEl     ? noteEl.value        : "",
     client:      clientEl   ? clientEl.value      : "",
-    project:     projEl     ? projEl.value        : ""
+    project:     projEl     ? projEl.value        : "",
+    matCorpus:   document.getElementById('matCorpus')?.value || localStorage.getItem('kosztorys_board') || 'BIAŁY W960 18mm',
+    matFront:    document.getElementById('matFront')?.value  || 'none',
   };
 }
 
@@ -2962,6 +3242,7 @@ function calculate(){
 
     document.getElementById("result").innerHTML=`
       <div class="result-card">
+        <div onclick="closeAllPanels();window.scrollTo({top:0,behavior:'smooth'});" style="display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:14px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.35);border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.1em;color:#e74c3c;"><span style="font-size:1.1rem;">✕</span> ЗАКРИТИ / НАЗАД</div>
         <h2>Wynik – ${cfg.type} ${cfg.width}×${cfg.height}×${cfg.depth}${noteStr2}</h2>
         ${clientStr2}
         ${weightHtml}
@@ -3043,10 +3324,82 @@ function resetForm(){
 }
 
 /* ===== updateCounter ===== */
+function _updateProjBadge(){
+  var b=document.getElementById('projCountBadge');
+  if(!b) return;
+  var n=(window.project||[]).length;
+  b.textContent=n;
+  b.style.display=n>0?'inline':'none';
+}
+
+/* ===== UNIVERSAL BACK / NAVIGATION ===== */
+function universalBack(){
+  // закрити все відкрите і скролити вгору
+  closeAllPanels();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function closeAllPanels(){
+  // Інструменти
+  var tp=document.getElementById('toolsPanel');
+  var ta=document.getElementById('toolsPanelArrow');
+  var fb=document.getElementById('fixedCloseBar');
+  if(tp && tp.style.display!=='none'){ tp.style.display='none'; if(ta) ta.textContent='▼'; if(fb) fb.style.display='none'; }
+  // JSON panel
+  var jp=document.getElementById('jsonPanel');
+  var ja=document.getElementById('jsonPanelArrow');
+  if(jp && jp.style.display!=='none'){ jp.style.display='none'; if(ja) ja.textContent='▼'; }
+  // Render drawer
+  var rd=document.getElementById('renderDrawer');
+  if(rd && rd.style.transform==='translateY(0px)'){ if(typeof toggleRenderDrawer==='function') toggleRenderDrawer(); }
+  // Project result — scroll back to top
+  var pr=document.getElementById('result');
+  if(pr) pr.innerHTML='';
+}
+
+// Показуємо "ВГОРУ" коли скролять вниз більше 200px
+(function(){
+  var lastY=0;
+  var bar=null;
+  window.addEventListener('scroll',function(){
+    if(!bar) bar=document.getElementById('universalBackBar');
+    if(!bar) return;
+    var y=window.pageYOffset||document.documentElement.scrollTop;
+    // Показати якщо скролили > 250px від верху І не відкриті інструменти
+    var toolsOpen = document.getElementById('toolsPanel') && document.getElementById('toolsPanel').style.display!=='none';
+    if(y>250 && !toolsOpen){
+      bar.style.display='block';
+    } else if(y<=50){
+      bar.style.display='none';
+    }
+    lastY=y;
+  }, {passive:true});
+})();
+
+function toggleToolsPanel(){
+  var p=document.getElementById('toolsPanel');
+  var a=document.getElementById('toolsPanelArrow');
+  var bar=document.getElementById('fixedCloseBar');
+  if(!p) return;
+  var open=p.style.display==='none';
+  p.style.display=open?'block':'none';
+  if(a) a.textContent=open?'▲':'▼';
+  if(bar) bar.style.display=open?'block':'none';
+  if(!open){
+    var jp=document.getElementById('jsonPanel');
+    var ja=document.getElementById('jsonPanelArrow');
+    if(jp) jp.style.display='none';
+    if(ja) ja.textContent='▼';
+  }
+}
+
 function updateCounter(){
   const el=document.getElementById('moduleCountNum');
   if(el) el.textContent=project.length;
+  _updateProjBadge();
 }
+
+function updateModuleCounter(){ updateCounter(); }
 
 /* ===== setTag ===== */
 function setTag(tag){
@@ -3130,10 +3483,95 @@ function showProject(){
   allRunners.forEach(r=>{if(!rg[r.length])rg[r.length]=0;rg[r.length]++;});
 
   /* ── cena ── */
-  const p18 = parseFloat(localStorage.getItem('price_18')||'0');
-  const p3  = parseFloat(localStorage.getItem('price_3') ||'0');
-  const pe  = parseFloat(localStorage.getItem('price_e') ||'0');
-  const totalCost = totalM2_18*p18 + totalM2_3*p3 + totalEdge*pe;
+  // ── WM-Format price catalog ──
+  const WMF = {
+    boards: {
+      'BIAŁY W960 18mm':    {price:24.20, edge:0.80,  code:'W960'},
+      'BIAŁY 16mm':            {price:22.00, edge:0.90,  code:'W16'},
+      'KASIMIR U702 ST9 (WMF)':{price:32.80, edge:1.34,  code:'U702'},
+      'JESION / JESION wędz. 18mm':{price:42.00, edge:1.70, code:'JESION'},
+      'DĄB H2033 ST10 (WMF)':  {price:51.86, edge:1.91,  code:'H2033'},
+      'BEŻ / KREM 18mm':       {price:32.00, edge:1.10,  code:'BEZ'},
+      'SZARY jasny 18mm':      {price:30.00, edge:1.10,  code:'SZA'},
+      'CZERWONY U335 (WMF)':   {price:52.64, edge:1.40,  code:'U335'},
+      'DĄB jasny 18mm':        {price:38.00, edge:1.50,  code:'DAB-J'},
+      'DĄB ciemny 18mm':       {price:44.00, edge:1.70,  code:'DAB-C'},
+      'ORZECH 18mm':           {price:48.00, edge:1.80,  code:'ORZECH'},
+      'BETON / KAMIEŃ 18mm':   {price:36.00, edge:1.30,  code:'BETON'},
+      'ANTRACYT/CZARNY 18mm':  {price:35.00, edge:1.20,  code:'ANT'},
+      'GREIGE / TAUPE 18mm':   {price:34.00, edge:1.10,  code:'GREIGE'},
+      'HDF 3mm biały':         {price: 9.00, edge:0.00,  code:'HDF'},
+    },
+    hdf:     {price:9.00,  label:'HDF 3mm (rynek śr.)'},
+    hdfSub:  {price:11.00, label:'HDF premium / SUB'},
+    cut18:   {price:3.50,  label:'Cięcie 18mm (rynek śr.)'},
+    cut3:    {price:3.50,  label:'Cięcie HDF 3mm'},
+    glue:    {price:3.50,  label:'Oklejanie obrzeża (1mb)'},
+    glue2:   {price:4.20,  label:'Oklejanie PCV grube (1mb)'},
+    pack:    {price:1.00,  label:'Pakowanie'},
+    // Akcesoria (rynek PL 2025)
+    zawias_blum:    {price:17.00, label:'Zawias Blum Clip Top Blumotion (szt.)'},
+    szuflada_antaro:{price:210.00,label:'Szuflada Blum Tandembox Antaro 500mm (kpl.)'},
+    szuflada_std:   {price:80.00, label:'Szuflada standardowa 500mm (kpl.)'},
+    front_pcv_m2:   {price:145.00,label:'Front PCV foliowany śr. (m²)'},
+    front_mdf_m2:   {price:260.00,label:'Front MDF lakierowany śr. (m²)'},
+  };
+  // Use majority matCorpus from project modules, fallback to global setting
+  const _modBoards = project.map(m=>m.matCorpus).filter(Boolean);
+  const selBoard = (_modBoards.length ? _modBoards.sort((a,b)=>_modBoards.filter(v=>v===b).length-_modBoards.filter(v=>v===a).length)[0] : null) || localStorage.getItem('kosztorys_board') || 'BIAŁY W960 18mm';
+  const selBoard3 = localStorage.getItem('kosztorys_board3') || 'hdf';
+  const markup = parseFloat(localStorage.getItem('kosztorys_markup')||'0');
+  const laborH = parseFloat(localStorage.getItem('kosztorys_labor')||'0');
+
+  const boardInfo = WMF.boards[selBoard] || WMF.boards['BIAŁY 18mm (standard)'] || {price:27,edge:1.00};
+  const p18 = boardInfo.price;
+  const pe  = boardInfo.edge;
+  const p3  = selBoard3==='hdfSub' ? WMF.hdfSub.price : WMF.hdf.price;
+
+  // cuts = total parts count (each part = 1 cut)
+  let totalCuts18 = 0, totalCuts3 = 0;
+  project.forEach(cfg=>{
+    try{
+      const d = generateModuleData(cfg);
+      totalCuts18 += (d.parts||[]).filter(p=>p.t===18||p.t===16).length;
+      totalCuts3  += (d.parts||[]).filter(p=>p.t===3).length;
+    }catch(e){}
+  });
+
+  const costBoard18 = totalM2_18 * p18;
+  const costBoard3  = totalM2_3  * p3;
+  const costEdge    = totalEdge  * pe;
+  const costCut18   = totalCuts18 * WMF.cut18.price;
+  const costCut3    = totalCuts3  * WMF.cut3.price;
+  const costGlue    = totalEdge   * WMF.glue.price;
+  // Akcesoria: policz zawiasy i szuflady na podstawie modułów
+  let totalHinges = 0, totalDrawers = 0, totalDrawersStd = 0;
+  project.forEach(cfg=>{
+    try{
+      const d = generateModuleData(cfg);
+      // zawiasy: ~2 na drzwi, hingeQty z cfg lub szacunek
+      const h = parseInt(cfg.hingeQty||0) || ((d.parts||[]).filter(p=>p.r==='front').length * 2);
+      totalHinges += h;
+      // szuflady: policz z config
+      if(cfg.config==='Szuflady'){
+        const drawerRows = parseInt(cfg.rows||cfg.drawerQty||3);
+        const isBlum = (cfg.system||'').toLowerCase().includes('antaro')||(cfg.system||'').toLowerCase().includes('tandembox')||(cfg.system||'').toLowerCase().includes('legrabox')||(cfg.system||'').toLowerCase().includes('merivobox');
+        if(isBlum) totalDrawers += drawerRows;
+        else totalDrawersStd += drawerRows;
+      }
+    }catch(e){}
+  });
+  const useBlumHinges = (localStorage.getItem('okucia_zawias')||'blum') === 'blum';
+  const zawias_price = useBlumHinges ? WMF.zawias_blum.price : 8.00;
+  const costHinges   = totalHinges * zawias_price;
+  const costDrawers  = totalDrawers * WMF.szuflada_antaro.price + totalDrawersStd * WMF.szuflada_std.price;
+  const costOkucia   = costHinges + costDrawers;
+
+  const costMat     = costBoard18 + costBoard3 + costEdge + costCut18 + costCut3 + costGlue;
+  const costMarkup  = (costMat + costOkucia) * markup / 100;
+  const costLabor   = laborH;
+  const totalCost   = costMat + costOkucia + costMarkup + costLabor;
+  const p18_legacy  = p18; // for old totalCost references
 
   /* ── klient ── */
   const fc=project[0]||{};
@@ -3163,62 +3601,132 @@ function showProject(){
       ${tagLabel[tag]} &nbsp;<span style="font-weight:400;opacity:.6;">(${byTag[tag].length})</span>
     </div>`;
     byTag[tag].forEach(({cfg,i})=>{
-      modList+=`<div style="display:flex;align-items:center;justify-content:space-between;
-        padding:6px 8px;border-radius:6px;border:1px solid var(--border);margin-bottom:5px;
-        background:var(--surface2);">
-        <div style="font-size:.78rem;font-family:'JetBrains Mono',monospace;flex:1;min-width:0;">
+      modList+=`<div onclick="if(confirm('\u0412\u0438\u0434\u0430\u043b\u0438\u0442\u0438: ${cfg.type} ${cfg.width}\xd7${cfg.height}\xd7${cfg.depth}?'))removeModule(${i})"
+        style="display:flex;align-items:center;justify-content:space-between;
+        padding:8px 12px;border-radius:8px;border:1px solid var(--border);margin-bottom:5px;
+        background:var(--surface2);cursor:pointer;"
+        onmouseenter="this.style.borderColor='rgba(231,76,60,.5)';this.style.background='rgba(231,76,60,.08)'"
+        onmouseleave="this.style.borderColor='';this.style.background='var(--surface2)'">
+        <div style="font-size:.78rem;font-family:'JetBrains Mono',monospace;flex:1;min-width:0;pointer-events:none;">
           <span style="color:var(--muted);font-size:.65rem;">${i+1}.</span>
           <strong style="color:var(--text);">${cfg.type}</strong>
           <span style="color:var(--text2);"> ${cfg.width}\xd7${cfg.height}\xd7${cfg.depth}</span>
+          ${cfg.matCorpus?'<span style="color:var(--muted);font-size:.65rem;"> · '+cfg.matCorpus+(cfg.matFront&&cfg.matFront!=="none"?' / '+cfg.matFront:'')+'</span>':''}
           ${cfg.note?'<span style="color:var(--muted);font-size:.7rem;display:block;margin-top:2px;">\u2014 '+cfg.note+'</span>':''}
         </div>
-        <button onclick="removeModule(${i})"
-          style="flex-shrink:0;margin-left:8px;padding:4px 10px;background:var(--danger);
-          border:none;border-radius:5px;color:#fff;font-size:.75rem;cursor:pointer;font-weight:700;">
-          \u2715
-        </button>
+        <span style="color:rgba(231,76,60,.5);font-size:1rem;margin-left:10px;pointer-events:none;">\u2715</span>
       </div>`;
     });
   });
 
-  /* ── kalkulator cen ── */
-  const priceCard=`<div style="margin-top:16px;padding:14px;background:var(--bg);border:1px solid var(--border);border-radius:8px;">
-    <div style="font-size:.75rem;font-weight:700;letter-spacing:.1em;color:var(--accent);margin-bottom:10px;">\ud83d\udcb0 KALKULATOR CEN MATERIA\u0141\u00d3W</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px;">
-      <div><div style="font-size:.6rem;color:var(--muted);">P\u0142yta 18mm (z\u0142/m\u00b2)</div>
-        <input type="number" id="inp_p18" value="${p18||''}" placeholder="np. 85"
-          oninput="localStorage.setItem('price_18',this.value);showProject();"
-          style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;"></div>
-      <div><div style="font-size:.6rem;color:var(--muted);">HDF 3mm (z\u0142/m\u00b2)</div>
-        <input type="number" id="inp_p3" value="${p3||''}" placeholder="np. 18"
-          oninput="localStorage.setItem('price_3',this.value);showProject();"
-          style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;"></div>
-      <div><div style="font-size:.6rem;color:var(--muted);">Kraw\u0119d\u017c (z\u0142/mb)</div>
-        <input type="number" id="inp_pe" value="${pe||''}" placeholder="np. 4"
-          oninput="localStorage.setItem('price_e',this.value);showProject();"
-          style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;"></div>
+  /* ── KOSZTORYS WM-Format ── */
+  const boardOptions = Object.keys(WMF.boards).map(k=>
+    `<option value="${k}" ${k===selBoard?'selected':''}>${k} — ${WMF.boards[k].price.toFixed(2)} zł/m²</option>`
+  ).join('');
+
+  const rowStyle = (v)=> parseFloat(v)>0 ? 'color:var(--accent)' : 'color:var(--muted)';
+  const rows = [
+    ['🪵 Płyta 18mm',        totalM2_18.toFixed(3)+' m²', p18.toFixed(2), costBoard18.toFixed(2)],
+    ['📋 HDF/SUB 3mm',       totalM2_3.toFixed(3)+' m²',  p3.toFixed(2),  costBoard3.toFixed(2)],
+    ['〰 Obrzeże ABS',        totalEdge.toFixed(1)+' mb',   pe.toFixed(2),  costEdge.toFixed(2)],
+    ['✂ Cięcie 18mm',        totalCuts18+' szt',           WMF.cut18.price.toFixed(2), costCut18.toFixed(2)],
+    ['✂ Cięcie HDF',         totalCuts3+' szt',            WMF.cut3.price.toFixed(2),  costCut3.toFixed(2)],
+    ['🔲 Oklejanie obrzeża',  totalEdge.toFixed(1)+' mb',   WMF.glue.price.toFixed(2),  costGlue.toFixed(2)],
+  ].map(([n,q,u,v])=>`<tr>
+    <td style="padding:5px 8px;font-size:.75rem;">${n}</td>
+    <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--text2);">${q}</td>
+    <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:.73rem;text-align:right;color:var(--muted);">${u}</td>
+    <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;text-align:right;font-weight:700;${rowStyle(v)}">${v} zł</td>
+  </tr>`).join('');
+
+  // Okucia rows (only if > 0)
+  const okuciaRows = [
+    totalHinges > 0 ? ['🔩 Zawiasy Blum/std',   totalHinges+' szt', zawias_price.toFixed(2), costHinges.toFixed(2)] : null,
+    totalDrawers > 0 ? ['🗂 Szuflady Antaro 500', totalDrawers+' kpl', WMF.szuflada_antaro.price.toFixed(2), costDrawers.toFixed(2)] : null,
+    totalDrawersStd > 0 ? ['🗂 Szuflady std',     totalDrawersStd+' kpl', WMF.szuflada_std.price.toFixed(2), (totalDrawersStd*WMF.szuflada_std.price).toFixed(2)] : null,
+  ].filter(Boolean).map(([n,q,u,v])=>`<tr style="background:rgba(180,140,60,.06)">
+    <td style="padding:5px 8px;font-size:.75rem;">${n}</td>
+    <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:.73rem;color:var(--text2);">${q}</td>
+    <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:.73rem;text-align:right;color:var(--muted);">${u}</td>
+    <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-size:.78rem;text-align:right;font-weight:700;color:var(--accent);">${v} zł</td>
+  </tr>`).join('');
+
+  const priceCard=`<div style="margin-top:16px;padding:0;background:var(--bg);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+    <div style="padding:10px 14px;background:rgba(200,152,64,.1);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
+      <div style="font-size:.75rem;font-weight:800;letter-spacing:.1em;color:var(--accent);">💰 KOSZTORYS (rynek PL 2025/2026)</div>
+      <div style="font-size:.6rem;color:var(--muted);">ceny netto · płyty: hurtownia śr. · okucia: Blum 2025</div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;font-family:'JetBrains Mono',monospace;font-size:.75rem;">
-      <div style="background:var(--surface2);padding:8px;border-radius:6px;">
-        <div style="color:var(--muted);font-size:.6rem;">P\u0142yta 18mm</div>
-        <strong>${totalM2_18.toFixed(2)} m\u00b2</strong>
-        ${p18?'<div style="color:var(--accent);">'+( totalM2_18*p18).toFixed(2)+' z\u0142</div>':''}
+
+    <!-- wybór płyty -->
+    <div style="padding:10px 14px;border-bottom:1px solid var(--border);">
+      <div style="font-size:.62rem;color:var(--muted);margin-bottom:4px;letter-spacing:.08em;text-transform:uppercase;">Płyta korpusowa 18mm</div>
+      <select id="selBoard" onchange="localStorage.setItem('kosztorys_board',this.value);showProject();"
+        style="width:100%;padding:7px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.78rem;">
+        ${boardOptions}
+      </select>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">
+        <div>
+          <div style="font-size:.6rem;color:var(--muted);margin-bottom:3px;">Płyta HDF/SUB (tył)</div>
+          <select id="selBoard3" onchange="localStorage.setItem('kosztorys_board3',this.value);showProject();"
+            style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.75rem;">
+            <option value="hdf" ${selBoard3==='hdf'?'selected':''}>HDF 3mm śr. rynek — 9,00 zł/m²</option>
+            <option value="hdfSub" ${selBoard3==='hdfSub'?'selected':''}>HDF premium/SUB — 11,00 zł/m²</option>
+          </select>
+        </div>
+        <div>
+          <div style="font-size:.6rem;color:var(--muted);margin-bottom:3px;">Narzut marży (%)</div>
+          <input type="number" id="inp_markup" value="${markup||''}" placeholder="np. 30" min="0" max="200"
+            oninput="localStorage.setItem('kosztorys_markup',this.value);showProject();"
+            style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;">
+        </div>
       </div>
-      <div style="background:var(--surface2);padding:8px;border-radius:6px;">
-        <div style="color:var(--muted);font-size:.6rem;">HDF 3mm</div>
-        <strong>${totalM2_3.toFixed(2)} m\u00b2</strong>
-        ${p3?'<div style="color:var(--accent);">'+( totalM2_3*p3).toFixed(2)+' z\u0142</div>':''}
-      </div>
-      <div style="background:var(--surface2);padding:8px;border-radius:6px;">
-        <div style="color:var(--muted);font-size:.6rem;">Kraw\u0119d\u017c (est.)</div>
-        <strong>${totalEdge.toFixed(1)} mb</strong>
-        ${pe?'<div style="color:var(--accent);">'+( totalEdge*pe).toFixed(2)+' z\u0142</div>':''}
+      <div style="margin-top:6px;">
+        <div style="font-size:.6rem;color:var(--muted);margin-bottom:3px;">Robocizna (zł, wpisz ręcznie)</div>
+        <input type="number" id="inp_labor" value="${laborH||''}" placeholder="np. 800"
+          oninput="localStorage.setItem('kosztorys_labor',this.value);showProject();"
+          style="width:100%;padding:6px 8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.85rem;">
       </div>
     </div>
-    ${totalCost>0?`<div style="margin-top:10px;padding:10px 14px;background:var(--accent);border-radius:8px;text-align:center;">
-      <div style="font-size:.65rem;color:rgba(255,255,255,.7);letter-spacing:.1em;">SUMA MATERIA\u0141U</div>
-      <div style="font-size:1.3rem;font-weight:900;color:#fff;font-family:'Barlow Condensed',sans-serif;">${totalCost.toFixed(2)} z\u0142</div>
-    </div>`:''}
+
+    <!-- tabela kosztów -->
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="background:rgba(255,255,255,.04);">
+        <th style="padding:6px 8px;font-size:.6rem;color:var(--muted);text-align:left;letter-spacing:.08em;text-transform:uppercase;">Pozycja</th>
+        <th style="padding:6px 8px;font-size:.6rem;color:var(--muted);text-align:left;">Ilość</th>
+        <th style="padding:6px 8px;font-size:.6rem;color:var(--muted);text-align:right;">Cena</th>
+        <th style="padding:6px 8px;font-size:.6rem;color:var(--muted);text-align:right;">Wartość</th>
+      </tr></thead>
+      <tbody>${rows}${okuciaRows}</tbody>
+      <tfoot>
+        <tr style="border-top:1px solid var(--border);">
+          <td colspan="3" style="padding:7px 8px;font-size:.72rem;color:var(--muted);">🪵 Materiały razem</td>
+          <td style="padding:7px 8px;font-family:'JetBrains Mono',monospace;font-weight:900;text-align:right;color:var(--text);">${costMat.toFixed(2)} zł</td>
+        </tr>
+        ${costOkucia>0?`<tr style="border-top:1px dashed rgba(200,152,64,.3);">
+          <td colspan="3" style="padding:7px 8px;font-size:.72rem;color:var(--muted);">🔩 Akcesoria (zawiasy/szuflady)</td>
+          <td style="padding:7px 8px;font-family:'JetBrains Mono',monospace;font-weight:900;text-align:right;color:var(--text);">${costOkucia.toFixed(2)} zł</td>
+        </tr>`:''}
+        ${markup>0?`<tr style="border-top:1px dashed rgba(200,152,64,.3);">
+          <td colspan="3" style="padding:5px 8px;font-size:.72rem;color:var(--muted);">Narzut ${markup}%</td>
+          <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-weight:700;text-align:right;color:var(--accent2);">+${costMarkup.toFixed(2)} zł</td>
+        </tr>`:''}
+        ${laborH>0?`<tr>
+          <td colspan="3" style="padding:5px 8px;font-size:.72rem;color:var(--muted);">Robocizna</td>
+          <td style="padding:5px 8px;font-family:'JetBrains Mono',monospace;font-weight:700;text-align:right;color:var(--accent2);">+${laborH.toFixed(2)} zł</td>
+        </tr>`:''}
+      </tfoot>
+    </table>
+
+    <!-- suma -->
+    <div style="padding:12px 14px;background:rgba(200,152,64,.12);border-top:2px solid var(--accent);">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <div style="font-size:.62rem;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;">ŁĄCZNA WYCENA NETTO</div>
+          <div style="font-size:.6rem;color:var(--muted);">Obrzeże: ${boardInfo.edge.toFixed(2)} zł/mb · Cięcie: ${WMF.cut18.price.toFixed(2)} zł/szt</div>
+        </div>
+        <div style="font-size:1.6rem;font-weight:900;color:var(--accent);font-family:'Barlow Condensed',sans-serif;">${totalCost.toFixed(2)} zł</div>
+      </div>
+    </div>
   </div>`;
 
   /* ── BOM tabela ── */
@@ -3252,6 +3760,7 @@ function showProject(){
 
   /* ── render ── */
   const out=`<div class="result-card">
+    <div onclick="closeAllPanels();window.scrollTo({top:0,behavior:'smooth'});" style="display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:14px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.35);border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.1em;color:#e74c3c;"><span style="font-size:1.1rem;">✕</span> ЗАКРИТИ / НАЗАД</div>
     <h2>\ud83d\udcca PROJEKT — ${project.length} modu\u0142\u00f3w</h2>
     ${clientHdr}
 
@@ -3307,7 +3816,7 @@ function showProject(){
   setTimeout(()=>pv.scrollIntoView({behavior:'smooth',block:'start'}),50);
 }
 
-function removeModule(idx){
+function removeModule(idx){ _historyPush();
   project.splice(idx,1);
   updateCounter();
   showProject();
@@ -3353,10 +3862,16 @@ function printProject(){
   const rg={};
   allRunners.forEach(r=>{if(!rg[r.length])rg[r.length]=0;rg[r.length]++;});
 
-  const p18=parseFloat(localStorage.getItem('price_18')||'0');
-  const p3=parseFloat(localStorage.getItem('price_3')||'0');
-  const pe=parseFloat(localStorage.getItem('price_e')||'0');
-  const totalCost=totalM2_18*p18+totalM2_3*p3+totalEdge*pe;
+  const _selBoard=localStorage.getItem('kosztorys_board')||'BIAŁY W960 18mm';
+  const _WMF_boards={'BIAŁY W960 18mm':24.20,'KASIMIR U702 ST9':32.80,'JESION H1225 ST12':42.32,'DĄB H2033 ST10':51.86,'BEŻ U220 ST9':42.75,'SZARY U963 ST9':42.75,'CZERWONY U335':52.64,'GRENOBY U241':45.30,'BIAŁY W960 16mm':20.34};
+  const _WMF_edges={'BIAŁY W960 18mm':0.80,'KASIMIR U702 ST9':1.34,'JESION H1225 ST12':1.91,'DĄB H2033 ST10':1.91,'BEŻ U220 ST9':1.14,'SZARY U963 ST9':1.14,'CZERWONY U335':1.40,'GRENOBY U241':1.14,'BIAŁY W960 16mm':0.80};
+  const p18=_WMF_boards[_selBoard]||24.20;
+  const p3=(localStorage.getItem('kosztorys_board3')==='hdfSub')?9.51:7.73;
+  const pe=_WMF_edges[_selBoard]||0.80;
+  const _markup=parseFloat(localStorage.getItem('kosztorys_markup')||'0');
+  const _labor=parseFloat(localStorage.getItem('kosztorys_labor')||'0');
+  const _costMat=totalM2_18*p18+totalM2_3*p3+totalEdge*pe+totalEdge*3.29;
+  const totalCost=_costMat*(1+_markup/100)+_labor;
 
   const fc=project[0]||{};
   const dateStr=new Date().toLocaleDateString('pl-PL');
@@ -3796,11 +4311,11 @@ function draw2D(cfg){
 
     // Prowadnice —        
     if(cfg.config==="Szuflady"){
-      const sysInfo=systemData[cfg.system];
-      const GAP=12;
-      // frontHeights[0]=dolny, frontHeights[qty-1]=gorny
-      const fhFromBottom=[...cfg.frontHeights]; // juz od dolu
-      let mark=2+golaOffset;
+      const sysInfo=systemData[cfg.system]||systemData['Antaro'];
+      if(!sysInfo) return;
+      const GAP=12; // від низу провідниці до низу наступної: frontH + 12
+      const fhFromBottom=[...cfg.frontHeights]; // od dolu
+      let mark=golaOffset; // P1 від 0
       const runnerYs=[]; // runnerYs[0]=dolny, ..., [qty-1]=gorny
       for(let i=0;i<cfg.qty;i++){
         runnerYs.push(mark);
@@ -3809,8 +4324,9 @@ function draw2D(cfg){
       // NIE odwracamy — i=0 = dolny pasuje do frontHeights[0]=dolny
 
       for(let i=0;i<cfg.qty;i++){
-        const frontH=(cfg.frontHeights&&cfg.frontHeights[i])?cfg.frontHeights[i]:Math.floor((cfg.height-golaOffset-4-((cfg.qty-1)*3))/cfg.qty);
-        const backH=sysInfo.types[cfg.drawerTypes[i]||'N'];
+        const frontH=(cfg.frontHeights&&cfg.frontHeights[i])?cfg.frontHeights[i]:Math.floor((cfg.height-golaOffset-2-((cfg.qty-1)*3))/cfg.qty);
+        const _dk=cfg.drawerTypes[i]||Object.keys(sysInfo.types)[0];
+        const backH=sysInfo.types[_dk]||68;
         const runnerBottom=runnerYs[i];
 
         // Dno szuflady (box)
@@ -3846,6 +4362,42 @@ function draw2D(cfg){
         ctx.font=`bold 9px 'JetBrains Mono',monospace`;
         ctx.textAlign='right';
         ctx.fillText(`${runnerBottom}`,lx-4,ry(runnerBottom)+3);
+
+        // Отвір кріплення провідниці: runnerBottom + drillY
+        const drillYsys = sysInfo.drillY || 37;
+        const holeY = runnerBottom + drillYsys;
+        const holeYpx = ry(holeY);
+
+        // Червона крапка на лінії провідниці (спереду і ззаду)
+        [rx(sysInfo.drillX||37), rx(cfg.runner-(sysInfo.drillX||37))].forEach(hx=>{
+          ctx.beginPath();
+          ctx.arc(hx, holeYpx, 4, 0, Math.PI*2);
+          ctx.fillStyle='rgba(220,50,50,0.25)';
+          ctx.fill();
+          ctx.strokeStyle='#e74c3c';
+          ctx.lineWidth=1.5;
+          ctx.stroke();
+        });
+
+        // Лінія від отвору до підпису праворуч
+        const rx2 = rx(cfg.runner) + 6;
+        ctx.strokeStyle='rgba(231,76,60,0.6)';
+        ctx.lineWidth=0.8;
+        ctx.setLineDash([2,2]);
+        ctx.beginPath();
+        ctx.moveTo(rx(cfg.runner-(sysInfo.drillX||37)), holeYpx);
+        ctx.lineTo(rx2+28, holeYpx);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Підпис: абсолютна висота від дна + "+drillY від низу пров."
+        ctx.fillStyle='#e74c3c';
+        ctx.font=`bold 9px 'JetBrains Mono',monospace`;
+        ctx.textAlign='left';
+        ctx.fillText(`${holeY}mm`,rx2+30, holeYpx+3);
+        ctx.fillStyle='rgba(231,76,60,0.6)';
+        ctx.font=`7px 'JetBrains Mono',monospace`;
+        ctx.fillText(`(+${drillYsys} від пров.)`,rx2+30, holeYpx+12);
       }
 
       ctx.fillStyle='rgba(79,193,247,0.6)';
@@ -4211,7 +4763,7 @@ function showTemplates(){
   const modal=document.createElement('div');
   modal.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
   modal.innerHTML=`<div style="background:var(--surface);border-radius:12px;padding:20px;max-width:380px;width:100%;max-height:80vh;overflow-y:auto;">
-    <h3 style="margin:0 0 14px;font-size:.9rem;letter-spacing:.1em;color:var(--accent);">\uD83D\uDCE6 SZABLONY KUCHNI</h3>
+    <div onclick="closeAllPanels();window.scrollTo({top:0,behavior:'smooth'});" style="display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:14px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.35);border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.1em;color:#e74c3c;"><span style="font-size:1.1rem;">✕</span> ЗАКРИТИ / НАЗАД</div><h3 style="margin:0 0 14px;font-size:.9rem;letter-spacing:.1em;color:var(--accent);">\uD83D\uDCE6 SZABLONY KUCHNI</h3>
     ${tpls.map((t,i)=>`<div onclick="loadTemplate(${i});document.body.removeChild(this.closest('[style*=fixed]'));"
       style="padding:12px;border:1px solid var(--border);border-radius:8px;margin-bottom:10px;cursor:pointer;">
       <div style="font-weight:700;font-size:.85rem;">${t.name}</div>
@@ -5036,6 +5588,7 @@ function drawDrillCanvas(holes, cfg){
   // Zawiasy, konfirmaty — ko\u0142ka
   holes.filter(h=>h.type!=='prowadnica').forEach(h=>{
     if(h.side!=='bok') return;
+    if(!h.color) return; // захист від undefined
     const cx2 = sx(h.x);
     const cy  = sy(h.y);
     const r   = Math.max(3, (h.diameter/2) * scale);
@@ -5274,7 +5827,7 @@ function checkCollisions(cfg, runners){
   // === KOLIZJA 6: Front szuflady za wysoki (suma) ===
   if(cfg.config==='Szuflady'){
     const golaOffset = cfg.type==='Dolna GOLA' ? 50 : 0;
-    const available = cfg.height - golaOffset - 4 - ((cfg.qty-1)*3);
+    const available = cfg.height - golaOffset - 2 - ((cfg.qty-1)*3);
     const sum = cfg.frontHeights.reduce((a,b)=>a+b,0);
     const diff = sum - available;
     if(diff > 0){
@@ -5402,12 +5955,107 @@ function toggleCat(catId){
   document.querySelectorAll('.cat-sub').forEach(s=>s.classList.remove('open'));
   document.querySelectorAll('.cat-arrow').forEach(a=>a.classList.remove('open'));
   document.querySelectorAll('.cat-card').forEach(c=>c.classList.remove('cat-open'));
+  // Remove any existing close buttons
+  document.querySelectorAll('.cat-close-btn').forEach(b=>b.remove());
   if(!isOpen){
     sub.classList.add('open');
     if(arr) arr.classList.add('open');
     if(card) card.classList.add('cat-open');
+    // Add close button at top of open list
+    var closeBtn = document.createElement('div');
+    closeBtn.className = 'cat-close-btn';
+    closeBtn.innerHTML = '✕ ЗАКРИТИ';
+    closeBtn.style.cssText = 'padding:10px 14px;text-align:center;font-family:Barlow Condensed,sans-serif;font-weight:800;font-size:.82rem;letter-spacing:.1em;color:#e74c3c;cursor:pointer;border-bottom:1px solid rgba(231,76,60,.2);background:rgba(231,76,60,.06);';
+    closeBtn.onclick = function(e){ e.stopPropagation(); toggleCat(catId); };
+    sub.insertBefore(closeBtn, sub.firstChild);
   }
 }
+
+// ── Material zone ──────────────────────────────
+// ── Ceny wg analizy rynku PL 2025/2026 (WM-Format + średnia rynkowa) ──
+const WMF_BOARDS = {
+  // ── Kolory jednorodne (segment standard) ──
+  'BIAŁY 18mm (standard)':    {price:27.00, edge:1.00, color:'#f5f5f0', hint:'np. W960, Kronospan'},
+  'BIAŁY 18mm (WM-Format)':   {price:24.20, edge:0.80, color:'#f0f0ec', hint:'WM-Format W960'},
+  'SZARY jasny 18mm':         {price:30.00, edge:1.10, color:'#c8ccd0', hint:'np. U963 / Kronospan'},
+  'ANTRACYT/CZARNY 18mm':     {price:35.00, edge:1.20, color:'#3a3a3a', hint:'np. U961/U999'},
+  'BEŻ / KREM 18mm':          {price:32.00, edge:1.10, color:'#e8d8b0', hint:'np. U220 ST9'},
+  'GREIGE / TAUPE 18mm':      {price:34.00, edge:1.10, color:'#c0b098', hint:''},
+  // ── Dekory drewniane ──
+  'DĄB jasny 18mm':           {price:38.00, edge:1.50, color:'#c4943a', hint:'np. Sonoma / H1334'},
+  'DĄB ciemny 18mm':          {price:44.00, edge:1.70, color:'#7d5a2a', hint:'np. H2033 ST10'},
+  'JESION / JESION wędz. 18mm':{price:42.00, edge:1.70, color:'#b8924a', hint:'np. H1225 ST12'},
+  'ORZECH 18mm':              {price:48.00, edge:1.80, color:'#6b4020', hint:'np. H3734/H3757'},
+  'BETON / KAMIEŃ 18mm':      {price:36.00, edge:1.30, color:'#909090', hint:'np. F186/F274'},
+  // ── WM-Format (z faktur) ──
+  'KASIMIR U702 ST9 (WMF)':   {price:32.80, edge:1.34, color:'#c4a882', hint:'WM-Format'},
+  'DĄB H2033 ST10 (WMF)':     {price:51.86, edge:1.91, color:'#7d5a2a', hint:'WM-Format'},
+  'CZERWONY U335 (WMF)':      {price:52.64, edge:1.40, color:'#c04040', hint:'WM-Format'},
+  // ── Inne grubości ──
+  'BIAŁY 16mm':               {price:22.00, edge:0.90, color:'#f5f5f0', hint:'tylne ścianki, półki'},
+  'HDF 3mm biały':            {price: 9.00, edge:0.00, color:'#f8f8f4', hint:'dno szuflad, tył'},
+};
+// ── Ceny frontów wg rynku PL 2025 (zł/m², VAT 8% lub 23%) ──
+const WMF_FRONTS = {
+  'none':              {label:'— jak korpus (bez frontu)', color:'', price:0},
+  // PCV foliowane (100–200 zł/m², śr. 145)
+  'PCV_BIALY':         {label:'PCV Biały gładki',          color:'#f0f0f0', price:130},
+  'PCV_MAT':           {label:'PCV Mat (soft-touch)',       color:'#e0e0d8', price:145},
+  'PCV_DECO_DAB':      {label:'PCV Dekor Dąb',             color:'#c4943a', price:155},
+  'PCV_DECO_BET':      {label:'PCV Dekor Beton',           color:'#909090', price:155},
+  'PCV_KOLOR':         {label:'PCV Kolor (RAL)',            color:'#4080c0', price:165},
+  // MDF lakierowane (220–320 zł/m², śr. 260)
+  'MDF_LAK_BIALY':     {label:'MDF Lakier Biały mat',      color:'#f8f8f8', price:240},
+  'MDF_LAK_POLYS':     {label:'MDF Lakier Biały połysk',   color:'#ffffff',  price:280},
+  'MDF_LAK_KOLOR_MAT': {label:'MDF Lakier Kolor mat',      color:'#4080c0', price:260},
+  'MDF_LAK_KOLOR_POL': {label:'MDF Lakier Kolor połysk',   color:'#3060a0', price:300},
+  // Akryl (280–400 zł/m²)
+  'AKRYL_BIALY':       {label:'Akryl Biały wysoki połysk', color:'#f0f8ff', price:320},
+  'AKRYL_KOLOR':       {label:'Akryl Kolor wysoki połysk', color:'#2060e0', price:360},
+  // Premium
+  'SZKLO':             {label:'Szkło / Aluminium',          color:'#a0c8e0', price:420},
+  'FORNIR':            {label:'Fornir naturalny',           color:'#9a7040', price:380},
+  'LAMINAT':           {label:'Laminat (jak korpus)',       color:'',        price:30},
+};
+
+function showMatZone(){
+  const z = document.getElementById('matZone');
+  if(!z) return;
+  z.style.display = 'block';
+  // restore saved values
+  const savedBoard = localStorage.getItem('mat_corpus') || localStorage.getItem('kosztorys_board') || 'BIAŁY W960 18mm';
+  const savedFront = localStorage.getItem('mat_front') || 'none';
+  const sc = document.getElementById('matCorpus');
+  const sf = document.getElementById('matFront');
+  if(sc) sc.value = savedBoard;
+  if(sf) sf.value = savedFront;
+  updateMatPreview();
+}
+
+function saveMat(){
+  const sc = document.getElementById('matCorpus');
+  const sf = document.getElementById('matFront');
+  if(sc){ localStorage.setItem('mat_corpus', sc.value); localStorage.setItem('kosztorys_board', sc.value); }
+  if(sf){ localStorage.setItem('mat_front',  sf.value); }
+  updateMatPreview();
+}
+
+function updateMatPreview(){
+  const sc = document.getElementById('matCorpus');
+  const sf = document.getElementById('matFront');
+  const prev = document.getElementById('matPreview');
+  if(!sc||!sf||!prev) return;
+  const board = WMF_BOARDS[sc.value] || WMF_BOARDS['BIAŁY W960 18mm'];
+  const front = WMF_FRONTS[sf.value] || WMF_FRONTS['none'];
+  prev.style.display = 'block';
+  const frontPriceStr = (sf.value!=='none' && front.price) ? ` · ${front.price} zł/m²` : '';
+  prev.innerHTML =
+    `<span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:${board.color};border:1px solid rgba(255,255,255,.2);margin-right:5px;vertical-align:middle;"></span>` +
+    `Korpus: <strong style="color:var(--text)">${sc.value.replace(' (WMF)','')}</strong> · <strong style="color:var(--gold)">${board.price.toFixed(2)} zł/m²</strong> · obrzeże ${board.edge.toFixed(2)} zł/mb` +
+    (board.hint ? ` <span style="opacity:.5">(${board.hint})</span>` : '') +
+    (sf.value!=='none' ? `<br><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:${front.color||board.color};border:1px solid rgba(255,255,255,.2);margin-right:5px;vertical-align:middle;margin-top:4px;"></span>Front: <strong style="color:var(--text)">${front.label}</strong><strong style="color:var(--gold)">${frontPriceStr}</strong>` : '');
+}
+// ────────────────────────────────────────────────
 
 function selectType(val, el){
   // Update hidden select
@@ -5425,6 +6073,8 @@ function selectType(val, el){
   // Update breadcrumb
   const bc = document.getElementById('breadcrumbType');
   if(bc) bc.textContent = val;
+  // Show material zone
+  showMatZone();
   // Trigger autoLogic
   autoLogic();
   // Stop propagation to parent cat-card
@@ -5739,6 +6389,11 @@ function draw3D(cfg){
 function toggleJsonPanel(){
   var p=document.getElementById('jsonPanel');
   var a=document.getElementById('jsonPanelArrow');
+  // init tabs on first open
+  if(p && p.style.display==='none' && !p._tabsInit){
+    p._tabsInit=true;
+    jsonSetMode('bom');
+  }
   if(p.style.display==='none'){
     p.style.display='block';
     if(a) a.innerHTML='&#9650;';
@@ -5797,7 +6452,7 @@ function buildJsonCheatSheets(c) {
 
   if (drawerFronts.length > 0 && H > 0) {
     var GAP = 12;
-    var mark = 2;
+    var mark = 0;
     html += '<div style="padding:10px 14px;border-top:2px solid #e67e22;background:linear-gradient(135deg,#fef9f0,#fff8ee);">';
     html += '<div style="font-size:.72rem;font-weight:800;color:#c0560a;letter-spacing:.1em;margin-bottom:8px;font-family:monospace;">📍 КООРДИНАТИ НАПРАВЛЯЮЧИХ</div>';
     html += '<table style="width:100%;border-collapse:collapse;font-size:.76rem;">';
@@ -5826,14 +6481,212 @@ function buildJsonCheatSheets(c) {
   return html;
 }
 
+// ── JSON Panel helpers ─────────────────────────────────────────
+
+function jsonSetMode(mode){
+  ['bom','project','prompt'].forEach(m=>{
+    const el = document.getElementById('jsonMode'+m.charAt(0).toUpperCase()+m.slice(1));
+    const tab = document.getElementById('jsonTab'+m.charAt(0).toUpperCase()+m.slice(1));
+    if(el) el.style.display = m===mode ? 'block' : 'none';
+    if(tab){
+      tab.style.background = m===mode ? (m==='bom'?'#1a5276':m==='project'?'#7d3c00':'#1a4a2e') : '#0d1117';
+      tab.style.borderColor = m===mode ? (m==='bom'?'#2e86c1':m==='project'?'#e67e22':'#2ecc71') : '#30363d';
+      tab.style.color = m===mode ? (m==='bom'?'#79c0ff':m==='project'?'#e67e22':'#2ecc71') : '#555';
+    }
+  });
+}
+
+function validateJson(ta, errId){
+  const el = document.getElementById(errId);
+  if(!el) return;
+  const raw = (ta.value||'').trim();
+  if(!raw){ el.innerHTML=''; ta.style.borderColor='#30363d'; return; }
+  try{
+    const parsed = JSON.parse(raw);
+    const arr = Array.isArray(parsed) ? parsed : (parsed.modules||parsed.projects||null);
+    if(!arr){ el.innerHTML='<span style="color:#f0ad4e">⚠ Oczekiwano tablicy [] lub {modules:[]}</span>'; ta.style.borderColor='#f0ad4e'; return; }
+    // Validate required fields
+    const missing = [];
+    arr.forEach((m,i)=>{
+      const id = m.code||m.type||('#'+i);
+      if(errId.includes('Project')){
+        if(!m.type && !m.name) missing.push(id+': brak type/name');
+        if(!m.width && !m.W) missing.push(id+': brak width/W');
+        if(!m.height && !m.H) missing.push(id+': brak height/H');
+      } else {
+        if(!m.H && !m.height) missing.push(id+': brak H');
+        if(!m.W && !m.width) missing.push(id+': brak W');
+        if(!m.parts && !m.sections) missing.push(id+': brak parts');
+      }
+    });
+    if(missing.length){
+      el.innerHTML='<span style="color:#f0ad4e">⚠ '+arr.length+' el. — brakujące pola: '+missing.slice(0,3).join(', ')+(missing.length>3?' +'+( missing.length-3)+' więcej':'')+'</span>';
+      ta.style.borderColor='#f0ad4e';
+    } else {
+      el.innerHTML='<span style="color:#2ecc71">✅ Poprawny JSON — '+arr.length+' elementów</span>';
+      ta.style.borderColor='#2ecc71';
+    }
+  } catch(e){
+    // Try to point to error location
+    const msg = e.message||'';
+    const pos = msg.match(/position (\d+)/);
+    let hint = '';
+    if(pos){
+      const idx = parseInt(pos[1]);
+      const before = raw.substring(Math.max(0,idx-20),idx);
+      const after = raw.substring(idx,Math.min(raw.length,idx+10));
+      hint = ' → …'+before+'<span style="background:#c0392b;color:#fff;padding:0 2px;">'+after.charAt(0)+'</span>'+after.slice(1);
+    }
+    el.innerHTML='<span style="color:#e74c3c">❌ Błąd JSON: '+msg+hint+'</span>';
+    ta.style.borderColor='#e74c3c';
+  }
+}
+
+function loadJsonToProject(){
+  const ta = document.getElementById('projektJsonProject');
+  const el = document.getElementById('projektResultProject');
+  const raw = (ta?.value||'').trim();
+  if(!raw){el.innerHTML='<div style="color:#e74c3c;font-size:.75rem;padding:6px;">⚠ Wklej JSON!</div>';return;}
+  let parsed;
+  try{ parsed=JSON.parse(raw); }
+  catch(e){el.innerHTML='<div style="color:#e74c3c;font-size:.75rem;padding:6px;">❌ Błąd JSON: '+e.message+'</div>';return;}
+  let mods = Array.isArray(parsed) ? parsed
+    : Array.isArray(parsed.modules) ? parsed.modules
+    : Array.isArray(parsed.projects) ? parsed.projects
+    : null;
+  if(!mods||!mods.length){el.innerHTML='<div style="color:#e74c3c;font-size:.75rem;padding:6px;">⚠ Nie znaleziono modułów</div>';return;}
+  // Preview
+  const prev = mods.slice(0,5).map((m,i)=>`${i+1}. ${m.type||m.name||m.code||'?'} ${m.width||m.W||'?'}×${m.height||m.H||'?'}×${m.depth||m.D||'?'}`).join('\n');
+  const hasK = !!(parsed.kosztorys);
+  if(!confirm('Załadować '+mods.length+' modułów'+(hasK?' + kosztorys':'')+' do projektu?\n\n'+prev+(mods.length>5?'\n...':'')+'\n\n⚠ Aktualne '+project.length+' modułów zostaną zastąpione.')){return;}
+  _historyPush();
+  _doImport(parsed, mods, 'JSON paste');
+  el.innerHTML='<div style="color:#2ecc71;font-size:.75rem;padding:6px 0;">✅ Załadowano '+mods.length+' modułów'+(hasK?' + kosztorys':'')+'</div>';
+  setTimeout(()=>{ const p=document.getElementById('result'); if(p) p.scrollIntoView({behavior:'smooth'}); },300);
+}
+
+function copyAiPrompt(type){
+  const preview = document.getElementById('aiPromptPreview');
+  const msg = document.getElementById('aiPromptCopyMsg');
+  let prompt = '';
+  if(type==='bom'){
+    prompt = `Wygeneruj JSON z listą części (BOM) do produkcji mebli kuchennych.
+
+Format odpowiedzi — TYLKO JSON, bez komentarzy, bez markdown:
+[
+  {
+    "code": "SD-01",
+    "name": "Szafka dolna",
+    "section": "Dolne",
+    "H": 720,
+    "W": 600,
+    "D": 560,
+    "parts": [
+      { "action": "Bok lewy",   "l": 672, "w": 560, "t": 18, "qty": 1, "note": "wieniec -48" },
+      { "action": "Bok prawy",  "l": 672, "w": 560, "t": 18, "qty": 1 },
+      { "action": "Wieniec górny", "l": 564, "w": 560, "t": 18, "qty": 1 },
+      { "action": "Dno",        "l": 564, "w": 560, "t": 18, "qty": 1 },
+      { "action": "Plecy HDF",  "l": 690, "w": 582, "t": 3,  "qty": 1 },
+      { "action": "Front",      "l": 693, "w": 596, "t": 18, "qty": 1 }
+    ]
+  }
+]
+
+Zasady:
+- H/W/D = wymiary zewnętrzne korpusu (mm)
+- Boki: l = H - 48 (dwa wieńce 18mm + 12mm nóżka)
+- Wieńce/Dno: l = W - 36 (2x bok 18mm)
+- Plecy HDF 3mm: lekko mniejsze od otworu
+- Każda część: l=długość, w=szerokość, t=grubość, qty=ilość`;
+  } else {
+    prompt = `Wygeneruj JSON z listą szafek do projektu kuchennego.
+
+Format odpowiedzi — TYLKO JSON, bez komentarzy:
+{
+  "client": "Kowalski Jan",
+  "projName": "Kuchnia 2026",
+  "modules": [
+    {
+      "type": "Dolna",
+      "width": 600,
+      "height": 720,
+      "depth": 560,
+      "config": "Drzwi",
+      "frontCount": 1,
+      "system": "Antaro",
+      "tag": "dolne",
+      "note": "szafka pod zlew"
+    },
+    {
+      "type": "Wisząca",
+      "width": 600,
+      "height": 720,
+      "depth": 320,
+      "config": "Drzwi",
+      "frontCount": 2,
+      "tag": "wiszace",
+      "note": ""
+    }
+  ]
+}
+
+Dostępne typy szafek:
+Dolna, Dolna GOLA, Pod zmywarkę, Wisząca, Wisząca z klapą, Pod okap,
+Słupek pod piekarnik, Słupek pełny, Narożna dolna L, Narożna górna,
+AGD pod piekarnik + szuflada, AGD pod mikrofalówkę + szuflada
+
+Standardowe wymiary:
+- Dolne: H=720, D=560
+- Wiszące: H=720, D=320  
+- Słupki: H=2100, D=560`;
+  }
+  preview.style.display='block';
+  preview.textContent=prompt;
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(prompt).then(()=>{
+      msg.style.display='block';
+      setTimeout(()=>msg.style.display='none',2500);
+    }).catch(()=>{ /* fallback */ });
+  } else {
+    // Fallback for Android
+    const ta=document.createElement('textarea');
+    ta.value=prompt; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy');
+    document.body.removeChild(ta);
+    msg.style.display='block';
+    setTimeout(()=>msg.style.display='none',2500);
+  }
+}
+
 function loadProjektJson(){
   var raw=(document.getElementById('projektJson')||{}).value||'';
   raw=raw.trim();
   var el=document.getElementById('projektResult');
   if(!raw){el.innerHTML='<div class="warn">Wklej JSON!</div>';return;}
   var corp;
-  try{corp=JSON.parse(raw);}catch(e){el.innerHTML='<div class="warn">Błąd JSON: '+e.message+'</div>';return;}
-  if(!Array.isArray(corp)||!corp.length){el.innerHTML='<div class="warn">JSON musi być tablicą []</div>';return;}
+  try{corp=JSON.parse(raw);}catch(e){
+    // Highlight error position
+    var msg=e.message||''; var pos=msg.match(/position (\d+)/);
+    var hint='';
+    if(pos){var idx=parseInt(pos[1]);hint=' (pozycja '+idx+': …'+raw.substring(Math.max(0,idx-15),idx+5)+'…)';}
+    el.innerHTML='<div style="color:#e74c3c;padding:8px;background:rgba(231,76,60,.1);border-radius:6px;font-size:.75rem;font-family:JetBrains Mono,monospace;">❌ Błąd JSON'+hint+'<br><small>'+msg+'</small></div>';
+    return;
+  }
+  if(corp && !Array.isArray(corp) && Array.isArray(corp.modules)) corp=corp.modules;
+  if(corp && !Array.isArray(corp) && Array.isArray(corp.projects)) corp=corp.projects;
+  if(!Array.isArray(corp)||!corp.length){el.innerHTML='<div style="color:#f0ad4e;padding:8px;font-size:.75rem;">⚠ JSON musi być tablicą [] lub {modules:[]}</div>';return;}
+  // Validate each module
+  var warns=[];
+  corp.forEach(function(m,i){
+    var id=(m.code||m.name||'#'+i);
+    if(!m.H&&!m.height) warns.push(id+': brak H');
+    if(!m.W&&!m.width)  warns.push(id+': brak W');
+    if(!m.parts&&!m.sections) warns.push(id+': brak parts');
+  });
+  if(warns.length){
+    el.innerHTML='<div style="color:#f0ad4e;padding:8px;background:rgba(240,173,78,.1);border-radius:6px;font-size:.72rem;font-family:JetBrains Mono,monospace;margin-bottom:8px;">⚠ '+warns.slice(0,5).join('<br>')+(warns.length>5?'<br>+'+( warns.length-5)+' więcej':'')+'</div>';
+    // Don't return — still load with warnings
+  }
   var SC={'Dolne':'#1F618D','Wiszące':'#AF6700','Słupki':'#1C2833','Garderoba':'#6C3483','Korytarz':'#0E6655','Regał':'#C0392B','Biurko':'#1E8449'};
   function sc(s){for(var k in SC){if((s||'').includes(k))return SC[k];}return '#1a5276';}
   function rc(a){var m={'Bok':'#E67E22','Boki':'#E67E22','Wieniec':'#27AE60','Dno':'#27AE60','Półka':'#2980B9','Półki':'#2980B9','Plecy':'#7F8C8D','Front':'#784212','Fronty':'#784212','Nóżki':'#8B4513','Wieszaki':'#8B4513','Prowadnice':'#8B4513','Kontrola':'#1A9260'};for(var k in m){if((a||'').includes(k))return m[k];}return '#555';}
@@ -5881,6 +6734,18 @@ function loadProjektJson(){
     '</div></div>';
   });
   el.innerHTML=h;
+  // inject close button at top
+  (function(){
+    var _pr=document.getElementById('projektResult');
+    if(_pr && !_pr.querySelector('.univ-close-btn')){
+      var _d=document.createElement('div');
+      _d.className='univ-close-btn';
+      _d.setAttribute('onclick',"closeAllPanels();window.scrollTo({top:0,behavior:'smooth'});");
+      _d.style.cssText="display:flex;align-items:center;gap:10px;padding:12px 14px;margin-bottom:14px;background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.35);border-radius:8px;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.1em;color:#e74c3c;";
+      _d.innerHTML='<span style=\"font-size:1.1rem;\">✕</span> ЗАКРИТИ / НАЗАД';
+      _pr.insertBefore(_d,_pr.firstChild);
+    }
+  })();
   document.getElementById('projektResult').scrollIntoView({behavior:'smooth',block:'start'});
 }
 
@@ -6169,7 +7034,25 @@ function loadRenderJson(){
   var corp;
   try{ corp = JSON.parse(raw); }
   catch(e){ errEl.textContent='⚠ Помилка JSON: '+e.message; errEl.style.display='block'; return; }
+  // Accept {modules:[]} from Export JSON
+  if(corp && !Array.isArray(corp) && Array.isArray(corp.modules)) corp=corp.modules;
   if(!Array.isArray(corp)||!corp.length){ errEl.textContent='⚠ JSON повинен бути масивом []'; errEl.style.display='block'; return; }
+
+  // Auto-convert project[] format (type/width/height) → render format
+  if(corp[0] && corp[0].type !== undefined && corp[0].width !== undefined){
+    var _tagSec={dolne:'Dolne',wiszace:'Wiszące',slupki:'Słupki',agd:'Słupki'};
+    corp=corp.map(function(m,idx){
+      var _parts=[];
+      try{_parts=generateModuleData(m).parts||[];}catch(e){}
+      return {
+        code:'M'+(idx<9?'0':'')+(idx+1),
+        name:m.type+(m.note?' · '+m.note.substring(0,40):''),
+        H:m.height, W:m.width, D:m.depth,
+        section:_tagSec[m.tag||'dolne']||'Dolne',
+        parts:_parts.map(function(p){return {action:p.name,l:p.w,w:p.h,t:p.t,qty:p.qty||1};})
+      };
+    });
+  }
 
   // convert JSON parts → MODULES format
   var MODULES = corp.map(function(c){
@@ -6253,7 +7136,9 @@ function buildRenderContent(MODULES){
   }
 
   function drawBox(svg,x,y,pw,ph,sec,code,hf,fc,isDr,sh,lbl){
-    var p=PAL[sec]||PAL.Dolne,g=svgEl('g',{},svg);
+    var _def={color:'#2e86c1',bg:'rgba(46,134,193,.1)',label:'#79c0ff'};
+    var p=PAL[sec]||PAL['Dolne']||_def;
+    var g=svgEl('g',{},svg);
     svgR(x+3,y+3,pw,ph,{fill:'rgba(0,0,0,.35)',rx:'2'},g);
     svgR(x,y,pw,ph,{fill:'rgba(14,16,26,1)',stroke:p.color,'stroke-width':'1.2',rx:'2'},g);
     svgR(x+2,y+2,pw-4,Math.min(ph*.04,5),{fill:'rgba(255,255,255,.05)',rx:'1'},g);
@@ -6397,14 +7282,14 @@ function buildRenderContent(MODULES){
       }
 
       if(mod.drawers>0){
-        var mark=2,GAP=12;
+        var mark=0,GAP=12;
         html+='<div class="rnd-sh-label" style="color:#e8b84a99;">📍 Координати направляючих</div>';
         html+='<table class="rnd-table"><thead><tr><th>Шухляда</th><th>▲ Низ напр.</th><th>H фронту</th></tr></thead><tbody>';
         for(var di=0;di<mod.drawers;di++){
           html+='<tr><td>Шух.'+(di+1)+'</td><td><span class="rnd-val-gold">'+mark+'</span> мм</td><td><span class="rnd-val-muted">'+mod.drawerH+'</span> мм</td></tr>';
           mark+=mod.drawerH+GAP;
         }
-        html+='</tbody></table><div class="rnd-info-tag">Зазор: 12 мм</div>';
+        html+='</tbody></table><div class="rnd-info-tag">Зазор між фронтами: 3 мм</div>';
       }
 
       if(!mod.shelves&&!mod.drawers){
@@ -6436,6 +7321,159 @@ function buildRenderContent(MODULES){
   document.getElementById('rndApp').innerHTML = html;
 }
 
+// ── UNDO history (до 10 станів) ─────────────────────────
+var _projectHistory = [];
+function _historyPush(){
+  try{ _projectHistory.push(JSON.stringify(project)); if(_projectHistory.length>10) _projectHistory.shift(); }catch(e){}
+  _updateUndoBtn();
+}
+function _historyUndo(){
+  if(!_projectHistory.length){showToast('⚠ Немає що скасувати','#f0ad4e','#7d6010');return;}
+  var prev=_projectHistory.pop();
+  try{ project=JSON.parse(prev); updateModuleCounter(); showProject(); showToast('↩ Скасовано — відновлено '+project.length+' модулів','#2ecc71','#1a4a2e'); }catch(e){}
+  _updateUndoBtn();
+}
+function _updateUndoBtn(){
+  var b=document.getElementById('btnUndo');
+  if(!b) return;
+  b.disabled=!_projectHistory.length;
+  b.style.opacity=_projectHistory.length?'1':'.35';
+  b.title=_projectHistory.length?'Скасувати ('+_projectHistory.length+' кроків)':'Немає що скасувати';
+}
+function showToast(msg, color, bg){
+  var t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:'+(bg||'#1a252f')+';border:1px solid '+(color||'#fff')+';color:'+(color||'#fff')+';padding:12px 22px;border-radius:8px;font-family:Barlow Condensed,sans-serif;font-weight:700;font-size:.95rem;z-index:9999;letter-spacing:.05em;box-shadow:0 4px 20px rgba(0,0,0,.5);white-space:nowrap;';
+  document.body.appendChild(t);
+  setTimeout(function(){t.style.transition='opacity .4s';t.style.opacity='0';setTimeout(function(){t.remove();},450);},2600);
+}
+
+// ── EXPORT ───────────────────────────────────────────────
+function exportProjectJSON(){
+  if(!project||!project.length){alert('Немає модулів для експорту');return;}
+  var clientEl=document.getElementById('clientName');
+  var projEl=document.getElementById('projectName');
+  var data={
+    client: clientEl?clientEl.value:'',
+    projName: projEl?projEl.value:'Projekt',
+    exported: new Date().toISOString(),
+    version: '3.3',
+    modules: project,
+    kosztorys: {
+      board:   localStorage.getItem('kosztorys_board')||'',
+      board3:  localStorage.getItem('kosztorys_board3')||'hdf',
+      markup:  localStorage.getItem('kosztorys_markup')||'0',
+      labor:   localStorage.getItem('kosztorys_labor')||'0',
+      mat_corpus: localStorage.getItem('mat_corpus')||'',
+      mat_front:  localStorage.getItem('mat_front')||'none',
+    }
+  };
+  var name='meble_'+(data.projName||'projekt').replace(/\s+/g,'_')+'_'+new Date().toISOString().slice(0,10)+'.json';
+  var blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name; a.click();
+  showToast('📤 Zbiorowy '+name,'#2ecc71','#1a4a2e');
+}
+
+// ── IMPORT — picker ───────────────────────────────────────
+function importProjectJSON(){
+  var input=document.getElementById('importJsonFile');
+  document.body.appendChild(input);
+  input.click();
+}
+
+// ── IMPORT — core (shared by file + paste "DO PROJEKTU") ──
+function _doImport(data, mods, source){
+  // Restore kosztorys settings if present
+  if(data.kosztorys){
+    var k=data.kosztorys;
+    if(k.board)   localStorage.setItem('kosztorys_board',   k.board);
+    if(k.board3)  localStorage.setItem('kosztorys_board3',  k.board3);
+    if(k.markup)  localStorage.setItem('kosztorys_markup',  k.markup);
+    if(k.labor)   localStorage.setItem('kosztorys_labor',   k.labor);
+    if(k.mat_corpus) localStorage.setItem('mat_corpus',     k.mat_corpus);
+    if(k.mat_front)  localStorage.setItem('mat_front',      k.mat_front);
+  }
+  // Auto-convert BOM→project if needed
+  mods=mods.map(function(m){
+    if(m.type) return m;
+    return {
+      type:m.name||m.code||'Dolna',
+      width:m.W||m.width||600, height:m.H||m.height||720, depth:m.D||m.depth||560,
+      config:m.config||'Drzwi', frontCount:m.frontCount||1,
+      system:m.system||'Antaro', note:m.note||m.code||'',
+      tag:m.section||m.tag||'dolne',
+      matCorpus:m.matCorpus||'', matFront:m.matFront||'none',
+    };
+  });
+  var cl=document.getElementById('clientName'); if(cl&&data.client) cl.value=data.client;
+  var pn=document.getElementById('projectName'); if(pn&&data.projName) pn.value=data.projName;
+  project=mods;
+  updateModuleCounter();
+  showProject();
+  showToast('✅ '+source+': '+mods.length+' modułów'+(data.kosztorys?' + kosztorys':''),'#2ecc71','#1a4a2e');
+}
+
+function handleImportJSON(input){
+  var file=input.files[0];
+  if(!file){input.value='';return;}
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var data=JSON.parse(e.target.result);
+      var mods=(data&&Array.isArray(data.modules))?data.modules
+              :(data&&Array.isArray(data.projects))?data.projects
+              :Array.isArray(data)?data:null;
+      if(!mods||!mods.length){
+        alert('⚠ JSON не містить модулів\n\nОчікується: {modules:[...]} або масив []');
+        input.value=''; return;
+      }
+      // Validate
+      var errs=[],warns=[];
+      mods.forEach(function(m,i){
+        var id=(m.code||m.type||m.name||'#'+i);
+        if(!m.type&&!m.name&&!m.code) errs.push(id+': brak type/name');
+        if((!m.width&&!m.W)&&(!m.height&&!m.H)) warns.push(id+': brak wymiarów');
+      });
+      if(errs.length){alert('❌ Błędy w JSON:\n'+errs.slice(0,5).join('\n'));input.value='';return;}
+      // Preview before confirm
+      var prevLines=mods.slice(0,5).map(function(m,i){
+        return (i+1)+'. '+(m.type||m.name||m.code||'?')+' '+(m.width||m.W||'?')+'×'+(m.height||m.H||'?')+'×'+(m.depth||m.D||'?');
+      }).join('\n');
+      var msg='📥 Завантажити '+mods.length+' модулів?\n'+(data.kosztorys?'+ кошторис буде відновлено\n':'')+
+              (warns.length?'\n⚠ '+warns.length+' попереджень\n':'')+
+              '\nПерші '+(Math.min(5,mods.length))+' модулів:\n'+prevLines+
+              (mods.length>5?'\n... ще '+(mods.length-5):'')+
+              '\n\n⚠ Поточний проєкт ('+project.length+' мод.) буде замінено.';
+      if(!confirm(msg)){input.value='';return;}
+      _historyPush();
+      _doImport(data, mods, 'Файл');
+    }catch(err){alert('⚠ Помилка читання JSON:\n'+err.message);}
+    input.value='';
+  };
+  reader.readAsText(file);
+}
+
 </script>
+  <!-- UNIVERSAL BACK BAR — видна при скролі вниз -->
+  <div id="universalBackBar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9998;padding:8px 12px 12px;background:rgba(15,20,35,.97);border-top:1px solid rgba(255,255,255,.1);display:none;">
+    <div style="display:grid;grid-template-columns:1fr auto;gap:8px;">
+      <button onclick="universalBack()"
+        style="padding:13px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px;color:#fff;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;letter-spacing:.1em;cursor:pointer;">
+        ⬆ ВГОРУ / НАЗАД
+      </button>
+      <button onclick="closeAllPanels()"
+        style="padding:13px 16px;background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);border-radius:8px;color:#e74c3c;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:.9rem;cursor:pointer;">
+        ✕
+      </button>
+    </div>
+  </div>
+
+  <!-- FIXED CLOSE BAR — для інструментів -->
+  <div id="fixedCloseBar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;padding:8px 12px 12px;background:rgba(15,20,35,.97);border-top:2px solid rgba(231,76,60,.5);">
+    <button onclick="toggleToolsPanel()"
+      style="width:100%;padding:13px;background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);border-radius:8px;color:#e74c3c;font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:.9rem;letter-spacing:.14em;cursor:pointer;">
+      ✕ ЗАКРИТИ ІНСТРУМЕНТИ
+    </button>
+  </div>
 </body>
 </html>
